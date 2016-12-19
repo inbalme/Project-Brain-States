@@ -12,7 +12,7 @@
 %% for opening workspace saved 
 clear all
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data
-cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
+% cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
 load ChAT_Files_v3
 peak_for_xls_mean=[]; 
 save_flag= 0;
