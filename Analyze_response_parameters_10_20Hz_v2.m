@@ -14,6 +14,7 @@
 clear all
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data
 exp_type=1; %1-NBES, 2-ChAT
+global exp_type
 save_flag= 0;
 print_flag=0;
 
@@ -112,7 +113,7 @@ plot_data_ff = (-1).*plot_data_var./plot_data_mean;
 % plot_data_CV(29910:35010,:,:)=nan;
 % 
 
-       trace_ind = [3,5,8]; %1:size(plot_data,2);  %trace_ind is the numbers of traces to be plotted
+       trace_ind = [2,4,5]; %1:size(plot_data,2);  %trace_ind is the numbers of traces to be plotted
        l=size(plot_data(:,trace_ind, x_value(1)),1);
         l=l/2-1;
         DC=20.*(0:length(trace_ind)-1);
