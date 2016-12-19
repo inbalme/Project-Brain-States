@@ -13,8 +13,8 @@
 %% for opening workspace saved 
 clear all
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data
-exp_type=1; %1-NBES, 2-ChAT
-global exp_type
+ global exp_type
+exp_type=2; %1-NBES, 2-ChAT
 save_flag= 0;
 print_flag=0;
 
@@ -105,13 +105,16 @@ plot_data=data_no_spikes{channel}; %data_no_spikes %raw_data %data_no_spike_no_D
 % end
 % end
 plot_data_mean = mean(plot_data,2);
-% plot_data_mean(29910:35010,:,:)=nan;
 plot_data_std =  std(data_no_spike_no_DC{channel},0,2);
 % plot_data_var=var(plot_data,0,2);
 plot_data_var=var(data_no_spike_no_DC{channel},0,2);
 plot_data_ff = (-1).*plot_data_var./plot_data_mean; 
-% plot_data_CV(29910:35010,:,:)=nan;
-% 
+    if exp_type==1;
+        plot_data(29910:35010,:,:)=nan;
+        plot_data_mean(29910:35010,:,:)=nan;
+        plot_data_std(29910:35010,:,:)=nan;
+        plot_data_CV(29910:35010,:,:)=nan;
+    end 
 
        trace_ind = [2,4,5]; %1:size(plot_data,2);  %trace_ind is the numbers of traces to be plotted
        l=size(plot_data(:,trace_ind, x_value(1)),1);
@@ -128,17 +131,16 @@ plot_data_ff = (-1).*plot_data_var./plot_data_mean;
         [Fig2,h2]= fn_Plot_Trace_v2(trace_to_plot, dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
          hline = findobj(gcf, 'type', 'line'); set(hline(1:end),'color',[0 0 1]);
         set(gca,'ylim',y1lim);
-%         [Fig3,h3]= fn_Plot_Trace_v2(plot_data_std(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
-%         ylabel('std [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
+%         [Fig3,h3]= fn_Plot_Trace_v2(plot_data_mean(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
+%         ylabel('mean Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
 % %         hline = findobj(gcf, 'type', 'line'); set(hline(13),'color',[0 0 0]);  set(hline(14),'color',[0 0 1]);
-%         [Fig4,h4] = fn_Plot_Trace_v2(plot_data_mean(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
-%         ylabel('mean Vm [mV]', 'FontSize', 16);          
-        [Fig5,h5]= fn_Plot_Trace_v2(plot_data_std(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});        
-%         [Fig5,h5]= fn_Plot_Trace_v2(plot_data_std(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
-        ylabel('std [mV]', 'FontSize', 16);  legend('NB-', 'NB+'); legend('boxoff','Location','northeast'); 
+%         [Fig4,h4] = fn_Plot_Trace_v2(plot_data_std(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
+%         ylabel('std Vm [mV]', 'FontSize', 16);          
+        [Fig5,h5]= fn_Plot_Trace_v2(plot_data_mean(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});        
+        ylabel('mean Vm [mV]', 'FontSize', 16);  legend('NB-', 'NB+'); legend('boxoff','Location','northeast'); 
 %         hline = findobj(gcf, 'type', 'line'); set(hline(13),'color',[0 0 0]);  set(hline(14),'color',[0 0 1]);
-        [Fig6,h6] = fn_Plot_Trace_v2(plot_data_mean(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
-        ylabel('mean Vm [mV]', 'FontSize', 16);  legend('NB-', 'NB+'); legend('boxoff','Location','northeast');
+        [Fig6,h6] = fn_Plot_Trace_v2(plot_data_std(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
+        ylabel('std Vm [mV]', 'FontSize', 16);  legend('NB-', 'NB+'); legend('boxoff','Location','northeast');
 %         [Fig9,h9]= fn_Plot_Trace_v2(plot_data_var(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
 %         ylabel('Variance [mV^2]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
 % 
@@ -445,6 +447,7 @@ SNR2=(Amplitude_signal/Amplitude_noise2)^2;
                     mean_peak_half_peak_fall{x_value}(stim_num,1)=nan;
                     mean_peak_half_peak_width{x_value}(stim_num)=nan;
                 end
+           end
  % parameters from single traces:               
                 %try keti's way of finding max response in single traces.
 %                loop on all traces, findpeaks on smoothed data without spikes
@@ -629,9 +632,8 @@ peaks(fileind).F1(:,x_value)=F1(1,t);
             peak_baseline_global_VAR_time{x_value}(fileind,stim_num)=peaks(fileind).baseline_global_VAR_time(x_value);
            
          end
-           end              
 end
-close all
+% close all
 clear data_no_spike_no_DC
     end %end of files loop
  
@@ -2468,7 +2470,13 @@ hold off
        
         %% save figures
 if save_flag==1
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\10_20Hz'
+    switch exp_type
+        case 1
+            cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\10_20Hz'
+        case 2
+            cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary'
+    end
+           
 % saveas(h1,'Train Amplitude Local.fig') 
 % print(h1,'Train Amplitude Local','-dpng','-r600','-opengl')
 saveas(h2,'Train Amplitude Local.fig') 
@@ -2532,6 +2540,11 @@ end
 % % cd 'd:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations';
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
 % print (6, '-deps', filename)
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\10_20Hz'
+switch exp_type
+        case 1
+            cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data'
+        case 2
+            cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016'
+    end
 filename='response_parameters'; 
 save(filename, 'files_to_analyze', 'peaks', 'peaks_stat','VmSTD_stat','VmM_stat','amp_stat')

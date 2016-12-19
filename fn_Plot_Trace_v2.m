@@ -13,7 +13,9 @@ global exp_type
 % cd 'D:\Inbal M.Sc\MATLAB\Project Brain States'
 stim1_X(1)=stim1_X(1)-100;
 raw_data_no_ES=raw_data;
-raw_data_no_ES(stim1_X(1):stim1_X(2),:)=nan;
+if exp_type==1;
+    raw_data_no_ES(stim1_X(1):stim1_X(2),:)=nan;
+end
 max_time_axis = ceil(size(raw_data,1).*dt_data);
 max_data = max(max(raw_data_no_ES(floor(stim2_X(1,1).*dt_stim2./dt_data):end,:)));
 min_data = min(min(raw_data_no_ES(floor(stim2_X(1,1).*dt_stim2./dt_data):end,:)));
@@ -55,8 +57,8 @@ if ~iscell(lineProps), lineProps={lineProps}; end
     obj(i)=plot((1:size(raw_data,1)).*dt_data,raw_data_no_ES(:,i), lineProps{:});
     
 end
-
-if nargin>=4
+if exist stim1_X var
+% if nargin>=4
 patch_xdata=[stim1_X; flipud(stim1_X)];
 ylim_data=[get(gca,'ylim')]';
 yex=wextend('1D','sym',ylim_data,1);
@@ -70,12 +72,13 @@ switch exp_type
     case 2
 %         stim1_Y = ones(size(stim1_X)).*(max_data+five_percent); 
 %         line(stim1_X.*dt_stim1,stim1_Y,'LineWidth',6,'Color','b') 
-        line(stim1_X.*dt_stim1,ylim_data,'LineWidth',6,'Color','b')
+        line(stim1_X.*dt_stim1,[ylim_data(2);ylim_data(2)],'LineWidth',6,'Color','b')
 end
 set(gca,'linewidth',1.2)
 end
 
-if nargin>6
+if exist stim2_X var
+% if nargin>6
 %     stim2_Y = ones(size(stim2_X)).*(max_data+five_percent); 
 %     line(stim2_X.*dt_stim2,stim2_Y,'LineWidth',6,'Color','r')
 patch_xdata=[stim2_X; flipud(stim2_X)];
