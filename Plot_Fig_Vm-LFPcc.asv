@@ -1,0 +1,80 @@
+%% plotting a figure "VmLFPcc"
+
+close all
+clear all
+
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz'
+
+%opening saved figures:
+spont_trace_Off_f44 = open('Vm-LFP_spont_ES_Off_file_44.fig');    
+spont_trace_Off_f44_ax = get(gcf, 'children');
+spont_trace_Off_f44_pos = [0.08 , 0.86 , 0.35 , 0.1];
+spont_trace_Off_f44_pos_top = spont_trace_Off_f44_pos(1,2)+spont_trace_Off_f44_pos(1,4);
+
+spont_trace_On_f44 = open('Vm-LFP_spont_ES_On_file_44.fig');    
+spont_trace_On_f44_ax = get(gcf, 'children');
+spont_trace_On_f44_pos = [0.45 , 0.86 , 0.35 , 0.1];
+spont_trace_On_f44_pos_top = spont_trace_On_f44_pos(1,2)+spont_trace_On_f44_pos(1,4);
+
+spont_VmLFPcc_f44 = open('Vm-LFPcc_spont_file_44.fig');    
+spont_VmLFPcc_f44_ax = get(gcf, 'children');
+spont_VmLFPcc_f44_pos = [0.82 , 0.86 , 0.1 , 0.1];
+spont_VmLFPcc_f44_pos_top = spont_VmLFPcc_f44_pos(1,2)+spont_VmLFPcc_f44_pos(1,4);
+
+spont_trace_Off_f46 = open('Vm-LFP_spont_ES_Off_file_46.fig');    
+spont_trace_Off_f46_ax = get(gcf, 'children');
+spont_trace_Off_f46_pos = [0.08 , 0.7 , 0.35 , 0.1];
+spont_trace_Off_f46_pos_top = spont_trace_Off_f46_pos(1,2)+spont_trace_Off_f46_pos(1,4);
+
+spont_trace_On_f46 = open('Vm-LFP_spont_ES_On_file_46.fig');    
+spont_trace_On_f46_ax = get(gcf, 'children');
+spont_trace_On_f46_pos = [0.45 , 0.7 , 0.35 , 0.1];
+spont_trace_On_f46_pos_top = spont_trace_On_f46_pos(1,2)+spont_trace_On_f46_pos(1,4);
+
+spont_VmLFPcc_f46 = open('Vm-LFPcc_spont_file_46.fig');    
+spont_VmLFPcc_f46_ax = get(gcf, 'children');
+spont_VmLFPcc_f46_pos = [0.82 , 0.7 , 0.18 , 0.1];
+spont_VmLFPcc_f46_pos_top = spont_VmLFPcc_f46_pos(1,2)+spont_VmLFPcc_f46_pos(1,4);
+
+%open a new figure:
+F = figure;
+set(gcf,'color','w');
+set(gcf,'DefaultAxesFontSize',12);
+set(gcf,'DefaultAxesFontName','arial');
+set(gcf, 'PaperType', 'A4');
+set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 20 27]); %[left, bottom, width, height] 
+set(gcf,'PaperOrientation','portrait');
+set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
+% annotation('textbox', [freq_1_zoom1_pos(1,1) freq_1_zoom1_pos_top 0 0]+[-0.06 0.01 0.04 0.04],...
+%            'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A',...
+%            'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+% annotation('textbox', [freq_1_zoom2_pos(1,1) freq_1_zoom2_pos_top 0 0]+[-0.06 0.01 0.04 0.04],...
+%            'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B',...
+%            'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')    
+% annotation('textbox', [freq_2_zoom1_pos(1,1) freq_2_zoom1_pos_top 0 0]+[-0.06 0.01 0.04 0.04],...
+%            'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C',...
+%            'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')  
+
+       
+%Placing plots in the figure:
+spont_trace_Off_f44_ax_copy = copyobj(spont_trace_Off_f44_ax,F); % copy axes to new fig
+set(spont_trace_Off_f44_ax_copy(2,1),'position',spont_trace_Off_f44_pos(1,:)) % Set its position
+set(spont_trace_Off_f44_ax_copy(1,1),'position',spont_trace_Off_f44_pos(1,:)) % Set its position
+
+
+spont_trace_On_f44_ax_copy = copyobj(spont_trace_On_f44_ax,F); % copy axes to new fig
+set(spont_trace_On_f44_ax_copy(1),'position',spont_trace_On_f44_pos(1,:)) % Set its position
+
+spont_VmLFPcc_f44_ax_copy = copyobj(spont_VmLFPcc_f44_ax,F); % copy axes to new fig
+set(spont_VmLFPcc_f44_ax_copy(1),'position',spont_VmLFPcc_f44_pos(1,:)) % Set its position
+
+spont_trace_Off_f46_ax_copy = copyobj(spont_trace_Off_f46_ax,F); % copy axes to new fig
+set(spont_trace_Off_f46_ax_copy(1),'position',spont_trace_Off_f46_pos(1,:)) % Set its position
+
+spont_trace_On_f46_ax_copy = copyobj(spont_trace_On_f46_ax,F); % copy axes to new fig
+set(spont_trace_On_f46_ax_copy(1),'position',spont_trace_On_f46_pos(1,:)) % Set its position
+
+spont_VmLFPcc_f46_ax_copy = copyobj(spont_VmLFPcc_f46_ax,F); % copy axes to new fig
+set(spont_VmLFPcc_f46_ax_copy(1),'position',spont_VmLFPcc_f46_pos(1,:)) % Set its position
+
+print -depsc2 'Fig VmLFPcc'
