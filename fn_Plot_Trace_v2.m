@@ -8,35 +8,30 @@
 
 function [F,obj] = fn_Plot_Trace_v2(raw_data,dt_data, dt_stim1, stim1_X, dt_stim2, stim2_X, lineProps);
 
-global exp_type
+global exp_type 
 % cd 'C:\Users\inbalme\Dropbox\Inbal M.Sc\MATLAB\Project Brain States'
 % cd 'D:\Inbal M.Sc\MATLAB\Project Brain States'
-stim1_X(1)=stim1_X(1)-100;
-raw_data_no_ES=raw_data;
-if exp_type==1;
-    raw_data_no_ES(stim1_X(1):stim1_X(2),:)=nan;
-end
-max_time_axis = ceil(size(raw_data,1).*dt_data);
-max_data = max(max(raw_data_no_ES(floor(stim2_X(1,1).*dt_stim2./dt_data):end,:)));
-min_data = min(min(raw_data_no_ES(floor(stim2_X(1,1).*dt_stim2./dt_data):end,:)));
-five_percent = (max_data-min_data).*0.02;
-min_data_wide = min_data-2.*five_percent;
-max_data_wide = max_data+2.*five_percent;
-
- x1limits = [0 max_time_axis];
- x1ticks = [0 0.5.*max_time_axis max_time_axis];
- if abs(min_data_wide) < 1
-     min_data_wide = (floor(min_data_wide.*10))./10;
- else
-     min_data_wide = floor(min_data_wide);
- end
- if abs(max_data_wide) < 1 
-      max_data_wide = (ceil(max_data_wide.*10))./10;
- else
-      max_data_wide = ceil(max_data_wide);
- end
- y1limits = [min_data_wide max_data_wide]; %[-0.3 0.5]; [0.5 1.5]
- y1ticks =  [min_data_wide max_data_wide]; %[-0.3 0 0.5]; %y1limits; [0.5 1 1.5]
+% max_time_axis = ceil(size(raw_data,1).*dt_data);
+% max_data = max(max(raw_data(floor(stim2_X(1,1).*dt_stim2./dt_data):end,:)));
+% min_data = min(min(raw_data(floor(stim2_X(1,1).*dt_stim2./dt_data):end,:)));
+% five_percent = (max_data-min_data).*0.02;
+% min_data_wide = min_data-2.*five_percent;
+% max_data_wide = max_data+2.*five_percent;
+% 
+%  x1limits = [0 max_time_axis];
+%  x1ticks = [0 0.5.*max_time_axis max_time_axis];
+%  if abs(min_data_wide) < 1
+%      min_data_wide = (floor(min_data_wide.*10))./10;
+%  else
+%      min_data_wide = floor(min_data_wide);
+%  end
+%  if abs(max_data_wide) < 1 
+%       max_data_wide = (ceil(max_data_wide.*10))./10;
+%  else
+%       max_data_wide = ceil(max_data_wide);
+%  end
+%  y1limits = [min_data_wide max_data_wide]; %[-0.3 0.5]; [0.5 1.5]
+%  y1ticks =  [min_data_wide max_data_wide]; %[-0.3 0 0.5]; %y1limits; [0.5 1 1.5]
 
      color_table = [0 0 0; 0 0 1; 1 0 0; 0 1 0; 0 1 1; 1 0 1; 1 1 0];
      if size(raw_data,2) > size(color_table,1)
@@ -54,10 +49,10 @@ defaultProps={'LineWidth',1.2,'color', color_table(i,:)};
 if nargin<7, lineProps=defaultProps; end
 if isempty(lineProps), lineProps=defaultProps; end
 if ~iscell(lineProps), lineProps={lineProps}; end
-    obj(i)=plot((1:size(raw_data,1)).*dt_data,raw_data_no_ES(:,i), lineProps{:});
+    obj(i)=plot((1:size(raw_data,1)).*dt_data,raw_data(:,i), lineProps{:});
     
 end
-if exist stim1_X var
+if ~isempty(stim1_X)
 % if nargin>=4
 patch_xdata=[stim1_X; flipud(stim1_X)];
 ylim_data=[get(gca,'ylim')]';
@@ -77,7 +72,7 @@ end
 set(gca,'linewidth',1.2)
 end
 
-if exist stim2_X var
+if exist ('stim2_X', 'var')
 % if nargin>6
 %     stim2_Y = ones(size(stim2_X)).*(max_data+five_percent); 
 %     line(stim2_X.*dt_stim2,stim2_Y,'LineWidth',6,'Color','r')
@@ -90,6 +85,6 @@ patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
 patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt_stim2,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 set(gca,'linewidth',1.2)
-set(gca, 'xlim', x1limits, 'ylim', y1limits)%,'xtick', x1ticks
+% set(gca, 'xlim', x1limits, 'ylim', y1limits)%,'xtick', x1ticks
 end
 hold off

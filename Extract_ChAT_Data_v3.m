@@ -11,7 +11,7 @@ global Exp
 
 files = Get_ChAT_Files_v3();
 
-for fileind =[74]; 
+for fileind =80:87; 
     clearvars -except  files fileind Exp
 no_spikes_flag=1;
     fname = files(fileind).name;

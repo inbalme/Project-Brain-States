@@ -99,17 +99,17 @@ end
 x_value = 2:3;
 
 plot_data=data_no_spikes{channel}; %data_no_spikes %raw_data %data_no_spike_no_DC %data_no_DC
-% for i=1:length(x_value)
-% if ES_flag(x_value(i))==1
-% %     plot_data(29910:35010,:,x_value(i)) =nan; %Ignoring the ES artifact
-% end
-% end
 plot_data_mean = mean(plot_data,2);
 plot_data_std =  std(data_no_spike_no_DC{channel},0,2);
 % plot_data_var=var(plot_data,0,2);
 plot_data_var=var(data_no_spike_no_DC{channel},0,2);
 plot_data_ff = (-1).*plot_data_var./plot_data_mean; 
     if exp_type==1;
+        % for i=1:length(x_value)
+% if ES_flag(x_value(i))==1
+% %     plot_data(29910:35010,:,x_value(i)) =nan; %Ignoring the ES artifact
+% end
+% end
         plot_data(29910:35010,:,:)=nan;
         plot_data_mean(29910:35010,:,:)=nan;
         plot_data_std(29910:35010,:,:)=nan;
