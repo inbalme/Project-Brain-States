@@ -23,11 +23,13 @@ switch exp_type
         files_to_analyze =[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
+        legend_string={'NB+', 'NB-'};
 
     case 2
-        files_to_analyze =[74];
+        files_to_analyze =[75];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
+        legend_string={'Light On', 'Light Off'};
 end
         
 % for fileind=1;
@@ -57,7 +59,7 @@ end
 %                 
 %% low-pass filtering below 300Hz       
 lp=300;
-                for xx=2:3
+                for xx=1:3
     for trace= 1:size(data_no_spikes{channel},2)    
             jj=data_no_spikes{channel}(:,trace,xx);
             data_no_spikes{channel}(:,trace,xx)=bandPass_fft_IL_NEW2016(jj,dt,-1,lp,0,0); 
@@ -105,15 +107,14 @@ plot_data_std =  std(data_no_spike_no_DC{channel},0,2);
 plot_data_var=var(data_no_spike_no_DC{channel},0,2);
 plot_data_ff = (-1).*plot_data_var./plot_data_mean; 
     if exp_type==1;
-        % for i=1:length(x_value)
-% if ES_flag(x_value(i))==1
-% %     plot_data(29910:35010,:,x_value(i)) =nan; %Ignoring the ES artifact
-% end
-% end
-        plot_data(29910:35010,:,:)=nan;
-        plot_data_mean(29910:35010,:,:)=nan;
-        plot_data_std(29910:35010,:,:)=nan;
-        plot_data_CV(29910:35010,:,:)=nan;
+        for i=1:length(x_value)
+            if ES_flag(x_value(i))==1
+                plot_data(29910:35010,:,x_value(i)) =nan; %Ignoring the ES artifact
+                plot_data_mean(29910:35010,:,x_value(i)) =nan;
+                plot_data_std(29910:35010,:,x_value(i)) =nan;
+                plot_data_CV(29910:35010,:,x_value(i)) =nan;
+            end
+        end
     end 
 
        trace_ind = [2,4,5]; %1:size(plot_data,2);  %trace_ind is the numbers of traces to be plotted
@@ -123,12 +124,14 @@ plot_data_ff = (-1).*plot_data_var./plot_data_mean;
         DC=wextend('addrow', 'per', DC, l);
         trace_to_plot = plot_data(:,trace_ind, x_value(1))+DC ; %DC is added just to make space between the traces
         x2lim=[stim2_X{x_value(1)}(1,1).*dt-0.5,stim2_X{x_value(1)}(1,1).*dt+2];
-        
-        [Fig1,h1]= fn_Plot_Trace_v2(trace_to_plot, dt, dt, stim1_X{channel}, dt, stim2_X{x_value(1)});       
+        tmp1=[];
+        lineprops1={'LineWidth',1.2,'color', [0 0 0]};
+        [Fig1,h1]= fn_Plot_Trace_v2(trace_to_plot, dt, dt,tmp1 , dt, stim2_X{x_value(1)},lineprops1);       
         hline = findobj(gcf, 'type', 'line'); set(hline(1:end),'color',[0 0 0]);
         y1lim=[get(gca,'ylim')]';
         trace_to_plot = plot_data(:,trace_ind, x_value(2))+DC ;
-        [Fig2,h2]= fn_Plot_Trace_v2(trace_to_plot, dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
+        lineprops2={'LineWidth',1.2,'color', [0 0 1]};
+        [Fig2,h2]= fn_Plot_Trace_v2(trace_to_plot, dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)},lineprops2);
          hline = findobj(gcf, 'type', 'line'); set(hline(1:end),'color',[0 0 1]);
         set(gca,'ylim',y1lim);
 %         [Fig3,h3]= fn_Plot_Trace_v2(plot_data_mean(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
@@ -137,10 +140,10 @@ plot_data_ff = (-1).*plot_data_var./plot_data_mean;
 %         [Fig4,h4] = fn_Plot_Trace_v2(plot_data_std(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
 %         ylabel('std Vm [mV]', 'FontSize', 16);          
         [Fig5,h5]= fn_Plot_Trace_v2(plot_data_mean(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});        
-        ylabel('mean Vm [mV]', 'FontSize', 16);  legend('NB-', 'NB+'); legend('boxoff','Location','northeast'); 
+        ylabel('mean Vm [mV]', 'FontSize', 16);  legend(legend_string); legend('boxoff','Location','northeast'); 
 %         hline = findobj(gcf, 'type', 'line'); set(hline(13),'color',[0 0 0]);  set(hline(14),'color',[0 0 1]);
         [Fig6,h6] = fn_Plot_Trace_v2(plot_data_std(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
-        ylabel('std Vm [mV]', 'FontSize', 16);  legend('NB-', 'NB+'); legend('boxoff','Location','northeast');
+        ylabel('std Vm [mV]', 'FontSize', 16);  legend(legend_string); legend('boxoff','Location','northeast');
 %         [Fig9,h9]= fn_Plot_Trace_v2(plot_data_var(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
 %         ylabel('Variance [mV^2]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
 % 

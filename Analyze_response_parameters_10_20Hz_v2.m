@@ -59,7 +59,7 @@ end
 %                 
 %% low-pass filtering below 300Hz       
 lp=300;
-                for xx=2:3
+                for xx=1:3
     for trace= 1:size(data_no_spikes{channel},2)    
             jj=data_no_spikes{channel}(:,trace,xx);
             data_no_spikes{channel}(:,trace,xx)=bandPass_fft_IL_NEW2016(jj,dt,-1,lp,0,0); 
@@ -124,7 +124,7 @@ plot_data_ff = (-1).*plot_data_var./plot_data_mean;
         DC=wextend('addrow', 'per', DC, l);
         trace_to_plot = plot_data(:,trace_ind, x_value(1))+DC ; %DC is added just to make space between the traces
         x2lim=[stim2_X{x_value(1)}(1,1).*dt-0.5,stim2_X{x_value(1)}(1,1).*dt+2];
-        tmp1=[];
+        tmp1=[]; %spacer instead of stim1_X, so that the light stim. will not be plotted
         lineprops1={'LineWidth',1.2,'color', [0 0 0]};
         [Fig1,h1]= fn_Plot_Trace_v2(trace_to_plot, dt, dt,tmp1 , dt, stim2_X{x_value(1)},lineprops1);       
         hline = findobj(gcf, 'type', 'line'); set(hline(1:end),'color',[0 0 0]);
