@@ -6,7 +6,6 @@
 % Parameters:
 %   voltages - A row vector, describing the voltange in the cell over time.
 %   dt - the time step (in seconds).
-%edited on 20/12/2016 by Inbal Meir. added the variable 'spike_positions'
 
 function [code, result, spike_positions] = fn_RemoveSpikesMO2(voltages, dt)
     % RemoveSpikes2 does one direction, so we use it twice.

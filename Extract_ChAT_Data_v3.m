@@ -11,7 +11,7 @@ global Exp
 
 files = Get_ChAT_Files_v3();
 
-for fileind =80:87; 
+for fileind =75; 
     clearvars -except  files fileind Exp
 no_spikes_flag=1;
     fname = files(fileind).name;
@@ -308,7 +308,7 @@ end
                     %Removing spikes
                     if no_spikes_flag==1;
                         for traces=1:size(raw_data{1}(:,:,x_value),2)
-                            [code{1}(:,traces,x_value), data_no_spikes{1}(:,traces,x_value)] = fn_RemoveSpikesMO2(raw_data{1}(:,traces,x_value)', dt{1});
+                            [code{1}(:,traces,x_value), data_no_spikes{1}(:,traces,x_value), spike_positions{traces,x_value}(:,1)] = fn_RemoveSpikesMO2(raw_data{1}(:,traces,x_value)', dt{1});
                         end
                     end
                 end   
@@ -399,7 +399,7 @@ end
 %%
  name = files(fileind).extracted_name;
     cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
-    save( name, 'Param','laser_flag','color_table', 'data','raw_data','code', 'data_no_spikes','galvano_flag','stim1_X','stim2_X', 'stim2_time','time_axis')  % for specific parameter from Exp look at GetPatameters
+    save( name, 'Param','laser_flag','color_table', 'data','raw_data','code','spike_positions', 'data_no_spikes','galvano_flag','stim1_X','stim2_X', 'stim2_time','time_axis')  % for specific parameter from Exp look at GetPatameters
 
  
 end

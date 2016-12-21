@@ -26,7 +26,7 @@ switch exp_type
         legend_string={'NB+', 'NB-'};
 
     case 2
-        files_to_analyze =[87];
+        files_to_analyze =[75];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};
