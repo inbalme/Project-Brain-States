@@ -141,23 +141,14 @@ switch exp_type
     case 1
         rec3=rectangle('Position',[stim1_X{1}(1)*dt-500*dt,ylim_data(1),(stim1_X{1}(2)-stim1_X{1}(1))*dt,ylim_data(2)-ylim_data(1)],'faceColor',color_table(3,:),'edgecolor','none');
     case 2
-        sdf
+%         sdf
 end
         %plotting scale bar
-yline_start=ylim_data(1)-7; 
-yline_end=yline_start+10;
-xline_start=x_axis_short(1,1)*dt-0.5; xline_end=xline_start+1;
-xline=[xline_start xline_start;xline_end xline_start]; yline=[yline_start yline_start; yline_start yline_end];
-stringh=[num2str(xline(2,1)-xline(1,1)), ' Sec'];
-stringv=[num2str(yline(2,2)-yline(2,1)), ' mV'];
-hline_h(1)=line(xline(:,1),yline(1,:),'color',[0 0 0],'linewidth',2);
-hline_v(2)=line(xline(:,2),yline(:,2),'color',[0 0 0],'linewidth',2);
-htext_h=text(xline(1,1)+(xline(2,1)-xline(1,1))/2,yline(1,1),stringh,'HorizontalAlignment', 'center','VerticalAlignment', 'top','fontsize',scalebar_fontsize); %'color',[0 0 0]
-% htext_v=text(xline(1,1),yline(2,1)+(yline(2,2)-yline(2,1))/2,stringv,'HorizontalAlignment', 'center','VerticalAlignment', 'bottom', 'rotation',90,'fontsize',10);
-htext_v=text(xline(1,1),yline(2,1),stringv,'HorizontalAlignment', 'left','VerticalAlignment', 'bottom', 'rotation',90,'fontsize',scalebar_fontsize);
-hold off
-set(gca,'ylim',[yline_start-0.2, ylim_data(2)],'xlim',[xline_start-0.2, xlim_data(2)]);
-% ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
+horiz_vert=1;        lengthh=1;     textit='Seconds';     c=[0,0,0];  fonsizes=12;
+        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+        horiz_vert=0;        lengthh=10;     textit='Seconds';     c=[0,0,0];  fonsizes=12;
+        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
 %%
