@@ -58,8 +58,8 @@ if LPF_flag==1;
     end
 end
 % remove outlyers:
-if exp_type==1 && files_to_analyze(fileind)==16;
-    data_current{channel}(:,4,:)=[];
+if files_to_analyze(fileind)==16;
+    data_no_spikes{channel}(:,4,:)=[];
 end
                 % Subtract mean trace from data with or without spikes
                 meansubtract_start_time = 0; %[sec]
@@ -73,8 +73,8 @@ for x_value = 1:size(data.x_value,2)
                 meansubtract_end_sample = meansubtract_start_sample+meansubtract_duration.*sf{channel}-1;
                 meansubtract_interval = round(meansubtract_start_sample:meansubtract_end_sample);
                
-%                 data_no_spike_no_DC{channel}(:,:,x_value) = fn_Subtract_Mean(data_no_spikes{channel}(:,:,x_value),meansubtract_interval);
-                data_current_no_DC{channel}(:,:,x_value) = fn_Subtract_Mean(data_current{channel}(:,:,x_value),meansubtract_interval);    
+                data_no_spike_no_DC{channel}(:,:,x_value) = fn_Subtract_Mean(data_no_spikes{channel}(:,:,x_value),meansubtract_interval);
+%                 data_no_DC{channel}(:,:,x_value) = fn_Subtract_Mean(raw_data{channel}(:,:,x_value),meansubtract_interval);    
 end
     end
 
