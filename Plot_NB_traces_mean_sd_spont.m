@@ -121,8 +121,8 @@ plot_data_ff = (-1).*plot_data_var./plot_data_mean;
     trace_to_plot = plot_data(:,trace_ind,1)+DC ; %DC is added just to make space between the traces 
         f1=figure;
         hold on
-        rec1=rectangle;
-        rec2=rectangle;
+        rec1=rectangle('Position',[segment1(1,1)*dt,trace_to_plot(segment1(1,1)),0.1,0.1]);
+        rec2=rectangle('Position',[segment1(1,1)*dt,trace_to_plot(segment1(1,1)),0.1,0.1]);
 htrace1=plot(segment1*dt,trace_to_plot(segment1,:,:), 'LineWidth',1.2,'color', color_table(1,:));
 htrace2=plot(segment2*dt,trace_to_plot(segment2,:,:), 'LineWidth',1.2,'color', color_table(2,:));
 % htrace1=plot(x_axis_long(1:2.5*sf{1})*dt,trace_to_plot(x_axis_long(1:2.5*sf{1}),:,:), 'LineWidth',1.2,'color', color_table(1,:));
@@ -145,11 +145,75 @@ switch exp_type
 end
 
         %plotting scale bar
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
+        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+ horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
+        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+
+set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
+set(gca, 'visible', 'off') ;
+%%
+%plot mean trace
+        f2=figure;
+        hold on
+       rec1=rectangle('Position',[segment1(1,1)*dt,plot_data_mean(segment1(1,1)),0.1,0.1]);
+         rec2=rectangle('Position',[segment1(1,1)*dt,plot_data_mean(segment1(1,1)),0.1,0.1]);
+htrace1=plot(segment1*dt,plot_data_mean(segment1,:,1), 'LineWidth',1.2,'color', color_table(1,:));
+htrace2=plot(segment2*dt,plot_data_mean(segment2,:,1), 'LineWidth',1.2,'color', color_table(2,:));
+% htrace1=plot(x_axis_long*dt,plot_data_mean(x_axis_long,:,1), 'LineWidth',1.2,'color', color_table(1,:));
+% text(x_axis_long(1)*dt,plot_data_mean(x_axis_long(1),1,1),[num2str(floor(plot_data_mean(x_axis_long(1),1,1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
+axis tight
+ylim_data=[get(gca,'ylim')]';
+xlim_data=get(gca,'xlim');
+set(rec1,'Position',[x_axis_short(1,1)*dt,ylim_data(1),(x_axis_short(1,end)-x_axis_short(1,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
+set(rec2,'Position',[x_axis_short(2,1)*dt,ylim_data(1),(x_axis_short(2,end)-x_axis_short(2,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
+
+switch exp_type
+    case 1
+        rec3=rectangle('Position',[stim1_X{1}(1)*dt,ylim_data(1),(stim1_X{1}(2)-stim1_X{1}(1))*dt,ylim_data(2)-ylim_data(1)],'faceColor',color_table(3,:),'edgecolor','none');
+    case 2
+        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
+        line(stim1_X{1}.*dt,stim1_Y,'LineWidth',6,'Color','b') 
+end
+% %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12;
         [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
  horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=12;
         [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
+set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
+set(gca, 'visible', 'off') ;
 
+%%
+%plot std trace
+        f3=figure;
+        hold on
+        rec1=rectangle('Position',[segment1(1,1)*dt,plot_data_std(segment1(1,1)),0.1,0.1]);
+         rec2=rectangle('Position',[segment1(1,1)*dt,plot_data_std(segment1(1,1)),0.1,0.1]);
+htrace1=plot(segment1*dt,plot_data_std(segment1,:,1), 'LineWidth',1.2,'color', color_table(1,:));
+htrace2=plot(segment2*dt,plot_data_std(segment2,:,1), 'LineWidth',1.2,'color', color_table(2,:));
+% htrace1=plot(x_axis_long*dt,plot_data_std(x_axis_long,:,1), 'LineWidth',1.2,'color', color_table(1,:));
+
+axis tight
+ylim_data=[get(gca,'ylim')]';
+xlim_data=get(gca,'xlim');
+set(rec1,'Position',[x_axis_short(1,1)*dt,ylim_data(1),(x_axis_short(1,end)-x_axis_short(1,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
+set(rec2,'Position',[x_axis_short(2,1)*dt,ylim_data(1),(x_axis_short(2,end)-x_axis_short(2,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
+
+switch exp_type
+    case 1
+        rec3=rectangle('Position',[stim1_X{1}(1)*dt,ylim_data(1),(stim1_X{1}(2)-stim1_X{1}(1))*dt,ylim_data(2)-ylim_data(1)],'faceColor',color_table(3,:),'edgecolor','none');
+    case 2
+        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
+        line(stim1_X{1}.*dt,stim1_Y,'LineWidth',6,'Color','b') 
+end
+% %plotting scale bar
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12;
+        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+ horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=12;
+        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+        
+        ylabel('Vm SD [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
 %%
@@ -183,7 +247,7 @@ set(gca, 'visible', 'off') ;
     trace_to_plot = plot_data(:,trace_ind,1)+DC ; %DC is added just to make space between the traces 
         f5=figure;
         hold on
-        rec1=rectangle;
+        rec1=rectangle('Position',[x_axis_short(2,1)*dt,trace_to_plot(x_axis_short(2,1)),0.1,0.1]);
 htrace1=plot(x_axis_short(2,:)*dt,trace_to_plot(x_axis_short(2,:),:,:), 'LineWidth',1.2,'color', color_table(2,:));
 
 axis tight
@@ -257,70 +321,7 @@ ylabel('Vm SD [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
 
-%%
-%plot mean trace
-        f2=figure;
-        hold on
-       rec1=rectangle;
-         rec2=rectangle;
-htrace1=plot(segment1*dt,plot_data_mean(segment1,:,1), 'LineWidth',1.2,'color', color_table(1,:));
-htrace2=plot(segment2*dt,plot_data_mean(segment2,:,1), 'LineWidth',1.2,'color', color_table(2,:));
-% htrace1=plot(x_axis_long*dt,plot_data_mean(x_axis_long,:,1), 'LineWidth',1.2,'color', color_table(1,:));
-% text(x_axis_long(1)*dt,plot_data_mean(x_axis_long(1),1,1),[num2str(floor(plot_data_mean(x_axis_long(1),1,1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
-axis tight
-ylim_data=[get(gca,'ylim')]';
-xlim_data=get(gca,'xlim');
-set(rec1,'Position',[x_axis_short(1,1)*dt,ylim_data(1),(x_axis_short(1,end)-x_axis_short(1,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
-set(rec2,'Position',[x_axis_short(2,1)*dt,ylim_data(1),(x_axis_short(2,end)-x_axis_short(2,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
 
-switch exp_type
-    case 1
-        rec3=rectangle('Position',[stim1_X{1}(1)*dt,ylim_data(1),(stim1_X{1}(2)-stim1_X{1}(1))*dt,ylim_data(2)-ylim_data(1)],'faceColor',color_table(3,:),'edgecolor','none');
-    case 2
-        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
-        line(stim1_X{1}.*dt,stim1_Y,'LineWidth',6,'Color','b') 
-end
-% %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=12;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
-ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
-set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
-set(gca, 'visible', 'off') ;
-
-%%
-%plot std trace
-        f3=figure;
-        hold on
-        rec1=rectangle;
-         rec2=rectangle;
-htrace1=plot(segment1*dt,plot_data_std(segment1,:,1), 'LineWidth',1.2,'color', color_table(1,:));
-htrace2=plot(segment2*dt,plot_data_std(segment2,:,1), 'LineWidth',1.2,'color', color_table(2,:));
-% htrace1=plot(x_axis_long*dt,plot_data_std(x_axis_long,:,1), 'LineWidth',1.2,'color', color_table(1,:));
-
-axis tight
-ylim_data=[get(gca,'ylim')]';
-xlim_data=get(gca,'xlim');
-set(rec1,'Position',[x_axis_short(1,1)*dt,ylim_data(1),(x_axis_short(1,end)-x_axis_short(1,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
-set(rec2,'Position',[x_axis_short(2,1)*dt,ylim_data(1),(x_axis_short(2,end)-x_axis_short(2,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
-
-switch exp_type
-    case 1
-        rec3=rectangle('Position',[stim1_X{1}(1)*dt,ylim_data(1),(stim1_X{1}(2)-stim1_X{1}(1))*dt,ylim_data(2)-ylim_data(1)],'faceColor',color_table(3,:),'edgecolor','none');
-    case 2
-        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
-        line(stim1_X{1}.*dt,stim1_Y,'LineWidth',6,'Color','b') 
-end
-% %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=12;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
-        
-        ylabel('Vm SD [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
-set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
-set(gca, 'visible', 'off') ;
 %%
 if save_flag==1;
      switch exp_type
