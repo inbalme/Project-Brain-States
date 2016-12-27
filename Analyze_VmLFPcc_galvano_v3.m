@@ -1,26 +1,42 @@
-%% Analyze NBES protocol ES+galvano v3 - recent version.
-% This file was created on 5/10/2015 and updated on 19/1/2016 and 7/2/2016
-%This file is used for the analysis of files created with extract_NBES_Data_v2
+%Analyze_VmLFPcc_galvano_v3
+% This file was created on 27/12/2016, based on Analyze NBES protocol
+% ES+galvano v3.
+%This file is used for the analysis of files created with
+%extract_NBES_Data_v2 or extract_ChAT_Data_v3
 
 %       protocol 5 (NBES+galvnao (5 x-values))
 %       protocol 6 (ChAT intracellular current injections light+galvnao (15 x-values))
 %       protocol 8 - ChAT intracellular: light only (3 x-values): 1) train
 %       20 Hz, 10ms ondur, 50 pulses. 2) single pulse 5 sec ondur. 3)single pulse 10 ms
 %       protocol 9 - IC: I-V curve
-%       protocol 10 (NBES+galvnao train+test (3 x-values))
+%       protocol 10 (NBES+galvnao train+test (3 x-values)) or 
 %                 11 - NBES: 3 currents+galvano train+test (6 x-values)
 
 clear all
 close all
 cc_stat=[]; cc_spont=[]; cc_evoked=[]; cc=[]; cc_shuffled_it=[]; cc_shuff_sub=[];
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
-load NBES_Files_v2
-cc_spont_for_xls_mean=[]; cc_evoked_for_xls_mean=[];
-files_to_analyze =84; %[44,46,48,50,52,56,58,62,72,75];
-save_flag=0;
-print_flag=1;
+ 
+ global exp_type
+exp_type=2; %1-NBES, 2-ChAT
+save_flag= 0;
+print_flag=0;
 norm_flag=1;
+
+switch exp_type
+    case 1
+        files_to_analyze =[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
+        cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
+        load NBES_Files_v2
+        legend_string={'NB+', 'NB-'};
+
+    case 2
+        files_to_analyze =[74,76,77,80,82,84,87];
+        cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
+        load ChAT_Files_v3
+        legend_string={'Light On', 'Light Off'};
+end
+
     for fileind=1:length(files_to_analyze) ;         
     clearvars -except cc_stat cc_spont cc_evoked  files_to_analyze fileind files cc_spont_for_xls_mean cc_evoked_for_xls_mean cc lags cc_shuffled_mean cc_shuffled_it cc_mean cc_shuff_sub_mean save_flag print_flag...
         cc_lag0_mat cc_lag0_shuff_mat cc_max_mat cc_max_time_mat cc_maxdiff_mat  cc_max_shuff_mat  norm_flag  
@@ -66,6 +82,14 @@ for xx=1:3
     end
 end
 
+%% low-pass filtering below 300Hz       
+lp=300;
+                for xx=1:3
+    for trace= 1:size(data_no_spikes{channel},2)    
+            jj=data_no_spikes{channel}(:,trace,xx);
+            data_no_spikes{channel}(:,trace,xx)=bandPass_fft_IL_NEW2016(jj,dt,-1,lp,0,0); 
+    end
+                end
 %%
 clear  start_time duration start_time start_sample end_sample interval interval_mat interval_plot x y patch_xdata patch_ydata yex ylim_data sem_xdata sem_ydata sem_cdata
 coeffs=[]; 

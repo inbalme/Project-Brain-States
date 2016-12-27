@@ -4,7 +4,7 @@ clear all
 
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data data_current
  global exp_type
-exp_type=2; %1-NBES, 2-ChAT
+exp_type=1; %1-NBES, 2-ChAT
 save_flag= 0;
 print_flag=0;
 short_flag=0; %1- short trace, 0- long trace
@@ -14,7 +14,7 @@ bl=-70; %baseline value;
 
 switch exp_type
     case 1
-        files_to_analyze =46; %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
+        files_to_analyze =75; %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};
@@ -119,20 +119,17 @@ plot_data_ff = (-1).*plot_data_var./plot_data_mean;
         DC=wextend('addrow', 'per', DC, l);        
               
 %         x2lim=[stim2_X{x_value(1)}(1,1).*dt-0.5,stim2_X{2}(1,1).*dt+2];
- 
-%%
-    %plot spont traces long:
-    trace_to_plot = plot_data(:,trace_ind,1)+DC ; %DC is added just to make space between the traces 
+  
    
 %% spontaneous figures    
+            %plot spont traces long:
+    trace_to_plot = plot_data(:,trace_ind,1)+DC ; %DC is added just to make space between the traces 
         s1=figure;
         hold on
         rec1=rectangle('Position',[segment1(1,1)*dt,trace_to_plot(segment1(1,1)),0.1,0.1]);
         rec2=rectangle('Position',[segment1(1,1)*dt,trace_to_plot(segment1(1,1)),0.1,0.1]);
 htrace1=plot(segment1*dt,trace_to_plot(segment1,:,:), 'LineWidth',1.2,'color', color_table(1,:));
 htrace2=plot(segment2*dt,trace_to_plot(segment2,:,:), 'LineWidth',1.2,'color', color_table(2,:));
-% htrace1=plot(x_axis_Slong(1:2.5*sf{1})*dt,trace_to_plot(x_axis_Slong(1:2.5*sf{1}),:,:), 'LineWidth',1.2,'color', color_table(1,:));
-% htrace2=plot(x_axis_Slong(2.5*sf{1}:end)*dt,trace_to_plot(x_axis_Slong(2.5*sf{1}:end),:,:), 'LineWidth',1.2,'color', color_table(2,:));
 
 % for i=1:length(trace_ind); %adding the voltage value of the first data point to the left of the trace
 %     text(x_axis_Slong(1)*dt,trace_to_plot(x_axis_Slong(1),i),[num2str(floor(plot_data(x_axis_Slong(1),i,1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
@@ -337,11 +334,11 @@ if save_flag==1;
             cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary\Long Trace Presentation'
     end
                   
-        saveas(s1,['f' num2str(files_to_analyze(fileind)) '_traces_x1_v2.fig']) 
+        saveas(s1,['f' num2str(files_to_analyze(fileind)) '_traces_x1_v2'],'fig') 
         print(s1,['f' num2str(files_to_analyze(fileind)) '_traces_x1_v2'],'-dpng','-r600','-opengl') 
-        saveas(s2,['f' num2str(files_to_analyze(fileind)) '_mean_x1_v2.fig']) 
+        saveas(s2,['f' num2str(files_to_analyze(fileind)) '_mean_x1_v2'],'fig') 
         print(s2,['f' num2str(files_to_analyze(fileind)) '_mean_x1_v2'],'-dpng','-r600','-opengl') 
-        saveas(s3,['f' num2str(files_to_analyze(fileind)) '_std_x1_mean-subt_v2.fig']) 
+        saveas(s3,['f' num2str(files_to_analyze(fileind)) '_std_x1_mean-subt_v2'],'fig') 
         print(s3,['f' num2str(files_to_analyze(fileind)) '_std_x1_mean-subt_v2'],'-dpng','-r600','-opengl') 
     
          switch exp_type
@@ -351,13 +348,13 @@ if save_flag==1;
             cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary\Zoom-in Trace Presentation'
          end
     
-       saveas(s4,['f' num2str(files_to_analyze(fileind)) '_traces_x1_noES_v2.fig']) 
+       saveas(s4,['f' num2str(files_to_analyze(fileind)) '_traces_x1_noES_v2'],'fig') 
         print(s4,['f' num2str(files_to_analyze(fileind)) '_traces_x1_noES_v2'],'-dpng','-r600','-opengl') 
-        saveas(s5,['f' num2str(files_to_analyze(fileind)) '_traces_x1_ES_v2.fig']) 
+        saveas(s5,['f' num2str(files_to_analyze(fileind)) '_traces_x1_ES_v2'],'fig') 
         print(s5,['f' num2str(files_to_analyze(fileind)) '_traces_x1_ES_v2'],'-dpng','-r600','-opengl') 
-        saveas(s6,['f' num2str(files_to_analyze(fileind)) '_mean_x1_v2.fig']) 
+        saveas(s6,['f' num2str(files_to_analyze(fileind)) '_mean_x1_v2'],'fig') 
         print(s6,['f' num2str(files_to_analyze(fileind)) '_mean_x1_v2'],'-dpng','-r600','-opengl') 
-        saveas(s7,['f' num2str(files_to_analyze(fileind)) '_std_1_mean-subt_v2.fig']) 
+        saveas(s7,['f' num2str(files_to_analyze(fileind)) '_std_1_mean-subt_v2'],'fig') 
         print(s7,['f' num2str(files_to_analyze(fileind)) '_std_x1_mean-subt_v2'],'-dpng','-r600','-opengl') 
 end
 
@@ -757,12 +754,12 @@ if save_flag==1;
                 cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary\Zoom-in Trace Presentation'  
     end
     
-        saveas(e5,['f' num2str(files_to_analyze(fileind)) '_traces_x2_v2.fig']) 
+        saveas(e5,['f' num2str(files_to_analyze(fileind)) '_traces_x2_v2'],'fig') 
         print(e5,['f' num2str(files_to_analyze(fileind)) '_traces_x2_v2'],'-dpng','-r600','-opengl') 
-        saveas(e6,['f' num2str(files_to_analyze(fileind)) '_traces_x3_v2.fig']) 
+        saveas(e6,['f' num2str(files_to_analyze(fileind)) '_traces_x3_v2'],'fig') 
         print(e6,['f' num2str(files_to_analyze(fileind)) '_traces_x3_v2'],'-dpng','-r600','-opengl') 
-        saveas(e7,['f' num2str(files_to_analyze(fileind)) '_mean_x2+3_v2.fig']) 
+        saveas(e7,['f' num2str(files_to_analyze(fileind)) '_mean_x2+3_v2'],'fig') 
         print(e7,['f' num2str(files_to_analyze(fileind)) '_mean_x2+3_v2'],'-dpng','-r600','-opengl') 
-        saveas(e8,['f' num2str(files_to_analyze(fileind)) '_std_x2+3_mean-subt_v2.fig']) 
+        saveas(e8,['f' num2str(files_to_analyze(fileind)) '_std_x2+3_mean-subt_v2'],'fig') 
         print(e8,['f' num2str(files_to_analyze(fileind)) '_std_x2+3_mean-subt_v2'],'-dpng','-r600','-opengl') 
 end

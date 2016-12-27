@@ -15,8 +15,8 @@ cc_stat=[]; cc_spont=[]; cc_evoked=[]; cc=[]; cc_shuffled_it=[]; cc_shuff_sub=[]
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data
 cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
 load ChAT_Files_v3
-cc_spont_for_xls_mean=[]; cc_evoked_for_xls_mean=[];
-files_to_analyze =[74];
+
+files_to_analyze =[87];
 save_flag=0;
 print_flag=1;
 norm_flag=0;
@@ -74,8 +74,8 @@ switch trace_type
     case 1
 %          start_time = [0.4,5.6]; %[sec] %[0,5]
 %          duration = 2.5; %[sec] 
-         start_time=[0.4, stim1_X{x_value(1)}(1,1).*dt];
-         duration =1;
+         start_time=[0.4, stim1_X{x_value(1)}(1,1).*dt+0.4];
+         duration =2.5;
             for t=1:length(start_time);
              start_sample(:,t) = ceil(start_time(t).*sf{1});
                 if start_time(t)==0
@@ -364,7 +364,7 @@ Fig{fileind}(trace_type+6)=figure;
  h1=fn_shadedErrorBar(lags{fileind,1}.*dt,cc_shuff_sub_mean{fileind}(:,1),cc_shuff_sub_sem1,{'LineWidth',1.5,'color', color_table(1,:)},1);
 h2=fn_shadedErrorBar(lags{fileind,1}.*dt,cc_shuff_sub_mean{fileind}(:,2),cc_shuff_sub_sem2,{'LineWidth',1.5,'color', color_table(5,:)},1);
 % ylim=get(gca,'ylim');
-ylim=[-0.4 0.4];
+ylim=[-0.8 0.8];
 yticks=[-0.4, -0.2 0, 0.2];
 % hline_zero=line([0 0],[ylim(1) ylim(2)],'linestyle','-.','color',[136 137 138]./256,'linewidth',1);
 % title('Vm-LFP crosscorrelation','FontSize', 16); 
@@ -381,7 +381,7 @@ Fig{fileind}(trace_type+8)=figure;
 h3=fn_shadedErrorBar(lags{fileind,1}.*dt,cc_shuffled_mean{fileind}(:,1),cc_shuffled_sem1,{'LineWidth',1.5,'linestyle','--','color', color_table(1,:)},1);
 h4=fn_shadedErrorBar(lags{fileind,1}.*dt,cc_shuffled_mean{fileind}(:,2),cc_shuffled_sem2,{'LineWidth',1.5,'linestyle','--','color', color_table(5,:)},1);
 %  ylim=get(gca,'ylim');
-ylim=[-0.2, 0.2];
+ylim=[-0.8, 0.8];
  yticks=[-0.2,0,0.2];
  if trace_type==2
 ylim=[-0.8 0.8];

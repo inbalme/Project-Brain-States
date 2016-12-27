@@ -10,9 +10,9 @@ global Exp
 
 files = Get_NBES_Files_v2();
 
-for fileind =[84]; %[17,23,26,27,28,29,33,35,60]; %[31,38,42,51,61,64,67,69,71,74,77]; %[16,22,44,46,48,50,52]; %[32,34,36,37,38,39]
+for fileind =[82,84]; %[17,23,26,27,28,29,33,35,60]; %[31,38,42,51,61,64,67,69,71,74,77]; %[16,22,44,46,48,50,52]; %[32,34,36,37,38,39]
     clearvars -except  files fileind Exp
-no_spikes_flag=0;
+no_spikes_flag=1;
     fname = files(fileind).name;
     path = files(fileind).path;
     Exp = [];

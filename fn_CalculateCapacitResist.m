@@ -1,3 +1,7 @@
+function res = fn_CalculateCapacitResist(I, voltages, frequency, doPlot, v_baseline)
+
+% CalculateCapacitResist - claculate the Capacitance and Resistance of the
+% cell and electrode.
 % Inputs:
 %           1)I - the amount of current injected during the current step (in nA).
 %           2)voltages - a trace of the voltages starting from the point the
@@ -16,9 +20,7 @@
 %           result(6) - the error in L2 metric (sum of square roots of errors at each
 %                       point).
 
-
-function res = CalculateCapacitResist(I, voltages, frequency, doPlot, v_baseline)
-
+%% var checks
 % What follows below assumes that the voltages curve is decreasing, so
 % if the case the opposite, we simply reverse it.
 if I > 0 & voltages(3) > voltages(1) & voltages(6) > voltages(3)
@@ -35,9 +37,9 @@ if nargin >= 4
 else
     DO_PLOTS_FINAL_ONLY = false;
 end;
-frequency = frequency * 1e3; %from KHz to Hz
-I = I*1e-9; %from nAmp to Amp
-voltages = voltages*1e-3;%from mV to V
+frequency = frequency * 1e3;
+I = I*1e-9;
+voltages = voltages*1e-3; % the voltage decay response at end of injection
 if exist('v_baseline')
     v_baseline = v_baseline*1e-3;
 end;
@@ -56,18 +58,19 @@ if exist('v_baseline')
     v_baseline = v_baseline - tmp;
 end;
 
-if DO_PLOTS | DO_PLOTS_FINAL_ONLY
+if DO_PLOTS | DO_PLOTS_FINAL_ONLY % plot the voltage decay
     figure;
     hold on;
     plot(voltages(1:(length(voltages/2))))
 end;
 
+%%
 % We have to determine the length of the fitting interval.
 % It cannot be set to some constant value in advance (e.g. 10 msecs)
 % because the time constant varies quite a lot
 % (QX slows it down by almost an order of magnitude).
 
-%Dvoltages = diff(sgolayfilt(voltages(1:frequency*0.1),3,51));
+% Dvoltages = diff(sgolayfilt(voltages(1:frequency*0.1),3,51));
 Dvoltages = medfilt1(diff(medfilt1(voltages(1:frequency*0.1),30)),30);
 Dvoltages = Dvoltages(20:length(Dvoltages)); % because of the medfilt1ering the first values are 0s.
 if Dvoltages(1) < 0
@@ -91,13 +94,13 @@ if FITTING_DURATION > 0.2
 end;
 % FITTING_DURATION = max(FITTING_DURATION,0.010); % 10 mseconds
 
-
-
+%%
 
 % we will have several fittings from which the best will be chosen.
 num_of_results = 0;
 
 % According to the voltage after FITTING_DURATION mseconds
+%check that voltage is steady ( back to base line)
 if max(voltages(ceil(frequency*FITTING_DURATION):ceil(frequency*(FITTING_DURATION+0.01)))) ...
         - min(voltages(ceil(frequency*FITTING_DURATION):ceil(frequency*(FITTING_DURATION+0.01)))) < 0.002
     final_voltage = mean(voltages(ceil(frequency*FITTING_DURATION):ceil(frequency*(FITTING_DURATION+0.01))));
@@ -110,16 +113,13 @@ end;
 R_total = final_voltage/I;
 R_total = abs(R_total)
 
-%
-%
-%
-% First we do PEELING
-time = (0:1:length(voltages)-1);
 
+%% First we do PEELING
+time = (0:1:length(voltages)-1);
 pealing_trial = 1;
 
-while 1
-    if pealing_trial > 500 % we won't do more than 10 retries
+while 1 % Calculate the initial guess values with polyfit
+    if pealing_trial > 10 % we won't do more than 10 retries
         error('Problem with initial guess');
         return;
     end;
@@ -156,7 +156,7 @@ while 1
         break;
     end;
 end; % while
-
+%% initial values
 
 tau1=R1*C1;
 tau2=R2*C2;
@@ -168,7 +168,7 @@ result(num_of_results,2) = C1;
 result(num_of_results,3) = R2;
 result(num_of_results,4) = C2;
 result(num_of_results,5) = checkFitting(R1,C1,R2,C2,false);
-
+%%
 % Nested function - used for fitting all parameters
     function diff = requiredVoltage_all(beta)
         R1 = abs(beta(1));
@@ -200,7 +200,7 @@ result(num_of_results,5) = checkFitting(R1,C1,R2,C2,false);
     end % function requiredVoltage_all
 
 
-
+%%
     % Nested function - used for fitting the taus (the two time
     % constants).
     function diff = requiredVoltage_taus(beta)
@@ -225,7 +225,7 @@ result(num_of_results,5) = checkFitting(R1,C1,R2,C2,false);
 
         diff = norm(v - voltages(1:1+ceil(FITTING_DURATION*frequency)),FITTING_NORM);
     end % function requiredVoltage_taus
-
+%%
     % Nested function - used for fitting C1  (electrode capacitance).
     function diff = requiredVoltage_C1(beta)
         C1 = abs(beta);
@@ -247,7 +247,7 @@ result(num_of_results,5) = checkFitting(R1,C1,R2,C2,false);
         v = alpha1*exp(x1*time/frequency) + alpha2*exp(x2*time/frequency)+I*(R1+R2);
         diff = norm(v - voltages(1:1+ceil(FITTING_DURATION*frequency)),FITTING_NORM);
     end % function requiredVoltage_C1
-
+%%
     % Nested function - used for fitting the two resistances.
     function diff = requiredVoltage_R1R2(beta)
         R1 = abs(beta(1));
@@ -270,6 +270,7 @@ result(num_of_results,5) = checkFitting(R1,C1,R2,C2,false);
         diff = norm(v - voltages(1:1+ceil(FITTING_DURATION*frequency)),FITTING_NORM);
     end % function requiredVoltage_R1R2
 
+%%
     % dist is  the distance of the fit from the data (in max metric)
     % r2dist is  the distance of the fit from the data (in L2 metric)
     % also plots if needToPlot == true.
@@ -304,7 +305,7 @@ result(num_of_results,5) = checkFitting(R1,C1,R2,C2,false);
         end;
         r2dist = norm(v(1:ceil(FITTING_DURATION*frequency)) -  voltages(1:ceil(FITTING_DURATION*frequency)));
     end;
-
+%%
     % And now... to fitting!
 
     % The code is somewhat twisted, since the values (namely R1,C1,R2,C2) are changed

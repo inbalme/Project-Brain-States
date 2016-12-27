@@ -26,7 +26,7 @@ switch exp_type
         legend_string={'NB+', 'NB-'};
 
     case 2
-        files_to_analyze =[77];
+        files_to_analyze =[74,76,77,80,82,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};
@@ -526,7 +526,7 @@ figure(10) %(fileind)
 %Parameters from mean trace                    peak_10per_lat    
 peaks(fileind).fname = fname; 
 peaks(fileind).cells=files_to_analyze;
-peaks(fileind).analysis_mfile='Analyze_NBES_response_parameters_10_20Hz_v2.m';
+peaks(fileind).analysis_mfile='Analyze_response_parameters_10_20Hz_v2.m';
 peaks(fileind).lp=lp;
 peaks(fileind).sf=sf{1};
 peaks(fileind).min_res_del=min_res_del; %start looking for response after this min delay from stim onset.
@@ -663,14 +663,14 @@ clear data_no_spike_no_DC
         
 %peak amplitudes - absolute values + relative change
         
-        if stim_num==9  %outlyer
-            peak_amp{2}(1,stim_num)=nan;
-            peak_amp{3}(1,stim_num)=nan;
-        end
-          if stim_num==8  %outlyer
-            peak_amp{2}(8,stim_num)=nan;
-            peak_amp{3}(8,stim_num)=nan;
-        end
+%         if stim_num==9  %outlyer
+%             peak_amp{2}(1,stim_num)=nan;
+%             peak_amp{3}(1,stim_num)=nan;
+%         end
+%           if stim_num==8  %outlyer
+%             peak_amp{2}(8,stim_num)=nan;
+%             peak_amp{3}(8,stim_num)=nan;
+%         end
         peaks_stat(stim_num).amp=[peak_amp{2}(:,stim_num),  peak_amp{3}(:,stim_num)];
         peaks_stat(stim_num).amp_m=nanmean(peaks_stat(stim_num).amp,1);
         peaks_stat(stim_num).amp_std=nanstd(peaks_stat(stim_num).amp,0,1);
@@ -807,11 +807,15 @@ clear data_no_spike_no_DC
                         
         %peak adaptation amplitude ratio - absolute values + relative change
         peaks_stat(stim_num).adapt_amp=[peak_adapt_amp{2}(:,stim_num),  peak_adapt_amp{3}(:,stim_num)];
-        peaks_stat(stim_num).adapt_amp([1,3,5,6,8,9],:)=[];
+        if exp_type==1
+            peaks_stat(stim_num).adapt_amp([1,3,5,6,8,9],:)=[];
+        end
         peaks_stat(stim_num).adapt_amp_m=nanmean(peaks_stat(stim_num).adapt_amp,1);
         peaks_stat(stim_num).adapt_amp_std=nanstd(peaks_stat(stim_num).adapt_amp,0,1);
         peaks_stat(stim_num).change_adapt_amp=[(peak_adapt_amp{3}(:,stim_num)-peak_adapt_amp{2}(:,stim_num))./abs(peak_adapt_amp{2}(:,stim_num))].*100; %percent change
-        peaks_stat(stim_num).change_adapt_amp([1,3,5,6,8,9],:)=[];
+        if exp_type==1
+            peaks_stat(stim_num).change_adapt_amp([1,3,5,6,8,9],:)=[];
+        end
         peaks_stat(stim_num).change_adapt_amp_m=nanmean(peaks_stat(stim_num).change_adapt_amp,1);
         peaks_stat(stim_num).change_adapt_amp_std=nanstd(peaks_stat(stim_num).change_adapt_amp,0,1);
         %testing for normal distribution       
@@ -1977,7 +1981,7 @@ clear pre_response_STD Vm_res_STD post_train_STD
 pre_response_STD(:,1)=[pre_response_STD_noNB;pre_response_STD_NB];
 Vm_res_STD(:,1)=[Vm_res_STD_meanstim_noNB;Vm_res_STD_meanstim_NB];
 post_train_STD(:,1)=[post_train_STD_noNB;post_train_STD_NB];
- S_1(:,1)=1:22;
+ S_1(:,1)=1:length(files_to_analyze); %22;
 ta_vector_names={'pre_response_STD_noNB','pre_response_STD_NB','Vm_res_STD_meanstim_noNB','Vm_res_STD_meanstim_NB','post_train_STD_noNB','post_train_STD_NB'};
 clear VmSTD ranovatbl ta
 ta=table(S_1,pre_response_STD_noNB,pre_response_STD_NB,Vm_res_STD_meanstim_noNB,Vm_res_STD_meanstim_NB,post_train_STD_noNB,post_train_STD_NB,...
@@ -2037,7 +2041,7 @@ clear pre_response_M Vm_res_M post_train_M
 pre_response_M(:,1)=[pre_response_M_noNB;pre_response_M_NB];
 Vm_res_M(:,1)=[Vm_res_M_meanstim_noNB;Vm_res_M_meanstim_NB];
 post_train_M(:,1)=[post_train_M_noNB;post_train_M_NB];
- S_1(:,1)=1:22;
+ S_1(:,1)=1:length(files_to_analyze); %22;
 ta_vector_names={'pre_response_M_noNB','pre_response_M_NB','Vm_res_M_meanstim_noNB','Vm_res_M_meanstim_NB','post_train_M_noNB','post_train_M_NB'};
 clear VmM ranovatbl ta
 ta=table(S_1,pre_response_M_noNB,pre_response_M_NB,Vm_res_M_meanstim_noNB,Vm_res_M_meanstim_NB,post_train_M_noNB,post_train_M_NB,...
@@ -2090,7 +2094,7 @@ peak_amp_NB(:,:)= peak_amp{3}(:,:);
 clear pre_response_M Vm_res_M post_train_M
 
 peak_amp_all(:,:)=[peak_amp_noNB;peak_amp_NB];
- S_1(:,1)=1:22;
+ S_1(:,1)=1:length(files_to_analyze); %22;
 
 clear VmM ranovatbl ta
 ta_vector_names={'peak_amp_noNB(:,1:10)','peak_amp_NB(:,1:10)'};
@@ -2152,7 +2156,7 @@ clear color_table
 hAnnotation = get(errbar_h1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
 hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
 % [legh,objh,outh,outm] = legend('NB Off','NB On','Location','northeast');
-l = legend ({'NB Off','NB On'},'fontsize',9,'Location','northeast'); legend('boxoff')
+l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
 ylim_data=[get(gca,'ylim')]';
   my=max([peaks_stat(1).pre_response_STD_std,peaks_stat(1).Vm_res_STD_meanstim_std,peaks_stat(1).post_train_STD_std])*1.1+max([peaks_stat(1).pre_response_STD_m,peaks_stat(1).Vm_res_STD_meanstim_m,peaks_stat(1).post_train_STD_m]); 
 linex=[1-0.15; 2-0.15];
@@ -2204,7 +2208,7 @@ text(3,my,asterisk_after,'HorizontalAlignment', 'center','verticalAlignment','bo
 % line(linex,liney,'color',[0 0 1],'linewidth',1.5,'markersize',10,'markerfacecolor','b')
 % text(1.5-0.15,liney(1,1),asterisk_sensory,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17,'color',[0 0 1])        
         hold off
-        ylim_data=[0 8.5];
+        ylim_data=[0 14];
         x1limits = [0.5 3.5];   x1ticks = [1,2,3];    
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'ylim',ylim_data,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','FontSize', 16,'xticklabel',{'Before','During','After'} ,'box', 'off'); %'fontweight', 'bold', 
@@ -2233,7 +2237,7 @@ clear color_table
 hAnnotation = get(errbar_h1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
 hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
 % [legh,objh,outh,outm] = legend('NB Off','NB On','Location','northeast');
-l = legend ({'NB Off','NB On'},'fontsize',9,'Location','northeast'); legend('boxoff')
+l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
 ylim_data=[get(gca,'ylim')]';
 my=max(ylim_data)+1;
 %   my=-1*max([peaks_stat(1).pre_response_M_std,peaks_stat(1).Vm_res_M_meanstim_std,peaks_stat(1).post_train_M_std])*1.1+max([peaks_stat(1).pre_response_M_m,peaks_stat(1).Vm_res_M_meanstim_m,peaks_stat(1).post_train_M_m]); 
@@ -2480,53 +2484,53 @@ if save_flag==1
             cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary'
     end
            
-% saveas(h1,'Train Amplitude Local.fig') 
+% saveas(h1,'Train Amplitude Local', 'fig') 
 % print(h1,'Train Amplitude Local','-dpng','-r600','-opengl')
-saveas(h2,'Train Amplitude Local.fig') 
+saveas(h2,'Train Amplitude Local', 'fig') 
 print(h2,'Train Amplitude Local','-dpng','-r600','-opengl')
-saveas(h3,'Train Peak Latency.fig') 
+saveas(h3,'Train Peak Latency', 'fig') 
 print(h3,'Train Peak Latency','-dpng','-r600','-opengl')
-saveas(h4,'Train Onset Latency.fig') 
+saveas(h4,'Train Onset Latency', 'fig') 
 print(h4,'Train Onset Latency','-dpng','-r600','-opengl')
-% saveas(h5,'Train Half-Width.fig') 
+% saveas(h5,'Train Half-Width', 'fig') 
 % print(h5,'Train Half-Width','-dpng','-r600','-opengl')
-% saveas(h6,'Train Peak_Value.fig') 
+% saveas(h6,'Train Peak_Value', 'fig') 
 % print(h6,'Train Peak_Value','-dpng','-r600','-opengl')
-% saveas(h7,'Train Local Baseline.fig') 
+% saveas(h7,'Train Local Baseline', 'fig') 
 % print(h7,'Train Local Baseline','-dpng','-r600','-opengl')
-% saveas(h8,'Train Response Mean Vm.fig') 
+% saveas(h8,'Train Response Mean Vm', 'fig') 
 % print(h8,'Train Response Mean Vm','-dpng','-r600','-opengl')
-saveas(h9,'Train Response Mean Vm STD.fig') 
+saveas(h9,'Train Response Mean Vm STD', 'fig') 
 print(h9,'Train Response Mean Vm STD','-dpng','-r600','-opengl')
 % % 
 % % 
-saveas(g1,'Global Baseline.fig')         
+saveas(g1,'Global Baseline', 'fig')         
 print(g1,'Global Baseline','-dpng','-r600','-opengl') 
-saveas(g2,'Adaptation Amplitude Ratio.fig') 
+saveas(g2,'Adaptation Amplitude Ratio', 'fig') 
 print(g2,'Adaptation Amplitude Ratio','-dpng','-r600','-opengl') 
-saveas(g3,'Adaptation Power Ratio.fig') 
+saveas(g3,'Adaptation Power Ratio', 'fig') 
 print(g3,'Adaptation Power Ratio','-dpng','-r600','-opengl') 
-% saveas(g4,'Vm STD_Pre-train.fig')
+% saveas(g4,'Vm STD_Pre-train', 'fig')
 % print(g4,'Vm STD_Pre-train','-dpng','-r600','-opengl') 
-% saveas(g5,'Vm STD_Train.fig') 
+% saveas(g5,'Vm STD_Train', 'fig') 
 % print(g5,'Vm STD_Train','-dpng','-r600','-opengl') 
-% saveas(g6,'Vm STD_Post-train.fig') 
+% saveas(g6,'Vm STD_Post-train', 'fig') 
 % print(g6,'Vm STD_Post-train','-dpng','-r600','-opengl') 
 
-saveas(k16,'SNR1.fig') 
+saveas(k16,'SNR1', 'fig') 
 print(k16,'SNR1','-dpng','-r600','-opengl') 
-saveas(k17,'SNR2.fig') 
+saveas(k17,'SNR2', 'fig') 
 print(k17,'SNR2','-dpng','-r600','-opengl') 
-saveas(k18,'Amplitude_Signal_v2.fig') 
+saveas(k18,'Amplitude_Signal_v2', 'fig') 
 print(k18,'Amplitude_Signal_v2','-dpng','-r600','-opengl') 
-saveas(k19,'Amplitude_Noise1_v2.fig') 
+saveas(k19,'Amplitude_Noise1_v2', 'fig') 
 print(k19,'Amplitude_Noise1_v2','-dpng','-r600','-opengl') 
-saveas(k20,'Amplitude_Noise2.fig') 
+saveas(k20,'Amplitude_Noise2', 'fig') 
 print(k20,'Amplitude_Noise2','-dpng','-r600','-opengl') 
 
-saveas(j1,'Vm STD_Before During After Sensory stim_v2.fig') 
+saveas(j1,'Vm STD_Before During After Sensory stim_v2', 'fig') 
 print(j1,'Vm STD_Before During After Sensory stim_v2','-dpng','-r600','-opengl') 
-saveas(j2,'Vm M_Before During After Sensory stim_v4.fig') 
+saveas(j2,'Vm M_Before During After Sensory stim_v4', 'fig') 
 print(j2,'Vm M_Before During After Sensory stim_v4','-dpng','-r600','-opengl') 
 end
 

@@ -145,10 +145,10 @@ for t=1:2;
                     if save_flag==1;
                         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
                         filename=['file', num2str(fileind), ' spontaneous activity NB-'];
-                        saveas(f(1),['file', num2str(fileind), ' spontaneous activity NB-.fig']); 
+                        saveas(f(1),['file', num2str(fileind), ' spontaneous activity NB-'],'fig'); 
                         print(f(1),filename,'-dpng','-r600','-opengl')    
                         filename=['file', num2str(fileind), ' spontaneous activity NB+'];
-                        saveas(f(2),['file', num2str(fileind), ' spontaneous activity NB+.fig']); 
+                        saveas(f(2),['file', num2str(fileind), ' spontaneous activity NB+'],'fig'); 
                         print(f(2),filename,'-dpng','-r600','-opengl')  
                     end
 %     close all
@@ -198,10 +198,10 @@ for x_value = 2:3; %size(data.x_value,2)
                     if save_flag==1;
                         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
                         filename=['file', num2str(fileind), ' whisker evoked activity NB-'];
-                        saveas(f(3),['file', num2str(fileind), ' whisker evoked activity NB-.fig']); 
+                        saveas(f(3),['file', num2str(fileind), ' whisker evoked activity NB-'],'fig'); 
                         print(f(3),filename,'-dpng','-r600','-opengl') 
                         filename=['file', num2str(fileind), ' whisker evoked activity NB+'];
-                        saveas(f(4),['file', num2str(fileind), ' whisker evoked activity NB+.fig']); 
+                        saveas(f(4),['file', num2str(fileind), ' whisker evoked activity NB+'],'fig'); 
                         print(f(4),filename,'-dpng','-r600','-opengl') 
                     end
     close all
@@ -600,7 +600,7 @@ hold off
         %save figure  
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
 filename='SNR';
-saveas(gcf,'SNR.fig'); 
+saveas(gcf,filename,'fig'); 
 print(gcf,filename,'-dpng','-r600','-opengl') 
 %%  Response Modulation  
 Res_mod_Y =  spikes_stat(stim_num).res_modulation';
@@ -640,7 +640,7 @@ hold off
 %save figure  
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
 filename='Response_modulation';
-saveas(gcf,'Response_modulation.fig'); 
+saveas(gcf,filename,'fig'); 
 print(gcf,filename,'-dpng','-r600','-opengl') 
 %%  Modulation Index 
 MI_Y =  spikes_stat(stim_num).MI';
@@ -725,7 +725,7 @@ hold off
         %save figure  
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
 filename='Latency';
-saveas(gcf,'Latency.fig'); 
+saveas(gcf,filename,'fig'); 
 print(gcf,filename,'-dpng','-r600','-opengl') 
 %% Latency STD (Jitter)
 latency_std_Y= spikes_stat(stim_num).latency_std';
@@ -767,7 +767,7 @@ hold off
         %save figure  
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
 filename='Latency STD';
-saveas(gcf,'Latency STD.fig'); 
+saveas(gcf,filename,'fig'); 
 print(gcf,filename,'-dpng','-r600','-opengl') 
 %% Success rate
 success_rate_Y= spikes_stat(stim_num).success_rate';
@@ -809,7 +809,7 @@ hold off
         %save figure  
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
 filename='Success Rate';
-saveas(gcf,'Success Rate.fig'); 
+saveas(gcf,filename,'fig'); 
 print(gcf,filename,'-dpng','-r600','-opengl') 
 
 %% Failures
@@ -850,5 +850,5 @@ hold off
         %save figure  
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
 filename='Failures';
-saveas(gcf,'Failures.fig'); 
+saveas(gcf,filename,'fig'); 
 print(gcf,filename,'-dpng','-r600','-opengl') 

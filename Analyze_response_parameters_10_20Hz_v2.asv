@@ -26,7 +26,7 @@ switch exp_type
         legend_string={'NB+', 'NB-'};
 
     case 2
-        files_to_analyze =[75];
+        files_to_analyze =[74,76,77,80,82,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};
@@ -124,7 +124,7 @@ plot_data_ff = (-1).*plot_data_var./plot_data_mean;
         DC=wextend('addrow', 'per', DC, l);
         trace_to_plot = plot_data(:,trace_ind, x_value(1))+DC ; %DC is added just to make space between the traces
         x2lim=[stim2_X{x_value(1)}(1,1).*dt-0.5,stim2_X{x_value(1)}(1,1).*dt+2];
-        tmp1=[];
+        tmp1=[]; %spacer instead of stim1_X, so that the light stim. will not be plotted
         lineprops1={'LineWidth',1.2,'color', [0 0 0]};
         [Fig1,h1]= fn_Plot_Trace_v2(trace_to_plot, dt, dt,tmp1 , dt, stim2_X{x_value(1)},lineprops1);       
         hline = findobj(gcf, 'type', 'line'); set(hline(1:end),'color',[0 0 0]);
@@ -526,7 +526,7 @@ figure(10) %(fileind)
 %Parameters from mean trace                    peak_10per_lat    
 peaks(fileind).fname = fname; 
 peaks(fileind).cells=files_to_analyze;
-peaks(fileind).analysis_mfile='Analyze_NBES_response_parameters_10_20Hz_v2.m';
+peaks(fileind).analysis_mfile='Analyze_response_parameters_10_20Hz_v2.m';
 peaks(fileind).lp=lp;
 peaks(fileind).sf=sf{1};
 peaks(fileind).min_res_del=min_res_del; %start looking for response after this min delay from stim onset.
@@ -663,14 +663,14 @@ clear data_no_spike_no_DC
         
 %peak amplitudes - absolute values + relative change
         
-        if stim_num==9  %outlyer
-            peak_amp{2}(1,stim_num)=nan;
-            peak_amp{3}(1,stim_num)=nan;
-        end
-          if stim_num==8  %outlyer
-            peak_amp{2}(8,stim_num)=nan;
-            peak_amp{3}(8,stim_num)=nan;
-        end
+%         if stim_num==9  %outlyer
+%             peak_amp{2}(1,stim_num)=nan;
+%             peak_amp{3}(1,stim_num)=nan;
+%         end
+%           if stim_num==8  %outlyer
+%             peak_amp{2}(8,stim_num)=nan;
+%             peak_amp{3}(8,stim_num)=nan;
+%         end
         peaks_stat(stim_num).amp=[peak_amp{2}(:,stim_num),  peak_amp{3}(:,stim_num)];
         peaks_stat(stim_num).amp_m=nanmean(peaks_stat(stim_num).amp,1);
         peaks_stat(stim_num).amp_std=nanstd(peaks_stat(stim_num).amp,0,1);
@@ -2152,7 +2152,7 @@ clear color_table
 hAnnotation = get(errbar_h1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
 hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
 % [legh,objh,outh,outm] = legend('NB Off','NB On','Location','northeast');
-l = legend ({'NB Off','NB On'},'fontsize',9,'Location','northeast'); legend('boxoff')
+l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
 ylim_data=[get(gca,'ylim')]';
   my=max([peaks_stat(1).pre_response_STD_std,peaks_stat(1).Vm_res_STD_meanstim_std,peaks_stat(1).post_train_STD_std])*1.1+max([peaks_stat(1).pre_response_STD_m,peaks_stat(1).Vm_res_STD_meanstim_m,peaks_stat(1).post_train_STD_m]); 
 linex=[1-0.15; 2-0.15];
@@ -2233,7 +2233,7 @@ clear color_table
 hAnnotation = get(errbar_h1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
 hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
 % [legh,objh,outh,outm] = legend('NB Off','NB On','Location','northeast');
-l = legend ({'NB Off','NB On'},'fontsize',9,'Location','northeast'); legend('boxoff')
+l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
 ylim_data=[get(gca,'ylim')]';
 my=max(ylim_data)+1;
 %   my=-1*max([peaks_stat(1).pre_response_M_std,peaks_stat(1).Vm_res_M_meanstim_std,peaks_stat(1).post_train_M_std])*1.1+max([peaks_stat(1).pre_response_M_m,peaks_stat(1).Vm_res_M_meanstim_m,peaks_stat(1).post_train_M_m]); 

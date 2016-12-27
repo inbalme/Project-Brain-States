@@ -253,13 +253,13 @@ if save_flag==1;
         print(Fig2,['f' num2str(files_to_analyze(fileind)) '_traces_x' num2str(x_value) '_ES+'],'-dpng','-r600','-opengl') 
         saveas(Fig5,['f' num2str(files_to_analyze(fileind)) '_std_x' num2str(x_value) '_mean-subt'],'fig') 
         print(Fig5,['f' num2str(files_to_analyze(fileind)) '_std_x' num2str(x_value) '_mean-subt'],'-dpng','-r600','-opengl') 
-        saveas(Fig6,['f' num2str(files_to_analyze(fileind)) '_mean_x' num2str(x_value)],'fig') 
-        print(Fig6,['f' num2str(files_to_analyze(fileind)) '_mean_x' num2str(x_value)],'-dpng','-r600','-opengl') 
-        saveas(Fig7,['f' num2str(files_to_analyze(fileind)) '_mean+std_x' num2str(x_value)],'fig') 
+        saveas(Fig6,['f' num2str(files_to_analyze(fileind)) '_mean_x' num2str(x_value) '.fig']) 
+        print(Fig6,['f' num2str(files_to_analyze(fileind)) '_mean_x' num2str(x_value) ],'-dpng','-r600','-opengl') 
+        saveas(Fig7,['f' num2str(files_to_analyze(fileind)) '_mean+std_x' num2str(x_value) '.fig']) 
         print(Fig7,['f' num2str(files_to_analyze(fileind)) '_mean+std_x' num2str(x_value)],'-dpng','-r600','-opengl') 
-        saveas(Fig8,['f' num2str(files_to_analyze(fileind)) '_summary_x' num2str(x_value)],'fig') 
+        saveas(Fig8,['f' num2str(files_to_analyze(fileind)) '_summary_x' num2str(x_value) '.fig']) 
         print(Fig8,['f' num2str(files_to_analyze(fileind)) '_summary_x' num2str(x_value)],'-dpng','-r600','-opengl')     
-        saveas(Fig9,['f' num2str(files_to_analyze(fileind)) '_var_x' num2str(x_value) '_mean-subt'],'fig') 
+        saveas(Fig9,['f' num2str(files_to_analyze(fileind)) '_var_x' num2str(x_value) '_mean-subt.fig']) 
         print(Fig9,['f' num2str(files_to_analyze(fileind)) '_var_x' num2str(x_value) '_mean-subt'],'-dpng','-r600','-opengl')     
         
 %         set(ax1,'xlim',x2lim); set(ax2,'xlim',x2lim); set(ax5,'xlim',x2lim); set(ax6,'xlim',x2lim); set(ax7,'xlim',x2lim); set(ax9,'xlim',x2lim); 
@@ -571,5 +571,4 @@ end
 % % cd 'd:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations';
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
 % print (6, '-deps', filename)
-% filename='response_parameters'; 
-% save(filename, 'peaks', 'peaks_stat', 'peaks_for_xls', 'peak_for_xls_mean')
+% filename='response_parameters'; save(filename, 'peaks', 'peaks_stat', 'peaks_for_xls', 'peak_for_xls_mean')
