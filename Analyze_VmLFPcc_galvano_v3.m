@@ -15,14 +15,14 @@
 clear all
 close all
 cc_stat=[]; cc_spont=[]; cc_evoked=[]; cc=[]; cc_shuffled_it=[]; cc_shuff_sub=[];
- global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data
+ global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X
  
  global exp_type
 exp_type=2; %1-NBES, 2-ChAT
 trace_type_input=1:3; %
 save_flag= 0;
 print_flag=1;
-norm_flag=1;
+norm_flag=0;
 LPF_flag=1;
 lp=300; %set the frequency for LPF of Vm
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
@@ -35,19 +35,22 @@ switch exp_type
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};
+        legend_string_shuff={'NB+ shuffled', 'NB- shuffled'};
 
     case 2
         files_to_analyze =77; %[74,76,77,80,82,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};
+        legend_string_shuff={'Light On shuffled', 'Light Off shuffled'};
 end
 
     for fileind=1:length(files_to_analyze) ;         
     clearvars -except cc_stat cc_spont cc_evoked  files_to_analyze fileind files cc_spont_for_xls_mean...
         cc_evoked_for_xls_mean cc lags cc_shuffled_mean cc_shuffled_it cc_mean cc_shuff_sub_mean save_flag print_flag...
         cc_lag0_mat cc_lag0_shuff_mat cc_max_mat cc_max_time_mat cc_maxdiff_mat  cc_max_shuff_mat...
-        norm_flag  LPF_flag lp BP50HzLFP_flag BP50HzVm_flag BPVm_flag exp_type trace_type_input
+        norm_flag  LPF_flag lp BP50HzLFP_flag BP50HzVm_flag BPVm_flag exp_type trace_type_input...
+        legend_string legend_string_shuff
    
     channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
     
@@ -324,158 +327,106 @@ clear color_table
 % plotting one trace of data and LFP against each other -
  trace=2;%1:size(current_data,2); %5;
  
-% before ES
-%  if trace_type==2;
-%          interval_plot(:,1)=interval(1,1)-0.2*sf{1}:interval(end,1);
-%          data_Vm_plot=current_data(interval_plot(:,1),trace,x_value(1));
-%         data_LFP_plot=Ch2_data_filt(interval_plot(:,1),trace,x_value(1));
-%  else         
         interval_plot(:,1)=interval(:,1);        
         data_Vm_plot=data_Vm{1}(:,trace);
-        data_LFP_plot=data_LFP{1}(:,trace);
-%  end   
-        min_dist=min(data_LFP_plot.*20-data_Vm_plot);
-        shift_LFP=5-min_dist;
-        data_LFP_plot=shift_LFP+data_LFP_plot.*20;
-        
+        data_LFP_plot=data_LFP{1}(:,trace).*20;
+
 Fig{fileind}(trace_type)=figure;
+subplot(2,1,2)
     hold on
         p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot, 'color',color_table(1,:),'LineWidth',1.2);
-        p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot,'color',color_table(2,:),'LineWidth',1.2);
-%         text(interval_plot(1,1).*dt*1000,data_Vm_plot(1),[num2str(floor(data_Vm_plot(1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
-             axis tight
-              ylim_data=[get(gca,'ylim')]';
-              xlim_data=[get(gca,'xlim')]';
-
+        axis tight
+                           
         if trace_type==2;
-            patch_xdata=[stim2_X{2}; flipud(stim2_X{2})];
-            yex=wextend('1D','sym',ylim_data,1);
-            l=(size(patch_xdata,2)-1)/2;
-            patch_ydata=wextend('ac','sym',yex,l);
-            patch_cdata=ones(size(patch_xdata));
-            patch(patch_xdata.*dt*1000,patch_ydata,patch_cdata,'faceColor',whisker_stim_color(1,:),'edgecolor','none'); %'faceAlpha', 0.3
-            set(gca,'xlim',xlim)
-            set(gca,'children',flipud(get(gca,'children')))
+            fn_plot_sensory_stim(dt, stim2_X,whisker_stim_color)
         end
         
         %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
-        
-    %plotting scale bar
-                    yline_start(1)=ylim_data(1)-5; yline_end(1)=yline_start(1)+5;
-                    yline_start(2)=data_LFP_plot(1)-2; yline_end(2)=yline_start(2)+5;
-                    xline_start=interval_plot(1,1).*dt*1000-150;
-%                     if t==2;
-%                      yline_start=ylim_data(1); yline_end=yline_start+2; 
-%                  end
-                    if trace_type==2
-                       yline_start(1)=ylim_data(1)-6; yline_end(1)=yline_start(1)+10; 
-                       yline_start(2)=data_LFP_plot(1)-5; yline_end(2)=yline_start(2)+10;
-                       xline_start=interval_plot(1,1).*dt*1000-50;
-                    end
-                     xline_end=xline_start+200;                   
-                    xline=[xline_start xline_start;xline_end xline_start]; 
-                    yline1=[yline_start(1) yline_start(1); yline_start(1) yline_end(1)];
-                    yline2=[yline_start(2) yline_start(2); yline_start(2) yline_end(2)];
-                    stringh=[num2str(xline(2,1)-xline(1,1)), ' mS'];
-                    stringv1=[num2str(yline1(2,2)-yline1(2,1)), ' mV'];
-                    stringv2=[num2str((yline1(2,2)-yline1(2,1))./20), ' mV'];
-                    hline_h(1)=line(xline(:,1),yline1(1,:),'color',[0 0 0],'linewidth',2); %horizontal scale bar for Vm
-                    hline_v(1)=line(xline(:,2),yline1(:,2),'color',[0 0 0],'linewidth',2); %vertical scale bar for Vm
-                    hline_v(2)=line(xline(:,2),yline2(:,2),'color',[0 0 0],'linewidth',2); %vertical scale bar for LFP
-%                     htext_h=text(xline(1,1)+(xline(2,1)-xline(1,1))/2,yline1(1,1),stringh,'HorizontalAlignment', 'center','VerticalAlignment', 'top','fontsize',10); %'color',[0 0 0]
-                    htext_h=text(xline(1,1),yline1(1,1),stringh,'HorizontalAlignment', 'left','VerticalAlignment', 'top','fontsize',scalebar_fontsize); %'color',[0 0 0]
-%                     htext_v(1)=text(xline(1,1),yline1(2,1)+(yline1(2,2)-yline1(2,1))/2,stringv1,'HorizontalAlignment', 'center','VerticalAlignment', 'bottom', 'rotation',90,'fontsize',10);
-                    htext_v(1)=text(xline(1,1),yline1(2,1),stringv1,'HorizontalAlignment', 'left','VerticalAlignment', 'bottom', 'rotation',90,'fontsize',scalebar_fontsize);
-                    htext_v(2)=text(xline(1,1),yline2(2,1)+(yline2(2,2)-yline2(2,1))/2,stringv2,'HorizontalAlignment', 'center','VerticalAlignment', 'bottom', 'rotation',90,'fontsize',scalebar_fontsize);
-
+horiz_vert=1;        lengthh=0.2;     textit=[num2str(lengthh.*1000), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
+        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+ horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
+        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
     hold off
+    ylim_data=[get(gca,'ylim')]';
+    xlim_data=[get(gca,'xlim')]';
+    set(gca, 'visible', 'off') ;
+    
+  subplot(2,1,1)     
+ 	hold on
+        p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot,'color',color_table(2,:),'LineWidth',1.2);
+%         text(interval_plot(1,1).*dt*1000,data_Vm_plot(1),[num2str(floor(data_Vm_plot(1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')  
+
+        axis tight            
+
+        if trace_type==2;
+            fn_plot_sensory_stim(dt,stim2_X,whisker_stim_color)
+        end
+        
+        %plotting scale bar
+ horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh./20), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
+        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+    hold off  
+    set(gca,'xlim',xlim_data)
+    set(gca, 'visible', 'off') ;
+
 title('Vm-LFP single trace ES Off','FontSize', 16); 
-% [legh,objh,outh,outm]=legend([p1,p2],{'Vm','LFP'},'fontsize',12,'box','off', 'location','northeast'); 
-% set(objh,'linewidth',1.5); 
-% set(objh(1:2),'fontsize',11); 
-ylim1=[yline_start(1)-5, ylim_data(2)+0.25*(ylim_data(2)- ylim_data(1))];
-xlim1=[xline_start-200, xlim_data(2)];
 ylabel('Potential [mV]' ,'FontSize', 14); xlabel('Time [S]','FontSize', 14)
-set(gca,'ylim',ylim1,'xlim',xlim1,'fontsize',14);                  
 l=legend([p2,p1],{'LFP','Vm'},'linewidth',1.5,'Location','northeast', 'box', 'off'); 
 l.LineWidth=1.5;
-set(gca, 'visible', 'off') ;
 
 % pause
 % close(gcf);
 % end %end of trace for loop
 
 % after ES
-  if trace_type==2;
-         interval_plot(:,2)=interval(1,2)-0.2*sf{1}:interval(end,2);
-         data_Vm_plot=current_data(interval_plot(:,2),trace,x_value(2));
-        data_LFP_plot=Ch2_data_filt(interval_plot(:,2),trace,x_value(2));
-  else       
+       
         interval_plot(:,2)=interval(:,2);        
         data_Vm_plot=data_Vm{2}(:,trace);
         data_LFP_plot=data_LFP{2}(:,trace);  
-     end
-        min_dist=min(data_LFP_plot.*20-data_Vm_plot);
-        shift_LFP=5-min_dist;
-        data_LFP_plot=shift_LFP+data_LFP_plot.*20;
-        
-Fig{fileind}(trace_type+2)=figure;
+          
+Fig{fileind}(trace_type+3)=figure;
+subplot(2,1,2)
     hold on
         p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot,'color',color_table(5,:),'LineWidth',1.2);
-       p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot,'color',color_table(4,:),'LineWidth',1.2);
-%         text(interval_plot(1,1).*dt*1000,data_Vm_plot(1),[num2str(floor(data_Vm_plot(1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
-             axis tight
-              ylim_data=[get(gca,'ylim')]';
-              xlim_data=[get(gca,'xlim')]';
-              
-    if trace_type==2;
-            patch_xdata=[stim2_X{2}; flipud(stim2_X{2})];
-            yex=wextend('1D','sym',ylim_data,1);
-            l=(size(patch_xdata,2)-1)/2;
-            patch_ydata=wextend('ac','sym',yex,l);
-            patch_cdata=ones(size(patch_xdata));
-            patch(patch_xdata.*dt*1000,patch_ydata,patch_cdata,'faceColor',whisker_stim_color(1,:),'edgecolor','none'); %'faceAlpha', 0.3
-            set(gca,'children',flipud(get(gca,'children')))
+        axis tight
+                           
+        if trace_type==2;
+            fn_plot_sensory_stim(dt, stim2_X,whisker_stim_color)
         end
-    %plotting scale bar
-                    yline_start(1)=ylim_data(1)-5; yline_end(1)=yline_start(1)+5;
-                    yline_start(2)=data_LFP_plot(1)-2; yline_end(2)=yline_start(2)+5;
-                    xline_start=interval_plot(1,1).*dt*1000-150;
-%                     if t==2;
-%                      yline_start=ylim_data(1); yline_end=yline_start+2; 
-%                  end
-                    if trace_type==2
-                       yline_start(1)=ylim_data(1)-6; yline_end(1)=yline_start(1)+10; 
-                       yline_start(2)=data_LFP_plot(1)-5; yline_end(2)=yline_start(2)+10;
-                       xline_start=interval_plot(1,1).*dt*1000-50;
-                    end
-                     xline_end=xline_start+200;                   
-                    xline=[xline_start xline_start;xline_end xline_start]; 
-                    yline1=[yline_start(1) yline_start(1); yline_start(1) yline_end(1)];
-                    yline2=[yline_start(2) yline_start(2); yline_start(2) yline_end(2)];
-                    stringh=[num2str(xline(2,1)-xline(1,1)), ' mS'];
-                    stringv1=[num2str(yline1(2,2)-yline1(2,1)), ' mV'];
-                    stringv2=[num2str((yline2(2,2)-yline2(2,1))./20), ' mV'];
-%                     hline_h(1)=line(xline(:,1),yline1(1,:),'color',[0 0 0],'linewidth',2); %horizontal scale bar for Vm
-%                     hline_v(1)=line(xline(:,2),yline1(:,2),'color',[0 0 0],'linewidth',2); %vertical scale bar for Vm 
-%                     hline_v(2)=line(xline(:,2),yline2(:,2),'color',[0 0 0],'linewidth',2); %vertical scale bar for LFP
-%                     htext_h=text(xline(1,1),yline1(1,1),stringh,'HorizontalAlignment', 'left','VerticalAlignment', 'top','fontsize',scalebar_fontsize); %'color',[0 0 0]
-%                     htext_v(1)=text(xline(1,1),yline1(2,1),stringv1,'HorizontalAlignment', 'left','VerticalAlignment', 'bottom', 'rotation',90,'fontsize',scalebar_fontsize);
-%                     htext_v(2)=text(xline(1,1),yline2(2,1)+(yline2(2,2)-yline2(2,1))/2,stringv2,'HorizontalAlignment', 'center','VerticalAlignment', 'bottom', 'rotation',90,'fontsize',scalebar_fontsize);
+        
+        %plotting scale bar
+horiz_vert=1;        lengthh=0.2;     textit=[num2str(lengthh.*1000), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
+        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+ horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
+        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
     hold off
+    ylim_data=[get(gca,'ylim')]';
+    xlim_data=[get(gca,'xlim')]';
+    set(gca, 'visible', 'off') ;
+    
+  subplot(2,1,1)     
+ 	hold on
+       p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot,'color',color_table(4,:),'LineWidth',1.2);
+%         text(interval_plot(1,1).*dt*1000,data_Vm_plot(1),[num2str(floor(data_Vm_plot(1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')  
+
+        axis tight            
+
+        if trace_type==2;
+            fn_plot_sensory_stim(dt,stim2_X,whisker_stim_color)
+        end
+        
+        %plotting scale bar
+ horiz_vert=0;        lengthh=0.5;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
+        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+    hold off  
+    set(gca,'xlim',xlim_data)
+    set(gca, 'visible', 'off') ;
+
 title('Vm-LFP single trace ES On','FontSize', 16); 
-% [legh,objh,outh,outm]=legend([p1,p2],{'Vm','LFP'},'fontsize',12,'box','off', 'location','northeast'); 
-% set(objh,'linewidth',1.5); 
-% set(objh(1:2),'fontsize',11); 
 ylabel('Potential [mV]' ,'FontSize', 14); xlabel('Time [S]','FontSize', 14)
-set(gca,'ylim',ylim1,'xlim',xlim1, 'fontsize',14);    %[yline_start(1)-5, ylim_data(2)+0.25*(ylim_data(2)- ylim_data(1))]; [xline_start-200, xlim_data(2)]
-l=legend([p2,p1],{'LFP','Vm'},'Location','northeast', 'box', 'off');
+l=legend([p2,p1],{'LFP','Vm'},'linewidth',1.5,'Location','northeast', 'box', 'off'); 
 l.LineWidth=1.5;
- set(gca, 'visible', 'off') ;
+
 %% clear prcntile1_off prcntile2_off ci_off patch_xdata patch_ydata
 %plotting the crosscorrelation for a single trace+the mean
 
@@ -486,7 +437,7 @@ l.LineWidth=1.5;
  cc_shuffled_sem1=std(cc_shuffled_it{fileind,1}(:,:),0,2)./sqrt(size(cc_shuff_sub{fileind,1}(:,:),2));
  cc_shuffled_sem2=std(cc_shuffled_it{fileind,2}(:,:),0,2)./sqrt(size(cc_shuff_sub{fileind,2}(:,:),2));
 
- Fig{fileind}(trace_type+4)=figure;
+ Fig{fileind}(trace_type+6)=figure;
  hold on
 % sem_xdata(:,1)=[lags{1}(:); fliplr(lags{1}(:))];
 % sem_ydata(:,1)=[prcntile1_off; fliplr(prcntile2_off)];
@@ -530,7 +481,7 @@ hold off
 % h2=scatter(c_mean_max_lag(1).*dt,c_mean_max_val(2),'y','fill');
 %% Plot actual and shuffled data on separate figures
 
-Fig{fileind}(trace_type+6)=figure;
+Fig{fileind}(trace_type+9)=figure;
  hold on
  h1=fn_shadedErrorBar(lags{fileind,1}.*dt,cc_shuff_sub_mean{fileind}(:,1),cc_shuff_sub_sem1,{'LineWidth',1.5,'color', color_table(1,:)},1);
 h2=fn_shadedErrorBar(lags{fileind,1}.*dt,cc_shuff_sub_mean{fileind}(:,2),cc_shuff_sub_sem2,{'LineWidth',1.5,'color', color_table(5,:)},1);
@@ -539,15 +490,16 @@ ylim=[-0.4 0.4];
 yticks=[-0.4, -0.2 0, 0.2];
 % hline_zero=line([0 0],[ylim(1) ylim(2)],'linestyle','-.','color',[136 137 138]./256,'linewidth',1);
 % title('Vm-LFP crosscorrelation','FontSize', 16); 
-l=legend([h1.mainLine h2.mainLine ],{'NB-','NB+'},'Location','northeast', 'box', 'off');
+l=legend([h1.mainLine h2.mainLine ],legend_string,'Location','northeast', 'box', 'off');
 l.LineWidth=1.5;
 l.FontSize=11;
 % legend('ES off mean cc','ES on mean cc'); legend('boxoff');%legend('boxoff','fontsize',6,'linewidth',1.5,'Position',[0.39,0.45,0.25,0.1]);
 xlabel('Lags [S]' ,'FontSize', 14); ylabel('CC' ,'FontSize', 14);
-set(gca,'xlim',[-0.5 0.5],'xtick',[-0.5 0 0.5],'ylim', ylim, 'ytick',yticks,'fontsize',14); %set(gca,'xlim',[-0.2 0.2]); set(gca,'xtick',[-0.2 0 0.2]);
+set(gca,'xlim',[-0.5 0.5],'xtick',[-0.5 0 0.5],'fontsize',14); 
+% set(gca,'xlim',[-0.5 0.5],'xtick',[-0.5 0 0.5],'ylim', ylim, 'ytick',yticks,'fontsize',14); 
 hold off
 
-Fig{fileind}(trace_type+8)=figure;
+Fig{fileind}(trace_type+12)=figure;
  hold on
 h3=fn_shadedErrorBar(lags{fileind,1}.*dt,cc_shuffled_mean{fileind}(:,1),cc_shuffled_sem1,{'LineWidth',1.5,'linestyle','--','color', color_table(1,:)},1);
 h4=fn_shadedErrorBar(lags{fileind,1}.*dt,cc_shuffled_mean{fileind}(:,2),cc_shuffled_sem2,{'LineWidth',1.5,'linestyle','--','color', color_table(5,:)},1);
@@ -560,12 +512,13 @@ yticks=[-0.8, -0.4, 0, 0.4, 0.8];
  end
 % hline_zero=line([0 0],[ylim(1) ylim(2)],'linestyle','-.','color',[136 137 138]./256,'linewidth',1);
 % title('Vm-LFP crosscorrelation','FontSize', 16); 
-l=legend([h3.mainLine h4.mainLine ],{'NB- shuffled','NB+ shuffled'},'Location','northeast', 'box', 'off');
+l=legend([h3.mainLine h4.mainLine ],legend_string_shuff,'Location','northeast', 'box', 'off');
 l.LineWidth=1.5;
 l.FontSize=11;
 % legend('ES off mean cc','ES on mean cc'); legend('boxoff');%legend('boxoff','fontsize',6,'linewidth',1.5,'Position',[0.39,0.45,0.25,0.1]);
 xlabel('Lags [S]' ,'FontSize', 14); ylabel('CC' ,'FontSize', 14);
-set(gca,'xlim',[-0.5 0.5],'xtick',[-0.5 0 0.5],'ylim',ylim,'ytick',yticks,'fontsize',14); %set(gca,'xlim',[-0.2 0.2]); set(gca,'xtick',[-0.2 0 0.2]);
+set(gca,'xlim',[-0.5 0.5],'xtick',[-0.5 0 0.5],'fontsize',14);
+% set(gca,'xlim',[-0.5 0.5],'xtick',[-0.5 0 0.5],'ylim',ylim,'ytick',yticks,'fontsize',14); 
 hold off
 % pause
         %% Save figures    
@@ -573,29 +526,29 @@ hold off
    if save_flag==1
         switch trace_type
             case 1
-                saveas(Fig{fileind}(trace_type),['Vm-LFP_spont_ES_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'fig') 
-                print(Fig{fileind}(trace_type),['Vm-LFP_spont_ES_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'-dpng','-r600','-opengl') 
-                saveas(Fig{fileind}(trace_type+2),['Vm-LFP_spont_ES_On_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'fig') 
-                print(Fig{fileind}(trace_type+2),['Vm-LFP_spont_ES_On_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'-dpng','-r600','-opengl') 
-                saveas(Fig{fileind}(trace_type+4),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind))],'fig') 
-                print(Fig{fileind}(trace_type+4),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind))],'-dpng','-r600','-opengl') 
-                saveas(Fig{fileind}(trace_type+6),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'actual_data'],'fig') 
-                print(Fig{fileind}(trace_type+6),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'actual_data'],'-dpng','-r600','-opengl') 
-                saveas(Fig{fileind}(trace_type+8),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'shuffled_data'],'fig') 
-                print(Fig{fileind}(trace_type+8),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'shuffled_data'],'-dpng','-r600','-opengl') 
+                saveas(Fig{fileind}(trace_type),['Vm-LFP_spont_stim1_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'fig') 
+                print(Fig{fileind}(trace_type),['Vm-LFP_spont_stim1_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'-dpng','-r600','-opengl') 
+                saveas(Fig{fileind}(trace_type+3),['Vm-LFP_spont_stim1_On_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'fig') 
+                print(Fig{fileind}(trace_type+3),['Vm-LFP_spont_stim1_On_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'-dpng','-r600','-opengl') 
+                saveas(Fig{fileind}(trace_type+6),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind))],'fig') 
+                print(Fig{fileind}(trace_type+6),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind))],'-dpng','-r600','-opengl') 
+                saveas(Fig{fileind}(trace_type+9),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'actual_data'],'fig') 
+                print(Fig{fileind}(trace_type+9),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'actual_data'],'-dpng','-r600','-opengl') 
+                saveas(Fig{fileind}(trace_type+12),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'shuffled_data'],'fig') 
+                print(Fig{fileind}(trace_type+12),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'shuffled_data'],'-dpng','-r600','-opengl') 
 
 
             case 2
-                saveas(Fig{fileind}(trace_type),['Vm-LFP_evoked_ES_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'fig') 
-                print(Fig{fileind}(trace_type),['Vm-LFP_evoked_ES_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'-dpng','-r600','-opengl') 
-                saveas(Fig{fileind}(trace_type+2),['Vm-LFP_evoked_ES_On_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'fig') 
-                print(Fig{fileind}(trace_type+2),['Vm-LFP_evoked_ES_On_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'-dpng','-r600','-opengl') 
-                saveas(Fig{fileind}(trace_type+4),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind))],'fig') 
-                print(Fig{fileind}(trace_type+4),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind))],'-dpng','-r600','-opengl') 
-                saveas(Fig{fileind}(trace_type+6),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind)), 'actual_data'],'fig') 
-                print(Fig{fileind}(trace_type+6),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind)), 'actual_data'],'-dpng','-r600','-opengl') 
-                saveas(Fig{fileind}(trace_type+8),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind)), 'shuffled_data'],'fig') 
-                print(Fig{fileind}(trace_type+8),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind)), 'shuffled_data'],'-dpng','-r600','-opengl') 
+                saveas(Fig{fileind}(trace_type),['Vm-LFP_evoked_stim1_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'fig') 
+                print(Fig{fileind}(trace_type),['Vm-LFP_evoked_stim1_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'-dpng','-r600','-opengl') 
+                saveas(Fig{fileind}(trace_type+3),['Vm-LFP_evoked_stim1_On_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'fig') 
+                print(Fig{fileind}(trace_type+3),['Vm-LFP_evoked_stim1_On_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'-dpng','-r600','-opengl') 
+                saveas(Fig{fileind}(trace_type+6),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind))],'fig') 
+                print(Fig{fileind}(trace_type+6),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind))],'-dpng','-r600','-opengl') 
+                saveas(Fig{fileind}(trace_type+9),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind)), 'actual_data'],'fig') 
+                print(Fig{fileind}(trace_type+9),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind)), 'actual_data'],'-dpng','-r600','-opengl') 
+                saveas(Fig{fileind}(trace_type+12),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind)), 'shuffled_data'],'fig') 
+                print(Fig{fileind}(trace_type+12),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind)), 'shuffled_data'],'-dpng','-r600','-opengl') 
                 % saveas(Fig10,['Vm-LFPcc_ongoing+evoked_file_' num2str(files_to_analyze(fileind)) '.fig']) 
                 % print(Fig10,['Vm-LFPcc_ongoing+evoked_file_' num2str(files_to_analyze(fileind))],'-dpng','-r600','-opengl') 
         end
@@ -607,6 +560,11 @@ hold off
         
         cc_spont(fileind).fname = fname;
         cc_spont(fileind).win_duration = duration;
+        cc_spont(fileind).BP50HzLFP=BP50HzLFP_flag; %removing 50Hz noise from LFP signal
+        cc_spont(fileind).BP50HzVm=BP50HzVm_flag; %removing 50Hz noise from Vm signal
+        cc_spont(fileind).BPVm=BPVm_flag; %filtering LFP and Vm same as LFP was filtered in the multiclamp
+        cc_spont(fileind).LPFVm=LPF_flag; %low-pass filtering of Vm
+        cc_spont(fileind).LP=lp; %set the frequency for LPF of Vm
         cc_spont(fileind).cc_max=c_mean_max_val; %value of maximal correlation 
         cc_spont(fileind).cc_max_lag=lags{fileind,1}(c_mean_max_r)';         
         cc_spont(fileind).cc_max_time=lags{fileind,1}(c_mean_max_r).*dt;
@@ -629,6 +587,11 @@ hold off
     if trace_type==2
         cc_evoked(fileind).fname = fname;
         cc_evoked(fileind).win_duration = duration;
+        cc_evoked(fileind).BP50HzLFP=BP50HzLFP_flag; %removing 50Hz noise from LFP signal
+        cc_evoked(fileind).BP50HzVm=BP50HzVm_flag; %removing 50Hz noise from Vm signal
+        cc_evoked(fileind).BPVm=BPVm_flag; %filtering LFP and Vm same as LFP was filtered in the multiclamp
+        cc_evoked(fileind).LPFVm=LPF_flag; %low-pass filtering of Vm
+        cc_evoked(fileind).LP=lp; %set the frequency for LPF of Vm
         cc_evoked(fileind).cc_max=c_mean_max_val; %value of maximal correlation
         cc_evoked(fileind).cc_max_shuff=c_mean_max_val_shuff; %value of cc_shuffled at the maximal correlation point at cc_shuff_sub
         cc_evoked(fileind).cc_max_lag=lags{fileind,1}(c_mean_max_r);
