@@ -146,7 +146,31 @@ if LPF_flag==1;
 end
 
 %% set the path for saving figures and variables
-a = exist('name','dir'); %a will be 1 if a folder "name" exists and 0 otherwise
+if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1 && LPF_flag==1
+    path_output='LFP+Vm filtered 50Hz+BP+LPF';
+else if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1
+     path_output='LFP+Vm filtered 50Hz+BP';  
+    else if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && LPF_flag==1
+            path_output='LFP+Vm filtered 50Hz+LPF';  
+         else if BP50HzLFP_flag==1 && BP50HzVm_flag==1
+                 path_output='LFP+Vm filtered 50Hz';  
+             else if BP50HzLFP_flag==1 
+                 path_output='LFP filtered 50Hz';  
+                 else path_output='Test';
+                 end
+             end
+        end
+    end
+end
+switch exp_type
+    case 1
+        path_output=['D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\',path_output];   
+        
+    case 2
+        path_output=['D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Vm-LFP correlations\',path_output];      
+end
+ 
+a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
                 mkdir('D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 50Hz')
                 mkdir('D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP+Vm filtered 50Hz')
                 mkdir('D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP+Vm filtered 50Hz+LPF')

@@ -144,6 +144,43 @@ if LPF_flag==1;
             end
         end
 end
+
+%% set the path for saving figures and variables
+if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1 && LPF_flag==1
+    path_output='LFP+Vm filtered 50Hz+BP+LPF';
+else if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1
+     path_output='LFP+Vm filtered 50Hz+BP';  
+    else if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && LPF_flag==1
+            path_output='LFP+Vm filtered 50Hz+LPF';  
+         else if BP50HzLFP_flag==1 && BP50HzVm_flag==1
+                 path_output='LFP+Vm filtered 50Hz';  
+             else if BP50HzLFP_flag==1 
+                 path_output='LFP filtered 50Hz';  
+                 else path_output='Test';
+                 end
+             end
+        end
+    end
+end
+switch exp_type
+    case 1
+        path_output=['D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\',path_output];   
+        cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations'
+        a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
+        if a==0;
+            mkdir(path_output);
+        end
+        cd(path_output)       
+    case 2
+        path_output=['D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Vm-LFP correlations\',path_output]; 
+        cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Vm-LFP correlations'
+        a = exist(path_output,'dir'); %a will be 7 if a folder "name" exists and 0 otherwise
+        if a==0;
+            mkdir(path_output);
+        end
+        cd(path_output)
+end
+ 
 %%
 clear  duration start_time start_sample end_sample interval interval_mat interval_plot x y patch_xdata patch_ydata yex ylim_data sem_xdata sem_ydata sem_cdata
 coeffs=[]; 
@@ -500,34 +537,40 @@ xlabel('Lags [S]' ,'FontSize', 14); ylabel('CC' ,'FontSize', 14);
 set(gca,'xlim',[-0.5 0.5],'xtick',[-0.5 0 0.5],'ylim',ylim,'ytick',yticks,'fontsize',14); %set(gca,'xlim',[-0.2 0.2]); set(gca,'xtick',[-0.2 0 0.2]);
 hold off
 % pause
-        %% Save figures       
- cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz Presentation'
-% cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP+Vm filtered'
+        %% Save figures    
+        switch exp_type
+            case 1
+                 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz Presentation'
+                % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP+Vm filtered'
+                
+            case 2
+                % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP+Vm filtered'
+        end
 if save_flag==1
 switch trace_type
     case 1
-saveas(Fig{fileind}(trace_type),['Vm-LFP_spont_ES_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace), '.fig']) 
+saveas(Fig{fileind}(trace_type),['Vm-LFP_spont_ES_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'fig') 
 print(Fig{fileind}(trace_type),['Vm-LFP_spont_ES_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'-dpng','-r600','-opengl') 
-saveas(Fig{fileind}(trace_type+2),['Vm-LFP_spont_ES_On_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace), '.fig']) 
+saveas(Fig{fileind}(trace_type+2),['Vm-LFP_spont_ES_On_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'fig') 
 print(Fig{fileind}(trace_type+2),['Vm-LFP_spont_ES_On_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'-dpng','-r600','-opengl') 
-saveas(Fig{fileind}(trace_type+4),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)) '.fig']) 
+saveas(Fig{fileind}(trace_type+4),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind))],'fig') 
 print(Fig{fileind}(trace_type+4),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind))],'-dpng','-r600','-opengl') 
-saveas(Fig{fileind}(trace_type+6),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'actual_data.fig']) 
+saveas(Fig{fileind}(trace_type+6),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'actual_data'],'fig') 
 print(Fig{fileind}(trace_type+6),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'actual_data'],'-dpng','-r600','-opengl') 
-saveas(Fig{fileind}(trace_type+8),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'shuffled_data.fig']) 
+saveas(Fig{fileind}(trace_type+8),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'shuffled_data'],'fig') 
 print(Fig{fileind}(trace_type+8),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'shuffled_data'],'-dpng','-r600','-opengl') 
 
 
     case 2
-saveas(Fig{fileind}(trace_type),['Vm-LFP_evoked_ES_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace), '.fig']) 
+saveas(Fig{fileind}(trace_type),['Vm-LFP_evoked_ES_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'fig') 
 print(Fig{fileind}(trace_type),['Vm-LFP_evoked_ES_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'-dpng','-r600','-opengl') 
-saveas(Fig{fileind}(trace_type+2),['Vm-LFP_evoked_ES_On_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace), '.fig']) 
+saveas(Fig{fileind}(trace_type+2),['Vm-LFP_evoked_ES_On_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'fig') 
 print(Fig{fileind}(trace_type+2),['Vm-LFP_evoked_ES_On_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'-dpng','-r600','-opengl') 
-saveas(Fig{fileind}(trace_type+4),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind)) '.fig']) 
+saveas(Fig{fileind}(trace_type+4),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind))],'fig') 
 print(Fig{fileind}(trace_type+4),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind))],'-dpng','-r600','-opengl') 
-saveas(Fig{fileind}(trace_type+6),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind)), 'actual_data.fig']) 
+saveas(Fig{fileind}(trace_type+6),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind)), 'actual_data'],'fig') 
 print(Fig{fileind}(trace_type+6),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind)), 'actual_data'],'-dpng','-r600','-opengl') 
-saveas(Fig{fileind}(trace_type+8),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind)), 'shuffled_data.fig']) 
+saveas(Fig{fileind}(trace_type+8),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind)), 'shuffled_data'],'fig') 
 print(Fig{fileind}(trace_type+8),['Vm-LFPcc_evoked_f' num2str(files_to_analyze(fileind)), 'shuffled_data'],'-dpng','-r600','-opengl') 
 % saveas(Fig10,['Vm-LFPcc_ongoing+evoked_file_' num2str(files_to_analyze(fileind)) '.fig']) 
 % print(Fig10,['Vm-LFPcc_ongoing+evoked_file_' num2str(files_to_analyze(fileind))],'-dpng','-r600','-opengl') 
@@ -587,7 +630,7 @@ clear c_max c_lag0 temp_mean c_mean_max_r c_mean_max_c...% c_mean_max_val...
     max_diff_val max_diff_loc c_maxdiff cc_shuff_sub cc_shuffled_mean  cc_shuffled_it cc lags cc_mean cc_shuff_sub_mean
 
 end  
-close all
+% close all
     end
 %% Statistics for cross-correlation
 %t-tests between cells  
@@ -859,7 +902,7 @@ hold off
  if save_flag==1;
  cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz'
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP+Vm filtered'
-saveas(gcf,'Vm-LFPcc_spont_max-peak_paired_population.fig') 
+saveas(gcf,'Vm-LFPcc_spont_max-peak_paired_population','fig') 
 print(gcf,'Vm-LFPcc_spont_max-peak_paired_population','-dpng','-r600','-opengl') 
  end
           %% Paired plot of evoked non-normalized max peak
@@ -884,7 +927,7 @@ hold off
           if save_flag==1;
  cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz'
 %   cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP+Vm filtered'
-saveas(gcf,'Vm-LFPcc_evoked_max-peak_paired_population.fig') 
+saveas(gcf,'Vm-LFPcc_evoked_max-peak_paired_population','fig') 
 print(gcf,'Vm-LFPcc_evoked_max-peak_paired_population','-dpng','-r600','-opengl') 
 end
 
@@ -913,7 +956,7 @@ hold off
 if save_flag==1;
  cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz'
 %   cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP+Vm filtered'
-saveas(gcf,'Vm-LFPcc_spont_zero-lag_paired_population.fig') 
+saveas(gcf,'Vm-LFPcc_spont_zero-lag_paired_population','fig') 
 print(gcf,'Vm-LFPcc_spont_zero-lag_paired_population','-dpng','-r600','-opengl') 
 end
         %% Paired plot of spont non-normalized lag0 shuffled
@@ -940,7 +983,7 @@ hold off
 if save_flag==1;
  cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz'
 %   cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP+Vm filtered'
-saveas(gcf,'Vm-LFPcc_spont_zero-lag_shuff_paired_population.fig') 
+saveas(gcf,'Vm-LFPcc_spont_zero-lag_shuff_paired_population','fig') 
 print(gcf,'Vm-LFPcc_spont_zero-lag_shuff_paired_population','-dpng','-r600','-opengl') 
 end
           %% Paired plot of evoked non-normalized lag0
@@ -967,7 +1010,7 @@ end
 %  if save_flag==1;
 % %   cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz'
 % %   cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP+Vm filtered'
-% saveas(gcf,'Vm-LFPcc_evoked_zero-lag_paired_population.fig') 
+% saveas(gcf,'Vm-LFPcc_evoked_zero-lag_paired_population','fig') 
 % print(gcf,'Vm-LFPcc_evoked_zero-lag_paired_population','-dpng','-r600','-opengl') 
 %  end
 % 
@@ -995,7 +1038,7 @@ end
 % %  if save_flag==1;
 % % %   cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz'
 % % %   cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP+Vm filtered'
-% % saveas(gcf,'Vm-LFPcc_evoked_zero-lag_shuff_paired_population.fig') 
+% % saveas(gcf,'Vm-LFPcc_evoked_zero-lag_shuff_paired_population','fig') 
 % % print(gcf,'Vm-LFPcc_evoked_zero-lag_shuff_paired_population','-dpng','-r600','-opengl') 
 % %  end 
 %% variables for repeated-measures ANOVA using a downloaded function
@@ -1239,7 +1282,7 @@ set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1, 'ylim',
  if save_flag==1;
  cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz'
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP+Vm filtered'
-saveas(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population.fig') 
+saveas(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population','fig') 
 print(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population','-dpng','-r600','-opengl') 
  end
          %% Paired plot of shuffled spont+evoked non-normalized max peak absolute values
@@ -1305,7 +1348,7 @@ set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1, 'ylim',
  if save_flag==1;
  cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz'
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP+Vm filtered'
-saveas(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population_shuff.fig') 
+saveas(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population_shuff','fig') 
 print(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population_shuff','-dpng','-r600','-opengl') 
  end
           %% Paired plot of spont+evoked non-normalized max peak real values
@@ -1371,7 +1414,7 @@ set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1, 'ylim',
  if save_flag==1;
  cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz'
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP+Vm filtered'
-saveas(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population_real_value.fig') 
+saveas(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population_real_value','fig') 
 print(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population_real_value','-dpng','-r600','-opengl') 
  end
          %% Paired plot of shuffled spont+evoked non-normalized max peak real values
@@ -1437,7 +1480,7 @@ set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1, 'ylim',
  if save_flag==1;
  cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz'
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP+Vm filtered'
-saveas(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population_shuff_real_value.fig') 
+saveas(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population_shuff_real_value','fig') 
 print(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population_shuff_real_value','-dpng','-r600','-opengl') 
  end
 %% Save analysis
