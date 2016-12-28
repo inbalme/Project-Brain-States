@@ -73,7 +73,6 @@ coeffs=[];
 switch trace_type
     case 1
 %          start_time = [0.4,5.6]; %[sec] %[0,5]
-%          duration = 2.5; %[sec] 
          start_time=[0.4, stim1_X{x_value(1)}(1,1).*dt+0.4];
          duration =2.5;
             for t=1:length(start_time);

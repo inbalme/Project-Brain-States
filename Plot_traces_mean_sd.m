@@ -7,7 +7,7 @@ clear all
 exp_type=1; %1-NBES, 2-ChAT
 save_flag= 0;
 print_flag=0;
-short_flag=0; %1- short trace, 0- long trace
+% short_flag=0; %1- short trace, 0- long trace
 LPF_flag=0;
 baseline_flag=0; %adding dashed line under traces
 bl=-70; %baseline value;
