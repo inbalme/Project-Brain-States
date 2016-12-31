@@ -13,43 +13,48 @@
 %                 11 - NBES: 3 currents+galvano train+test (6 x-values)
 
 clear all
-close all
+% close all
 cc_stat=[]; cc_spont=[]; cc_evoked=[]; cc=[]; cc_shuffled_it=[]; cc_shuff_sub=[];
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X
  
  global exp_type
 exp_type=2; %1-NBES, 2-ChAT
-trace_type_input=2; %
-save_flag= 0;
+trace_type_input=1:3; %
+save_flag= 1;
 print_flag=1;
 norm_flag=0;
-LPF_flag=1;
-lp=300; %set the frequency for LPF of Vm
+% LPF_flag=1;
+% lp=300; %set the frequency for LPF of Vm
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
+BPLFP_flag=1; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
+bp_manual_LFP=[0.1,150]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
+bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 
 switch exp_type
     case 1
-        files_to_analyze =[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
+        files_to_analyze =[46,48,50]; [8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};
         legend_string_shuff={'NB+ shuffled', 'NB- shuffled'};
 
     case 2
-        files_to_analyze =77; %[74,76,77,80,82,84,87];
+        files_to_analyze =77; %[76,77,80,82,84]; %87
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};
         legend_string_shuff={'Light On shuffled', 'Light Off shuffled'};
 end
 
-    for fileind=1:length(files_to_analyze) ;         
+    for fileind=1:length(files_to_analyze) ;    
+        close all
     clearvars -except cc_stat cc_spont cc_evoked  files_to_analyze fileind files cc_spont_for_xls_mean...
         cc_evoked_for_xls_mean cc lags cc_shuffled_mean cc_shuffled_it cc_mean cc_shuff_sub_mean save_flag print_flag...
         cc_lag0_mat cc_lag0_shuff_mat cc_max_mat cc_max_time_mat cc_maxdiff_mat  cc_max_shuff_mat...
-        norm_flag  LPF_flag lp BP50HzLFP_flag BP50HzVm_flag BPVm_flag exp_type trace_type_input
+        norm_flag  BP50HzLFP_flag BP50HzVm_flag BPVm_flag bp_manual exp_type trace_type_input...
+        legend_string legend_string_shuff
    
     channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
     
@@ -73,7 +78,7 @@ end
     current_data=data_no_spikes{channel};
     current_data_filt=[]; Ch2_data_filt=[];
 
-%% bandpass filtering to remove noise from LFP and Vm.
+%% bandpass filtering to remove 50Hz noise from LFP and Vm.
 if BP50HzLFP_flag==1;
     if isempty(Ch2_data_filt)
         tmpMat=Ch2_data;
@@ -103,56 +108,55 @@ if BP50HzVm_flag==1;
         end
 end
  tmpMat=[];
+ bp_filt=files(files_to_analyze(fileind)).V2_filter;
  
-if BPVm_flag==1;  %filtering both LFP and VM same as LFP was filtered during the experiment via multiclamp
-    bp_filt=files(files_to_analyze(fileind)).V2_filter;
+if BPLFP_flag==1;  %filtering both LFP and VM same as LFP was filtered during the experiment via multiclamp
+    if ~isempty(bp_manual_LFP)
+        bp_filt_LFP=bp_manual_LFP;
+    end
         if isempty(Ch2_data_filt)
-        tmpMat1=Ch2_data;
+        tmpMat=Ch2_data;
     else
-        tmpMat1=Ch2_data_filt;
+        tmpMat=Ch2_data_filt;
         end
-        if isempty(current_data_filt)
-            tmpMat2=current_data;
-        else
-            tmpMat2=current_data_filt;
-        end
+       
         for xx=1:3
             for trace= 1:size(tmpMat1,2)   
-                kl=tmpMat1(:,trace,xx);
+                kl=tmpMat(:,trace,xx);
                  Ch2_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(kl,dt,bp_filt(1),bp_filt(2),0,0); %filtering out 50Hz noise from LFP and Vm
-                km=tmpMat2(:,trace,xx);
-                 current_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(km,dt,bp_filt(1),bp_filt(2),0,0); %filtering Vm same as LFP
-        end
-        end
-end
-
-%% low-pass filtering of Vm below 300Hz       
-if LPF_flag==1;
-    if isempty(current_data_filt)
-        tmpMat=current_data;
-    else
-        tmpMat=current_data_filt;
-    end
-        for xx=1:3
-            for trace= 1:size(tmpMat,2)    
-                jj=tmpMat(:,trace,xx);
-                current_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(jj,dt,-1,lp,0,0); 
             end
         end
 end
+ tmpMat=[];
+if BPVm_flag==1;  %filtering both LFP and VM same as LFP was filtered during the experiment via multiclamp
+    if ~isempty(bp_manual_Vm)
+        bp_filt=bp_manual_Vm;
+    end      
+        if isempty(current_data_filt)
+            tmpMat=current_data;
+        else
+            tmpMat=current_data_filt;
+        end
+        for xx=1:3
+               km=tmpMat(:,trace,xx);
+               current_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(km,dt,bp_filt(1),bp_filt(2),0,0); %filtering Vm same as LFP
+        end
+        end
+end
+%% low-pass filtering of Vm below 300Hz       
 
 %% set the path for saving figures and variables
-if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1 && LPF_flag==1
-    path_output='LFP+Vm filtered 50Hz+BP+LPF';
-else if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1
-     path_output='LFP+Vm filtered 50Hz+BP';  
-    else if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && LPF_flag==1
-            path_output='LFP+Vm filtered 50Hz+LPF';  
+if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1 && BPLFP_flag==1
+    path_output='LFP_50Hz+BP Vm_ 50Hz+BP';
+else if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPLFP_flag==1
+     path_output='LFP_50Hz+BP Vm_ 50Hz';  
+    else if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1
+            path_output='LFP_50Hz Vm_50Hz+BP';  
          else if BP50HzLFP_flag==1 && BP50HzVm_flag==1
-                 path_output='LFP+Vm filtered 50Hz';  
+                 path_output='LFP_50Hz Vm_50Hz';  
              else if BP50HzLFP_flag==1 
-                 path_output='LFP filtered 50Hz';  
-                 else path_output='Test';
+                 path_output='LFP_50Hz';  
+                 else path_output='No offline filter';
                  end
              end
         end
@@ -250,7 +254,7 @@ switch exp_type
                 interval(:,2) = interval(:,1);
                 
            case 3
-                 start_time = [0.4,5.6]; %[sec] %[0,5]
+                 start_time = [0.4,stim1_X{x_value(1)}(1,1).*dt+0.4]; %[sec] %[0,5]
                  duration = 4; %[sec] 
                     for t=1:length(start_time);
                      start_sample(:,t) = ceil(start_time(t).*sf{1});
@@ -324,24 +328,26 @@ clear color_table
     whisker_stim_color(1,:)=[255 153 153]/256; %[239 188 86]/256;
     if print_flag==1;
 % plotting one trace of data and LFP against each other -
- trace=2;%1:size(current_data,2); %5;
+ trace=[2,3,4];%1:size(current_data,2); %5;
  
         interval_plot(:,1)=interval(:,1);        
-        data_Vm_plot=data_Vm{1}(:,trace);
+        data_Vm_plot=data_Vm_filt{1}(:,trace);
         data_LFP_plot=data_LFP{1}(:,trace).*20;
 
 Fig{fileind}(trace_type)=figure;
-subplot(2,1,2)
+for tr_ind=1:length(trace)
+subplot(2*length(trace),1,2*tr_ind)
     hold on
-        p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot, 'color',color_table(1,:),'LineWidth',1.2);
+        p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot(:,tr_ind), 'color',color_table(1,:),'LineWidth',1.2);
         axis tight
                            
         if trace_type==2;
             fn_plot_sensory_stim(dt, stim2_X,whisker_stim_color)
+            xlm=get(gca,'xlim'); xlm(2)=end_sample.*dt*1000; set(gca,'xlim',xlm); %showing only the part of trace that was used for CC analysis
         end
         
         %plotting scale bar
-horiz_vert=1;        lengthh=0.2;     textit=[num2str(lengthh.*1000), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
+horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
         [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
  horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
         [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
@@ -350,15 +356,16 @@ horiz_vert=1;        lengthh=0.2;     textit=[num2str(lengthh.*1000), ' mS'];   
     xlim_data=[get(gca,'xlim')]';
     set(gca, 'visible', 'off') ;
     
-  subplot(2,1,1)     
+  subplot(2*length(trace),1,2*tr_ind-1)     
  	hold on
-        p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot,'color',color_table(2,:),'LineWidth',1.2);
+        p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot(:,tr_ind),'color',color_table(2,:),'LineWidth',1.2);
 %         text(interval_plot(1,1).*dt*1000,data_Vm_plot(1),[num2str(floor(data_Vm_plot(1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')  
 
         axis tight            
 
         if trace_type==2;
             fn_plot_sensory_stim(dt,stim2_X,whisker_stim_color)
+            xlm=get(gca,'xlim'); xlm(2)=end_sample.*dt*1000; set(gca,'xlim',xlm); %showing only the part of trace that was used for CC analysis
         end
         
         %plotting scale bar
@@ -368,10 +375,11 @@ horiz_vert=1;        lengthh=0.2;     textit=[num2str(lengthh.*1000), ' mS'];   
     set(gca,'xlim',xlim_data)
     set(gca, 'visible', 'off') ;
 
-title('Vm-LFP single trace ES Off','FontSize', 16); 
-ylabel('Potential [mV]' ,'FontSize', 14); xlabel('Time [S]','FontSize', 14)
-l=legend([p2,p1],{'LFP','Vm'},'linewidth',1.5,'Location','northeast', 'box', 'off'); 
-l.LineWidth=1.5;
+end
+    title('Vm-LFP single trace ES Off','FontSize', 16); 
+    ylabel('Potential [mV]' ,'FontSize', 14); xlabel('Time [S]','FontSize', 14)
+    l=legend([p2,p1],{'LFP','Vm'},'linewidth',1.5,'Location','northeast', 'box', 'off'); 
+    l.LineWidth=1.5;
 
 % pause
 % close(gcf);
@@ -380,21 +388,23 @@ l.LineWidth=1.5;
 % after ES
        
         interval_plot(:,2)=interval(:,2);        
-        data_Vm_plot=data_Vm{2}(:,trace);
+        data_Vm_plot=data_Vm_filt{2}(:,trace);
         data_LFP_plot=data_LFP{2}(:,trace);  
           
 Fig{fileind}(trace_type+3)=figure;
-subplot(2,1,2)
+for tr_ind=1:length(trace)
+subplot(2*length(trace),1,2*tr_ind)
     hold on
-        p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot,'color',color_table(5,:),'LineWidth',1.2);
+        p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot(:,tr_ind),'color',color_table(5,:),'LineWidth',1.2);
         axis tight
                            
         if trace_type==2;
             fn_plot_sensory_stim(dt, stim2_X,whisker_stim_color)
+            xlm=get(gca,'xlim'); xlm(2)=end_sample.*dt*1000; set(gca,'xlim',xlm); %showing only the part of trace that was used for CC analysis
         end
         
         %plotting scale bar
-horiz_vert=1;        lengthh=0.2;     textit=[num2str(lengthh.*1000), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
+horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
         [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
  horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
         [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
@@ -403,15 +413,16 @@ horiz_vert=1;        lengthh=0.2;     textit=[num2str(lengthh.*1000), ' mS'];   
     xlim_data=[get(gca,'xlim')]';
     set(gca, 'visible', 'off') ;
     
-  subplot(2,1,1)     
+  subplot(2*length(trace),1,2*tr_ind-1)
  	hold on
-       p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot,'color',color_table(4,:),'LineWidth',1.2);
+       p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot(:,tr_ind),'color',color_table(4,:),'LineWidth',1.2);
 %         text(interval_plot(1,1).*dt*1000,data_Vm_plot(1),[num2str(floor(data_Vm_plot(1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')  
 
         axis tight            
 
         if trace_type==2;
             fn_plot_sensory_stim(dt,stim2_X,whisker_stim_color)
+            xlm=get(gca,'xlim'); xlm(2)=end_sample.*dt*1000; set(gca,'xlim',xlm); %showing only the part of trace that was used for CC analysis
         end
         
         %plotting scale bar
@@ -420,7 +431,7 @@ horiz_vert=1;        lengthh=0.2;     textit=[num2str(lengthh.*1000), ' mS'];   
     hold off  
     set(gca,'xlim',xlim_data)
     set(gca, 'visible', 'off') ;
-
+end
 title('Vm-LFP single trace ES On','FontSize', 16); 
 ylabel('Potential [mV]' ,'FontSize', 14); xlabel('Time [S]','FontSize', 14)
 l=legend([p2,p1],{'LFP','Vm'},'linewidth',1.5,'Location','northeast', 'box', 'off'); 
@@ -559,7 +570,12 @@ hold off
         
         cc_spont(fileind).fname = fname;
         cc_spont(fileind).win_duration = duration;
-         cc_spont(fileind).
+        cc_spont(fileind).BP50HzLFP=BP50HzLFP_flag; %removing 50Hz noise from LFP signal
+        cc_spont(fileind).BP50HzVm=BP50HzVm_flag; %removing 50Hz noise from Vm signal
+        cc_spont(fileind).BPLFP_flag=BPLFP_flag; %filtering LFP 
+        cc_spont(fileind).BPLFP=bp_filt_LFP; %the BP frequency filter for  LFP, used if BPLFP_flag=1
+        cc_spont(fileind).BPVm_flag=BPVm_flag; %filtering Vm 
+        cc_spont(fileind).BPVm=bp_filt_Vm; %the BP frequency filter for Vm, used if BPVm_flag=1
         cc_spont(fileind).cc_max=c_mean_max_val; %value of maximal correlation 
         cc_spont(fileind).cc_max_lag=lags{fileind,1}(c_mean_max_r)';         
         cc_spont(fileind).cc_max_time=lags{fileind,1}(c_mean_max_r).*dt;
@@ -582,6 +598,12 @@ hold off
     if trace_type==2
         cc_evoked(fileind).fname = fname;
         cc_evoked(fileind).win_duration = duration;
+        cc_evoked(fileind).BP50HzLFP=BP50HzLFP_flag; %removing 50Hz noise from LFP signal
+        cc_evoked(fileind).BP50HzVm=BP50HzVm_flag; %removing 50Hz noise from Vm signal
+        cc_evoked(fileind).BPLFP_flag=BPLFP_flag; %filtering LFP 
+        cc_evoked(fileind).BPLFP=bp_filt_LFP; %the BP frequency filter for  LFP, used if BPLFP_flag=1
+        cc_evoked(fileind).BPVm_flag=BPVm_flag; %filtering Vm 
+        cc_evoked(fileind).BPVm=bp_filt_Vm; %the BP frequency filter for Vm, used if BPVm_flag=1
         cc_evoked(fileind).cc_max=c_mean_max_val; %value of maximal correlation
         cc_evoked(fileind).cc_max_shuff=c_mean_max_val_shuff; %value of cc_shuffled at the maximal correlation point at cc_shuff_sub
         cc_evoked(fileind).cc_max_lag=lags{fileind,1}(c_mean_max_r);
@@ -594,7 +616,7 @@ hold off
         cc_evoked(fileind).cc_lag0_trace = c_lag0; %mean values of correlation at lag zero (for all traces)
         cc_evoked(fileind).cc_maxdiff_trace = c_maxdiff; %mean values of correlation at largest difference point (for all traces)
 
-        cc_lag0_mat{trace_type}(fileind,:)=cc_evoked(fileind).cc_lag0;
+         cc_lag0_mat{trace_type}(fileind,:)=cc_evoked(fileind).cc_lag0;
          cc_lag0_shuff_mat{trace_type}(fileind,:)=cc_evoked(fileind).cc_lag0_shuff;
          cc_max_mat{trace_type}(fileind,:)=cc_evoked(fileind).cc_max;
          cc_max_shuff_mat{trace_type}(fileind,:)=cc_evoked(fileind).cc_max_shuff;
@@ -621,9 +643,11 @@ end
         cc_stat.spont.change_max_val_m=mean(cc_stat.spont.change_max_val,1);
         cc_stat.spont.change_max_val_std=std(cc_stat.spont.change_max_val,0,1);
         change_max_val_mat= cc_stat.spont.change_max_val;
+    if length(files_to_analyze)>=5
         %testing for normal distribution       
         [cc_stat.spont.lillietest_h_max_val, cc_stat.spont.lillietest_p_max_val] = lillietest(cc_stat.spont.max_val(:,2)- cc_stat.spont.max_val(:,1));
         [cc_stat.spont.lillietest_h_change_max_val, cc_stat.spont.lillietest_p_change_max_val] = lillietest( cc_stat.spont.change_max_val);
+    end
         %paired ttest 
         [cc_stat.spont.ttest_h_max_val, cc_stat.spont.ttest_p_max_val]= ttest(cc_stat.spont.max_val(:,1),cc_stat.spont.max_val(:,2));   
         [cc_stat.spont.wilcoxon_p_max_val, cc_stat.spont.wilcoxon_h_max_val]= signrank(cc_stat.spont.max_val(:,1),cc_stat.spont.max_val(:,2));
@@ -641,9 +665,11 @@ end
         cc_stat.spont.change_max_val_shuff_m=mean(cc_stat.spont.change_max_val_shuff,1);
         cc_stat.spont.change_max_val_shuff_std=std(cc_stat.spont.change_max_val_shuff,0,1);
         change_max_val_shuff_mat= cc_stat.spont.change_max_val_shuff;
-        %testing for normal distribution       
+        %testing for normal distribution     
+    if length(files_to_analyze)>=5
         [cc_stat.spont.lillietest_h_max_val_shuff, cc_stat.spont.lillietest_p_max_val_shuff] = lillietest(cc_stat.spont.max_val_shuff(:,2)- cc_stat.spont.max_val_shuff(:,1));
         [cc_stat.spont.lillietest_h_change_max_val_shuff, cc_stat.spont.lillietest_p_change_max_val_shuff] = lillietest( cc_stat.spont.change_max_val_shuff);
+    end
         %paired ttest 
         [cc_stat.spont.ttest_h_max_val_shuff, cc_stat.spont.ttest_p_max_val_shuff]= ttest(cc_stat.spont.max_val_shuff(:,1),cc_stat.spont.max_val_shuff(:,2));   
         [cc_stat.spont.wilcoxon_p_max_val_shuff, cc_stat.spont.wilcoxon_h_max_val_shuff]= signrank(cc_stat.spont.max_val_shuff(:,1),cc_stat.spont.max_val_shuff(:,2));
@@ -662,8 +688,10 @@ end
         cc_stat.spont.change_lag0_std=std(cc_stat.spont.change_lag0,0,1);
         change_lag0_mat= cc_stat.spont.change_lag0;
         %testing for normal distribution       
+    if length(files_to_analyze)>=5
         [cc_stat.spont.lillietest_h_lag0, cc_stat.spont.lillietest_p_lag0] = lillietest(cc_stat.spont.lag0(:,2)- cc_stat.spont.lag0(:,1));
         [cc_stat.spont.lillietest_h_change_lag0, cc_stat.spont.lillietest_p_change_lag0] = lillietest( cc_stat.spont.change_lag0);
+    end
         %paired ttest 
         [cc_stat.spont.ttest_h_lag0, cc_stat.spont.ttest_p_lag0]= ttest(cc_stat.spont.lag0(:,1),cc_stat.spont.lag0(:,2));   
         [cc_stat.spont.wilcoxon_p_lag0, cc_stat.spont.wilcoxon_h_lag0]= signrank(cc_stat.spont.lag0(:,1),cc_stat.spont.lag0(:,2));
@@ -682,8 +710,10 @@ end
         cc_stat.spont.change_lag0_shuff_std=std(cc_stat.spont.change_lag0_shuff,0,1);
         change_lag0_shuff_mat= cc_stat.spont.change_lag0_shuff;
         %testing for normal distribution       
+     if length(files_to_analyze)>=5
         [cc_stat.spont.lillietest_h_lag0_shuff, cc_stat.spont.lillietest_p_lag0_shuff] = lillietest(cc_stat.spont.lag0_shuff(:,2)- cc_stat.spont.lag0_shuff(:,1));
         [cc_stat.spont.lillietest_h_change_lag0_shuff, cc_stat.spont.lillietest_p_change_lag0_shuff] = lillietest( cc_stat.spont.change_lag0_shuff);
+     end
         %paired ttest 
         [cc_stat.spont.ttest_h_lag0_shuff, cc_stat.spont.ttest_p_lag0_shuff]= ttest(cc_stat.spont.lag0_shuff(:,1),cc_stat.spont.lag0_shuff(:,2));   
         [cc_stat.spont.wilcoxon_p_lag0_shuff, cc_stat.spont.wilcoxon_h_lag0_shuff]= signrank(cc_stat.spont.lag0_shuff(:,1),cc_stat.spont.lag0_shuff(:,2));
@@ -702,8 +732,10 @@ end
         cc_stat.spont.change_maxdiff_std=std(cc_stat.spont.change_maxdiff,0,1);
         change_maxdiff_mat= cc_stat.spont.change_maxdiff;
         %testing for normal distribution       
+     if length(files_to_analyze)>=5
         [cc_stat.spont.lillietest_h_maxdiff, cc_stat.spont.lillietest_p_maxdiff] = lillietest(cc_stat.spont.maxdiff(:,2)- cc_stat.spont.maxdiff(:,1));
         [cc_stat.spont.lillietest_h_change_maxdiff, cc_stat.spont.lillietest_p_change_maxdiff] = lillietest( cc_stat.spont.change_maxdiff);
+     end
         %paired ttest 
         [cc_stat.spont.ttest_h_maxdiff, cc_stat.spont.ttest_p_maxdiff]= ttest(cc_stat.spont.maxdiff(:,1),cc_stat.spont.maxdiff(:,2));   
         [cc_stat.spont.wilcoxon_p_maxdiff, cc_stat.spont.wilcoxon_h_maxdiff]= signrank(cc_stat.spont.maxdiff(:,1),cc_stat.spont.maxdiff(:,2));
@@ -723,8 +755,10 @@ end
         cc_stat.evoked.change_max_val_std=std(cc_stat.evoked.change_max_val,0,1);
         change_max_val_mat= cc_stat.evoked.change_max_val;
         %testing for normal distribution       
+     if length(files_to_analyze)>=5
         [cc_stat.evoked.lillietest_h_max_val, cc_stat.evoked.lillietest_p_max_val] = lillietest(cc_stat.evoked.max_val(:,2)- cc_stat.evoked.max_val(:,1));
         [cc_stat.evoked.lillietest_h_change_max_val, cc_stat.evoked.lillietest_p_change_max_val] = lillietest( cc_stat.evoked.change_max_val);
+     end
         %paired ttest 
         [cc_stat.evoked.ttest_h_max_val, cc_stat.evoked.ttest_p_max_val]= ttest(cc_stat.evoked.max_val(:,1),cc_stat.evoked.max_val(:,2));   
         [cc_stat.evoked.wilcoxon_p_max_val, cc_stat.evoked.wilcoxon_h_max_val]= signrank(cc_stat.evoked.max_val(:,1),cc_stat.evoked.max_val(:,2));
@@ -743,8 +777,10 @@ end
         cc_stat.evoked.change_max_val_shuff_std=std(cc_stat.evoked.change_max_val_shuff,0,1);
         change_max_val_shuff_mat= cc_stat.evoked.change_max_val_shuff;
         %testing for normal distribution       
+     if length(files_to_analyze)>=5
         [cc_stat.evoked.lillietest_h_max_val_shuff, cc_stat.evoked.lillietest_p_max_val_shuff] = lillietest(cc_stat.evoked.max_val_shuff(:,2)- cc_stat.evoked.max_val_shuff(:,1));
         [cc_stat.evoked.lillietest_h_change_max_val_shuff, cc_stat.evoked.lillietest_p_change_max_val_shuff] = lillietest( cc_stat.evoked.change_max_val_shuff);
+     end
         %paired ttest 
         [cc_stat.evoked.ttest_h_max_val_shuff, cc_stat.evoked.ttest_p_max_val_shuff]= ttest(cc_stat.evoked.max_val_shuff(:,1),cc_stat.evoked.max_val_shuff(:,2));   
         [cc_stat.evoked.wilcoxon_p_max_val_shuff, cc_stat.evoked.wilcoxon_h_max_val_shuff]= signrank(cc_stat.evoked.max_val_shuff(:,1),cc_stat.evoked.max_val_shuff(:,2));
@@ -763,8 +799,10 @@ end
         cc_stat.evoked.change_lag0_std=std(cc_stat.evoked.change_lag0,0,1);
         change_lag0_mat= cc_stat.evoked.change_lag0;
         %testing for normal distribution       
+     if length(files_to_analyze)>=5
         [cc_stat.evoked.lillietest_h_lag0, cc_stat.evoked.lillietest_p_lag0] = lillietest(cc_stat.evoked.lag0(:,2)- cc_stat.evoked.lag0(:,1));
         [cc_stat.evoked.lillietest_h_change_lag0, cc_stat.evoked.lillietest_p_change_lag0] = lillietest( cc_stat.evoked.change_lag0);
+     end
         %paired ttest 
         [cc_stat.evoked.ttest_h_lag0, cc_stat.evoked.ttest_p_lag0]= ttest(cc_stat.evoked.lag0(:,1),cc_stat.evoked.lag0(:,2));   
         [cc_stat.evoked.wilcoxon_p_lag0, cc_stat.evoked.wilcoxon_h_lag0]= signrank(cc_stat.evoked.lag0(:,1),cc_stat.evoked.lag0(:,2));
@@ -783,8 +821,10 @@ end
         cc_stat.evoked.change_lag0_shuff_std=std(cc_stat.evoked.change_lag0_shuff,0,1);
         change_lag0_shuff_mat= cc_stat.evoked.change_lag0_shuff;
         %testing for normal distribution       
+     if length(files_to_analyze)>=5
         [cc_stat.evoked.lillietest_h_lag0_shuff, cc_stat.evoked.lillietest_p_lag0_shuff] = lillietest(cc_stat.evoked.lag0_shuff(:,2)- cc_stat.evoked.lag0_shuff(:,1));
         [cc_stat.evoked.lillietest_h_change_lag0_shuff, cc_stat.evoked.lillietest_p_change_lag0_shuff] = lillietest( cc_stat.evoked.change_lag0_shuff);
+     end
         %paired ttest 
         [cc_stat.evoked.ttest_h_lag0_shuff, cc_stat.evoked.ttest_p_lag0_shuff]= ttest(cc_stat.evoked.lag0_shuff(:,1),cc_stat.evoked.lag0_shuff(:,2));   
         [cc_stat.evoked.wilcoxon_p_lag0_shuff, cc_stat.evoked.wilcoxon_h_lag0_shuff]= signrank(cc_stat.evoked.lag0_shuff(:,1),cc_stat.evoked.lag0_shuff(:,2));
@@ -803,252 +843,17 @@ end
         cc_stat.evoked.change_maxdiff_std=std(cc_stat.evoked.change_maxdiff,0,1);
         change_maxdiff_mat= cc_stat.evoked.change_maxdiff;
         %testing for normal distribution       
+     if length(files_to_analyze)>=5
         [cc_stat.evoked.lillietest_h_maxdiff, cc_stat.evoked.lillietest_p_maxdiff] = lillietest(cc_stat.evoked.maxdiff(:,2)- cc_stat.evoked.maxdiff(:,1));
         [cc_stat.evoked.lillietest_h_change_maxdiff, cc_stat.evoked.lillietest_p_change_maxdiff] = lillietest( cc_stat.evoked.change_maxdiff);
+     end
         %paired ttest 
         [cc_stat.evoked.ttest_h_maxdiff, cc_stat.evoked.ttest_p_maxdiff]= ttest(cc_stat.evoked.maxdiff(:,1),cc_stat.evoked.maxdiff(:,2));   
         [cc_stat.evoked.wilcoxon_p_maxdiff, cc_stat.evoked.wilcoxon_h_maxdiff]= signrank(cc_stat.evoked.maxdiff(:,1),cc_stat.evoked.maxdiff(:,2));
         [cc_stat.evoked.ttest_h_change_maxdiff, cc_stat.evoked.ttest_p_change_maxdiff]= ttest(cc_stat.evoked.change_maxdiff);
         [cc_stat.evoked.wilcoxon_p_change_maxdiff, cc_stat.evoked.wilcoxon_h_change_maxdiff]= signrank(cc_stat.evoked.change_maxdiff);
  
-%% Plot spont and evoked lag zero cc peak, not normalized. p-values taken from normalized values paired t-test 
-%
-% min_line=floor(min(min(cc_stat.spont.lag0)));
-% max_line=ceil(max(max(cc_stat.spont.lag0)));
-% min_line=min(min(cc_stat.spont.lag0)).*1.05;
-% max_line=max(max(cc_stat.spont.lag0)).*1.05;
-%  g1=figure;
-%  hold on
-% scatter(cc_stat.spont.lag0(:,1),cc_stat.spont.lag0(:,2),50,'markerfacecolor','k')
-% line([min_line;max_line], [min_line;max_line],'linewidth',2,'color','k')
-% hold off
-%         xlabel('ES off' ,'FontSize', 16);  ylabel('ES on','FontSize', 16); 
-%         title(['Spontaneous Zero Lag Cross-Correlation, n=' num2str(length(files_to_analyze)) ', p=' num2str(cc_stat.spont.ttest_p_norm_lag0)] ,'FontSize', 16);   
-%         set(gca, 'xlim', [min_line, max_line], 'ylim', [min_line, max_line]);
-%         
-% min_line=min(min(cc_stat.evoked.lag0)).*1.05;
-% max_line=max(max(cc_stat.evoked.lag0)).*0.95;
-%  g2=figure;
-%  hold on
-% scatter(cc_stat.evoked.lag0(:,1),cc_stat.evoked.lag0(:,2),50,'markerfacecolor','k')
-% line([min_line;max_line], [min_line;max_line],'linewidth',2,'color','k')
-% hold off
-%         xlabel('ES off' ,'FontSize', 16);  ylabel('ES on','FontSize', 16); 
-%         title(['Evoked Zero Lag Cross-Correlation, n=' num2str(length(files_to_analyze)) ', p=' num2str(cc_stat.evoked.ttest_p_norm_lag0)] ,'FontSize', 16);   
-%         set(gca, 'xlim', [min_line, max_line], 'ylim', [min_line, max_line]);      
- %% Paired plot of spont normalized max peak
-%  clear CC_Y_max_val CC_X E
-% CC_Y_max_val=cc_stat.spont.norm_max_val';
-% CC_X(1,:)=ones(1,size(CC_Y_max_val,2));
-% CC_X(2,:)=2*ones(1,size(CC_Y_max_val,2));
-% E = std(CC_Y_max_val,0,2);
-% figure
-% hold on
-% line(CC_X,CC_Y_max_val,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-% errorbar(CC_X(:,1), mean(CC_Y_max_val,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-% hold off
-%         x1limits = [0.75 2.25];
-%         x1ticks = [1,2];
-%         y1limits = [0 1.1];
-%         y1ticks = [0,0.25,0.5];
-%         set( gca, 'xlim', x1limits, 'ylim', y1limits,'xtick', x1ticks,'fontsize',20,'linewidth',1,...
-%         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'Before ES','After ES'} ,'box', 'off'); %'fontweight', 'bold', 
-%          ylabel('CC spont', 'FontSize', 20,'fontname', 'arial');
-%          title('normalized max peak', 'FontSize',20,'fontname', 'arial')
-         %% Paired plot of spont non-normalized max peak
- clear CC_Y_max_val CC_X E
-CC_Y_max_val=cc_stat.spont.max_val';
-CC_X(1,:)=ones(1,size(CC_Y_max_val,2));
-CC_X(2,:)=2*ones(1,size(CC_Y_max_val,2));
-E = std(CC_Y_max_val,0,2);
-figure
-hold on
-line(CC_X,CC_Y_max_val,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-errorbar(CC_X(:,1), mean(CC_Y_max_val,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-hold off
-        x1limits = [0.75 2.25];
-        x1ticks = [1,2];
-        y1limits = [-0.5 0.7];
-        y1ticks = [-0.5,0,0.5];
-        set( gca, 'xlim', x1limits, 'ylim', y1limits,'xtick', x1ticks,'fontsize',20,'linewidth',1,...
-        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'Before ES','After ES'} ,'box', 'off'); %'fontweight', 'bold', 
-         ylabel('CC spont', 'FontSize', 20,'fontname', 'arial');
-           title(['Spontaneous Max-Peak Cross-Correlation, n=' num2str(length(files_to_analyze)),' p=', num2str(cc_stat.spont.ttest_p_max_val)] ,'fontname', 'arial','FontSize', 20);   
- if save_flag==1;
- cd(path_output)
-saveas(gcf,'Vm-LFPcc_spont_max-peak_paired_population','fig') 
-print(gcf,'Vm-LFPcc_spont_max-peak_paired_population','-dpng','-r600','-opengl') 
- end
-          %% Paired plot of evoked non-normalized max peak
- clear CC_Y_max_val CC_X E
-CC_Y_max_val=cc_stat.evoked.max_val';
-CC_X(1,:)=ones(1,size(CC_Y_max_val,2));
-CC_X(2,:)=2*ones(1,size(CC_Y_max_val,2));
-E = std(CC_Y_max_val,0,2);
-figure
-hold on
-line(CC_X,CC_Y_max_val,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-errorbar(CC_X(:,1), mean(CC_Y_max_val,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-hold off
-        x1limits = [0.75 2.25];
-        x1ticks = [1,2];
-        y1limits = [-0.5 0.7];
-        y1ticks = [-0.5,0.5];
-        set( gca, 'xlim', x1limits, 'ylim', y1limits,'xtick', x1ticks,'fontsize',20,'linewidth',1,...
-        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'Before ES','After ES'} ,'box', 'off'); %'fontweight', 'bold', 
-         ylabel('CC evoked', 'FontSize', 20,'fontname', 'arial');
-           title(['Evoked Max-Peak Cross-Correlation, n=' num2str(length(files_to_analyze)),' p=', num2str(cc_stat.evoked.ttest_p_max_val)] ,'fontname', 'arial','FontSize', 20);   
-          if save_flag==1;
- cd(path_output)
-saveas(gcf,'Vm-LFPcc_evoked_max-peak_paired_population','fig') 
-print(gcf,'Vm-LFPcc_evoked_max-peak_paired_population','-dpng','-r600','-opengl') 
-end
-
-         %% Paired plot of spont non-normalized lag0
- clear CC_Y_lag0 CC_X E
-CC_Y_lag0=cc_stat.spont.lag0';
-% CC_Y_lag0=cc_stat.spont.lag0';
-
-CC_X(1,:)=ones(1,size(CC_Y_lag0,2));
-CC_X(2,:)=2*ones(1,size(CC_Y_lag0,2));
-E = std(CC_Y_lag0,0,2);
-figure
-hold on
-line(CC_X,CC_Y_lag0,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-errorbar(CC_X(:,1), mean(CC_Y_lag0,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-hold off
-        x1limits = [0.75 2.25];
-        x1ticks = [1,2];
-        y1limits = [-0.5 0.7];
-        y1ticks = [-0.,0.5];
-        set( gca, 'xlim', x1limits, 'ylim', y1limits,'xtick', x1ticks,'fontsize',20,'linewidth',1,...
-        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'NB-','NB+'} ,'box', 'off'); %'fontweight', 'bold', 
-         ylabel('CC spont', 'FontSize', 20,'fontname', 'arial');
-          title(['Spontaneous Zero Lag Cross-Correlation, n=' num2str(length(files_to_analyze)),' p=' num2str(cc_stat.spont.wilcoxon_p_lag0)] ,'fontname', 'arial','FontSize', 20);   
-% save figure  
-if save_flag==1;
-cd(path_output)
-saveas(gcf,'Vm-LFPcc_spont_zero-lag_paired_population','fig') 
-print(gcf,'Vm-LFPcc_spont_zero-lag_paired_population','-dpng','-r600','-opengl') 
-end
-        %% Paired plot of spont non-normalized lag0 shuffled
- clear CC_Y_lag0_shuff CC_X E
-CC_Y_lag0_shuff=cc_stat.spont.lag0_shuff';
-
-CC_X(1,:)=ones(1,size(CC_Y_lag0_shuff,2));
-CC_X(2,:)=2*ones(1,size(CC_Y_lag0_shuff,2));
-E = std(CC_Y_lag0_shuff,0,2);
-figure
-hold on
-line(CC_X,CC_Y_lag0_shuff,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-errorbar(CC_X(:,1), mean(CC_Y_lag0_shuff,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-hold off
-        x1limits = [0.75 2.25];
-        x1ticks = [1,2];
-        y1limits = [-0.5 0.7];
-        y1ticks = [-0.,0.5];
-        set( gca, 'xlim', x1limits, 'ylim', y1limits,'xtick', x1ticks,'fontsize',20,'linewidth',1,...
-        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'NB-','NB+'} ,'box', 'off'); %'fontweight', 'bold', 
-         ylabel('CC spont', 'FontSize', 20,'fontname', 'arial');
-          title(['Spontaneous Zero Lag Cross-Correlation, n=' num2str(length(files_to_analyze)),' p=' num2str(cc_stat.spont.wilcoxon_p_lag0_shuff)] ,'fontname', 'arial','FontSize', 20);   
-% save figure  
-if save_flag==1;
- cd(path_output)
-saveas(gcf,'Vm-LFPcc_spont_zero-lag_shuff_paired_population','fig') 
-print(gcf,'Vm-LFPcc_spont_zero-lag_shuff_paired_population','-dpng','-r600','-opengl') 
-end
-          %% Paired plot of evoked non-normalized lag0
-%  clear CC_Y_lag0 CC_X E
-% % CC_Y_lag0=abs(cc_stat.evoked.lag0)';
-% CC_Y_lag0=cc_stat.evoked.lag0';
-% CC_X(1,:)=ones(1,size(CC_Y_lag0,2));
-% CC_X(2,:)=2*ones(1,size(CC_Y_lag0,2));
-% E = std(CC_Y_lag0,0,2);
-% figure
-% hold on
-% line(CC_X,CC_Y_lag0,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-% errorbar(CC_X(:,1), mean(CC_Y_lag0,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-% hold off
-%         x1limits = [0.75 2.25];
-%         x1ticks = [1,2];
-%         y1limits = [-0.5 0.7];
-%         y1ticks = [-0.5 0.5];
-%         set( gca, 'xlim', x1limits, 'ylim', y1limits,'xtick', x1ticks,'fontsize',20,'linewidth',1,...
-%         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'NB-','NB+'} ,'box', 'off'); %'fontweight', 'bold', 
-%          ylabel('CC evoked', 'FontSize', 20,'fontname', 'arial');
-%          title(['Evoked Zero Lag Cross-Correlation, n=' num2str(length(files_to_analyze)),' p=' num2str(cc_stat.evoked.ttest_p_lag0)],'fontname', 'arial','FontSize', 20);  
-%  % save figure
-%  if save_flag==1;
-% cd(path_output)
-% saveas(gcf,'Vm-LFPcc_evoked_zero-lag_paired_population','fig') 
-% print(gcf,'Vm-LFPcc_evoked_zero-lag_paired_population','-dpng','-r600','-opengl') 
-%  end
-% 
-       %% Paired plot of evoked non-normalized lag0 shuffled
-% %  clear CC_Y_lag0_shuff CC_X E
-% % % CC_Y_lag0_shuff=abs(cc_stat.evoked.lag0_shuff)';
-% % CC_Y_lag0_shuff=cc_stat.evoked.lag0_shuff';
-% % CC_X(1,:)=ones(1,size(CC_Y_lag0_shuff,2));
-% % CC_X(2,:)=2*ones(1,size(CC_Y_lag0_shuff,2));
-% % E = std(CC_Y_lag0_shuff,0,2);
-% % figure
-% % hold on
-% % line(CC_X,CC_Y_lag0_shuff,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-% % errorbar(CC_X(:,1), mean(CC_Y_lag0_shuff,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-% % hold off
-% %         x1limits = [0.75 2.25];
-% %         x1ticks = [1,2];
-% %         y1limits = [-0.5 0.7];
-% %         y1ticks = [-0.5 0.5];
-% %         set( gca, 'xlim', x1limits, 'ylim', y1limits,'xtick', x1ticks,'fontsize',20,'linewidth',1,...
-% %         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'NB-','NB+'} ,'box', 'off'); %'fontweight', 'bold', 
-% %          ylabel('CC evoked', 'FontSize', 20,'fontname', 'arial');
-% %          title(['Evoked Zero Lag Cross-Correlation, n=' num2str(length(files_to_analyze)),' p=' num2str(cc_stat.evoked.ttest_p_lag0_shuff)],'fontname', 'arial','FontSize', 20);  
-% %  % save figure
-% %  if save_flag==1;
-% % %   cd(path_output)
-% % saveas(gcf,'Vm-LFPcc_evoked_zero-lag_shuff_paired_population','fig') 
-% % print(gcf,'Vm-LFPcc_evoked_zero-lag_shuff_paired_population','-dpng','-r600','-opengl') 
-% %  end 
-%% variables for repeated-measures ANOVA using a downloaded function
-% clear all
-% lag0_spont_noNB(:,1)=cc_stat.spont.lag0(:,1);
-% lag0_spont_NB(:,1)=cc_stat.spont.lag0(:,2);
-% F2_spont_noNB(:,1)=zeros(size(lag0_spont_noNB)); %zeroes for NB-
-% F2_spont_NB(:,1)=ones(size(lag0_spont_NB)); %ones for NB+
-% lag0_spont(:,1)=[lag0_spont_noNB;lag0_spont_NB];
-% F1_spont(:,1)=zeros(size(lag0_spont));
-% F2_spont(:,1)=[F2_spont_noNB;F2_spont_NB];
-% 
-% max_val_spont_noNB(:,1)=cc_stat.spont.max_val(:,1);
-% max_val_spont_NB(:,1)=cc_stat.spont.max_val(:,2);
-% max_val_spont(:,1)=[max_val_spont_noNB;max_val_spont_NB];
-% 
-% lag0_evoked_noNB(:,1)=cc_stat.evoked.lag0(:,1);
-% lag0_evoked_NB(:,1)=cc_stat.evoked.lag0(:,2);
-% F2_evoked_noNB(:,1)=zeros(size(lag0_evoked_noNB)); %zeroes for NB-
-% F2_evoked_NB(:,1)=ones(size(lag0_evoked_NB)); %ones for NB+
-% lag0_evoked(:,1)=[lag0_evoked_noNB;lag0_evoked_NB];
-% F1_evoked(:,1)=ones(size(lag0_evoked));
-% F2_evoked(:,1)=[F2_evoked_noNB;F2_evoked_NB];
-% 
-% max_val_evoked_noNB(:,1)=cc_stat.evoked.max_val(:,1);
-% max_val_evoked_NB(:,1)=cc_stat.evoked.max_val(:,2);
-% max_val_evoked(:,1)=[max_val_evoked_noNB;max_val_evoked_NB];
-%  S_1(:,1)=1:10;
-% % all together
-% Y_lag0=[lag0_spont;lag0_evoked];
-% Y_max_val=[max_val_spont;max_val_evoked];
-% F1=[F1_spont;F1_evoked];
-% F2=[F2_spont;F2_evoked];
-% S(:,1)=[S_1;S_1;S_1;S_1];
-% FactNames={'spont/evoked','NB-/NB+'};
-%  filename='rmANOVA_R_actual_vars';
-% save(filename,'Y_lag0','Y_max_val', 'F1', 'F2','S','FactNames')
-% 
-% stats_lag0 = rm_anova2(Y_lag0,S,F1,F2,FactNames);
-% stats_max_val = rm_anova2(Y_max_val,S,F1,F2,FactNames);
-%% rmANOVA with matlab function - lag0
+%% rmANOVA with built-in matlab function - lag0
 % clear all
 % load cc_analysis
 lag0_spont_noNB(:,1)=cc_stat.spont.lag0(:,1);
@@ -1057,7 +862,7 @@ lag0_evoked_noNB(:,1)=cc_stat.evoked.lag0(:,1);
 lag0_evoked_NB(:,1)=cc_stat.evoked.lag0(:,2);
 lag0_spont(:,1)=[lag0_spont_noNB;lag0_spont_NB];
 lag0_evoked(:,1)=[lag0_evoked_noNB;lag0_evoked_NB];
- S_1(:,1)=1:10;
+ S_1(:,1)=1:length(files_to_analyze);
 
 ta=table(S_1,lag0_spont_noNB,lag0_spont_NB,lag0_evoked_noNB,lag0_evoked_NB,...
     'variablenames', {'cells','Y1','Y2','Y3','Y4'});
@@ -1076,7 +881,7 @@ lag0_shuff_evoked_noNB(:,1)=cc_stat.evoked.lag0_shuff(:,1);
 lag0_shuff_evoked_NB(:,1)=cc_stat.evoked.lag0_shuff(:,2);
 lag0_shuff_spont(:,1)=[lag0_shuff_spont_noNB;lag0_shuff_spont_NB];
 lag0_shuff_evoked(:,1)=[lag0_shuff_evoked_noNB;lag0_shuff_evoked_NB];
- S_1(:,1)=1:10;
+ S_1(:,1)=1:length(files_to_analyze);
  
 clear rm ranovatbl ta
 
@@ -1098,7 +903,7 @@ max_val_evoked_noNB(:,1)=cc_stat.evoked.max_val(:,1);
 max_val_evoked_NB(:,1)=cc_stat.evoked.max_val(:,2);
 max_val_spont(:,1)=[max_val_spont_noNB;max_val_spont_NB];
 max_val_evoked(:,1)=[max_val_evoked_noNB;max_val_evoked_NB];
- S_1(:,1)=1:10;
+ S_1(:,1)=1:length(files_to_analyze);
 
  ta_vector_names={'max_val_spont_noNB','max_val_spont_NB','max_val_evoked_noNB','max_val_evoked_NB'};
 clear rm ranovatbl ta
@@ -1138,13 +943,16 @@ mv_stat.eps=eps_mv;
 mv_stat.ANOVA=ranovatbl_mv;
 mv_stat.multcomp_NBbySS=NBbySS_mv;
 mv_stat.multcomp_SSbyNB=SSbyNB_mv;
+mv_stat.rmANOVA_p=max_val_rmANOVA_p;
+mv_stat.evoked_p=max_val_p_evoked;
+mv_stat.spont_p=max_val_p_spont;
 
 %%
 max_val_shuff_spont_noNB(:,1)= cc_stat.spont.max_val_shuff(:,1);
 max_val_shuff_spont_NB(:,1)=cc_stat.spont.max_val_shuff(:,2);
 max_val_shuff_evoked_noNB(:,1)=cc_stat.evoked.max_val_shuff(:,1);
 max_val_shuff_evoked_NB(:,1)=cc_stat.evoked.max_val_shuff(:,2);
- S_1(:,1)=1:10;
+ S_1(:,1)=1:length(files_to_analyze);
  
  ta_vector_names={'max_val_shuff_spont_noNB','max_val_shuff_spont_NB','max_val_shuff_evoked_noNB','max_val_shuff_evoked_NB'};
 
@@ -1186,8 +994,9 @@ mv_shuff_stat.eps=eps_mv_shuff;
 mv_shuff_stat.ANOVA=ranovatbl_mv_shuff;
 mv_shuff_stat.multcomp_NBbySS=NBbySS_mv_shuff;
 mv_shuff_stat.multcomp_SSbyNB=SSbyNB_mv;
-
-save('cc_rmANOVA','mv_stat','mv_shuff_stat')
+mv_shuff_stat.rmANOVA_p=max_val_rmANOVA_p;
+mv_shuff_stat.evoked_p=max_val_p_evoked;
+mv_shuff_stat.spont_p=max_val_p_spont;
          %% Paired plot of spont+evoked non-normalized max peak absolute values
 CC_Y_max_val_sp=cc_stat.spont.max_val';
 CC_X_sp(1,:)=ones(1,size(CC_Y_max_val_sp,2));
@@ -1204,7 +1013,8 @@ x1limits = [0.75 4.25];
 x1ticks = [1,2,3,4];
  y1limits = [-0.1 1];
 y1ticks = [0,0.5,1];
-
+max_val_p_spont=mv_stat.spont_p;
+max_val_p_evoked=mv_stat.evoked_p;
 if max_val_p_spont{1,1} >0.05 
     asterisk_sp='n.s.';
 else if max_val_p_spont{1,1}<0.05 && max_val_p_spont{1,1}>0.01
@@ -1269,7 +1079,8 @@ x1limits = [0.75 4.25];
 x1ticks = [1,2,3,4];
  y1limits = [-0.1 1];
 y1ticks = [0,0.5,1];
-
+max_val_shuff_p_spont=mv_shuff_stat.spont_p;
+max_val_shuff_p_evoked=mv_shuff_stat.evoked_p;
 if max_val_shuff_p_spont{1,1} >0.05 
     asterisk_sp='n.s.';
 else if max_val_shuff_p_spont{1,1}<0.05 && max_val_shuff_p_spont{1,1}>0.01
@@ -1451,4 +1262,4 @@ print(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population_shuff_real_value','-
 %% Save analysis
 cd(path_output)
  filename='cc_analysis'; 
-save(filename, 'files_to_analyze', 'cc_spont', 'cc_evoked', 'cc_stat')
+save(filename, 'files_to_analyze', 'cc_spont', 'cc_evoked', 'cc_stat','cc_rmANOVA','mv_stat','mv_shuff_stat')

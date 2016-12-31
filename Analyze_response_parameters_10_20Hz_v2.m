@@ -14,22 +14,24 @@
 clear all
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data
  global exp_type
-exp_type=2; %1-NBES, 2-ChAT
+exp_type=1; %1-NBES, 2-ChAT
 save_flag= 0;
 print_flag=0;
 
 switch exp_type
     case 1
-        files_to_analyze =[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
+        files_to_analyze =46; %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};
+        path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\10_20Hz';
 
     case 2
         files_to_analyze =[74,76,77,80,82,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};
+        path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary';
 end
         
 % for fileind=1;
@@ -2084,6 +2086,8 @@ VmM_stat.eps=eps_VmM;
 VmM_stat.ANOVA=ranovatbl_VmM;
 VmM_stat.multcomp_NBbySS=NBbySS_VmM;
 VmM_stat.multcomp_SSbyNB=SSbyNB_VmM;
+VmM_stat.rmANOVA_NB_effect_p=VmM_rmANOVA_NB_effect_p;
+VmM_stat.rmANOVA_sensory_stim_effect_p=VmM_rmANOVA_sensory_stim_effect_p;
 VmM_stat.p_before=VmM_p_before;
 VmM_stat.p_during=VmM_p_during;
 VmM_stat.p_after=VmM_p_after;
@@ -2477,13 +2481,13 @@ hold off
        
         %% save figures
 if save_flag==1
-    switch exp_type
-        case 1
-            cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\10_20Hz'
-        case 2
-            cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary'
-    end
-           
+%     switch exp_type
+%         case 1
+%             cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\10_20Hz'
+%         case 2
+%             cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary'
+%     end
+ cd(path_output)          
 % saveas(h1,'Train Amplitude Local', 'fig') 
 % print(h1,'Train Amplitude Local','-dpng','-r600','-opengl')
 saveas(h2,'Train Amplitude Local', 'fig') 
@@ -2547,11 +2551,6 @@ end
 % % cd 'd:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations';
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
 % print (6, '-deps', filename)
-switch exp_type
-        case 1
-            cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data'
-        case 2
-            cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016'
-    end
+cd(path_output)
 filename='response_parameters'; 
 save(filename, 'files_to_analyze', 'peaks', 'peaks_stat','VmSTD_stat','VmM_stat','amp_stat')
