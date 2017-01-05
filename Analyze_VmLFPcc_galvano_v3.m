@@ -20,6 +20,8 @@ cc_stat=[]; cc_spont=[]; cc_evoked=[]; cc=[]; cc_shuffled_it=[]; cc_shuff_sub=[]
  global exp_type
 exp_type=2; %1-NBES, 2-ChAT
 trace_type_input=1:3; %
+analyze_time_before_train=0.1;
+analyze_train_only_flag=0;
 save_flag= 1;
 print_flag=1;
 norm_flag=0;
@@ -34,7 +36,7 @@ bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from
 
 switch exp_type
     case 1
-        files_to_analyze =[46,48,50]; [8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
+        files_to_analyze =[46,48,50]; [8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};
@@ -54,7 +56,7 @@ end
         cc_evoked_for_xls_mean cc lags cc_shuffled_mean cc_shuffled_it cc_mean cc_shuff_sub_mean save_flag print_flag...
         cc_lag0_mat cc_lag0_shuff_mat cc_max_mat cc_max_time_mat cc_maxdiff_mat  cc_max_shuff_mat...
         norm_flag  BP50HzLFP_flag BP50HzVm_flag BPLFP_flag bp_manual_LFP BPVm_flag bp_manual_Vm exp_type trace_type_input...
-        legend_string legend_string_shuff
+        legend_string legend_string_shuff analyze_time_before_train analyze_train_only_flag
    
     channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
     
@@ -62,90 +64,94 @@ end
     path = files(files_to_analyze(fileind)).extracted_path;
     cd(path)
     load(fname) 
- %%   
-                sf{1} = Param.sf_Vm;
-                sf{2} = Param.sf_I1;
-                sf{3} = Param.sf_V2;
-                sf{4} = Param.sf_I2;
-                dt=1/sf{channel};
-                             
-                sf_airpuff = Param.sf_airpuff; %[1/sec]
-                dt_airpuff = 1/sf_airpuff;
-                sf_galvano = Param.sf_galvano; %[1/sec]
-                dt_galvano = 1/sf_galvano;   
-    Ch2_data= raw_data{3}./20; %dividing by the LFP gain           
-%     raw_data{3} = raw_data{3}./20; %dividing by the LFP gain
+    %%
+     Ch2_data= raw_data{3}./20; %dividing by the LFP gain           
     current_data=data_no_spikes{channel};
-    current_data_filt=[]; Ch2_data_filt=[];
-
-%% bandpass filtering to remove 50Hz noise from LFP and Vm.
-if BP50HzLFP_flag==1;
-    if isempty(Ch2_data_filt)
-        tmpMat=Ch2_data;
-    else
-        tmpMat=Ch2_data_filt;
-    end
-        for xx=1:3
-            for trace= 1:size(tmpMat,2)    
-                    jl=tmpMat(:,trace,xx);
-                    Ch2_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(jl,dt,49,51,1,0); %filtering out 50Hz noise from LFP and Vm
-            end
-        end
-end
-tmpMat=[];
-
-if BP50HzVm_flag==1;
-    if isempty(current_data_filt)
-        tmpMat=current_data;
-    else
-        tmpMat=current_data_filt;
-    end
-        for xx=1:3
-            for trace= 1:size(current_data,2)    
-                jm=tmpMat(:,trace,xx);
-                current_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(jm,dt,49,51,1,0); %filtering out 50Hz noise from LFP and Vm
-            end
-        end
-end
- tmpMat=[];
-bp_filt_LFP=files(files_to_analyze(fileind)).V2_filter;
-if BPLFP_flag==1;  %filtering both LFP and VM same as LFP was filtered during the experiment via multiclamp
-    if ~isempty(bp_manual_LFP)
-        bp_filt_LFP=bp_manual_LFP;
-    end
-        if isempty(Ch2_data_filt)
-        tmpMat=Ch2_data;
-    else
-        tmpMat=Ch2_data_filt;
-        end
-       
-        for xx=1:3
-            for trace= 1:size(tmpMat,2)   
-                kl=tmpMat(:,trace,xx);
-                 Ch2_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(kl,dt,bp_filt_LFP(1),bp_filt_LFP(2),0,0); %filtering out 50Hz noise from LFP and Vm
-            end
-        end
-end
- tmpMat=[];
- bp_filt_Vm=files(files_to_analyze(fileind)).V2_filter; 
-if BPVm_flag==1;  %filtering both LFP and VM same as LFP was filtered during the experiment via multiclamp
-    if ~isempty(bp_manual_Vm)
-        bp_filt_Vm=bp_manual_Vm;
-    end      
-        if isempty(current_data_filt)
-            tmpMat=current_data;
-        else
-            tmpMat=current_data_filt;
-        end
-    for xx=1:3
-        for trace= 1:size(tmpMat,2)   
-               km=tmpMat(:,trace,xx);
-               current_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(km,dt,bp_filt_Vm(1),bp_filt_Vm(2),0,0); %filtering Vm same as LFP
-        end
-    end
-end
-%% low-pass filtering of Vm below 300Hz       
-
+    galvano_nstim = Param.facade(6);
+    galvano_freq = Param.facade(7);
+    data_preprocessing
+  %%   
+%                 sf{1} = Param.sf_Vm;
+%                 sf{2} = Param.sf_I1;
+%                 sf{3} = Param.sf_V2;
+%                 sf{4} = Param.sf_I2;
+%                 dt=1/sf{channel};
+%                              
+%                 sf_airpuff = Param.sf_airpuff; %[1/sec]
+%                 dt_airpuff = 1/sf_airpuff;
+%                 sf_galvano = Param.sf_galvano; %[1/sec]
+%                 dt_galvano = 1/sf_galvano;   
+%     Ch2_data= raw_data{3}./20; %dividing by the LFP gain           
+% %     raw_data{3} = raw_data{3}./20; %dividing by the LFP gain
+%     current_data=data_no_spikes{channel};
+%     current_data_filt=[]; Ch2_data_filt=[];
+% 
+% %% bandpass filtering to remove 50Hz noise from LFP and Vm.
+% if BP50HzLFP_flag==1;
+%     if isempty(Ch2_data_filt)
+%         tmpMat=Ch2_data;
+%     else
+%         tmpMat=Ch2_data_filt;
+%     end
+%         for xx=1:3
+%             for trace= 1:size(tmpMat,2)    
+%                     jl=tmpMat(:,trace,xx);
+%                     Ch2_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(jl,dt,49,51,1,0); %filtering out 50Hz noise from LFP and Vm
+%             end
+%         end
+% end
+% tmpMat=[];
+% 
+% if BP50HzVm_flag==1;
+%     if isempty(current_data_filt)
+%         tmpMat=current_data;
+%     else
+%         tmpMat=current_data_filt;
+%     end
+%         for xx=1:3
+%             for trace= 1:size(current_data,2)    
+%                 jm=tmpMat(:,trace,xx);
+%                 current_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(jm,dt,49,51,1,0); %filtering out 50Hz noise from LFP and Vm
+%             end
+%         end
+% end
+%  tmpMat=[];
+% bp_filt_LFP=files(files_to_analyze(fileind)).V2_filter;
+% if BPLFP_flag==1;  %filtering both LFP and VM same as LFP was filtered during the experiment via multiclamp
+%     if ~isempty(bp_manual_LFP)
+%         bp_filt_LFP=bp_manual_LFP;
+%     end
+%         if isempty(Ch2_data_filt)
+%         tmpMat=Ch2_data;
+%     else
+%         tmpMat=Ch2_data_filt;
+%         end
+%        
+%         for xx=1:3
+%             for trace= 1:size(tmpMat,2)   
+%                 kl=tmpMat(:,trace,xx);
+%                  Ch2_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(kl,dt,bp_filt_LFP(1),bp_filt_LFP(2),0,0); %filtering out 50Hz noise from LFP and Vm
+%             end
+%         end
+% end
+%  tmpMat=[];
+%  bp_filt_Vm=files(files_to_analyze(fileind)).V2_filter; 
+% if BPVm_flag==1;  %filtering both LFP and VM same as LFP was filtered during the experiment via multiclamp
+%     if ~isempty(bp_manual_Vm)
+%         bp_filt_Vm=bp_manual_Vm;
+%     end      
+%         if isempty(current_data_filt)
+%             tmpMat=current_data;
+%         else
+%             tmpMat=current_data_filt;
+%         end
+%     for xx=1:3
+%         for trace= 1:size(tmpMat,2)   
+%                km=tmpMat(:,trace,xx);
+%                current_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(km,dt,bp_filt_Vm(1),bp_filt_Vm(2),0,0); %filtering Vm same as LFP
+%         end
+%     end
+% end
 %% set the path for saving figures and variables
 if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1 && BPLFP_flag==1
     path_output='LFP_50Hz+BP Vm_ 50Hz+BP';
@@ -185,88 +191,92 @@ end
 %%
 for trace_type=trace_type_input; %1:2; 
         norm_LFP=[]; norm_Vm=[]; 
-    switch trace_type
-        case 1
-            x_value=[1,1];
-        case 2
-            x_value=[2:3]; %2:3; %[1,1];
-        case 3
-            x_value=[2,1]; %for apont. activity takes the "before" from x-value 2 and the "after" from x-value 1. enables taking longer interval
-end
-clear  duration start_time start_sample end_sample interval interval_mat interval_plot x y patch_xdata patch_ydata yex ylim_data sem_xdata sem_ydata sem_cdata
-coeffs=[]; 
-switch exp_type
-    case 1
-        switch trace_type
-            case 1
-                 start_time = [0.4,5.6]; %[sec] %[0,5]
-                 duration = 2.5; %[sec] 
-                    for t=1:length(start_time);
-                     start_sample(:,t) = ceil(start_time(t).*sf{1});
-                        if start_time(t)==0
-                            start_sample(:,t) = 1;
-                        end
-                      end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1})-1;
-                      interval(:,t) = start_sample(:,t):end_sample(:,t);
-                    end 
-            case 2
-                 start_sample =stim2_X{x_value(1)}(1,1)-0.1.*sf{1};  %start 100ms before sensory stim
-        %          duration = 1; %[sec]
-                galvano_nstim = Param.facade(6);
-                galvano_freq = Param.facade(7);
-                duration = galvano_nstim./galvano_freq+0.05;
-                end_sample = start_sample+duration.*sf{1}-1;
-                interval(:,1) = round(start_sample:end_sample);
-                interval(:,2) = interval(:,1);
-            case 3
-                 start_time = [0.4,5.6]; %[sec] %[0,5]
-                 duration = 4; %[sec] 
-                    for t=1:length(start_time);
-                     start_sample(:,t) = ceil(start_time(t).*sf{1});
-                        if start_time(t)==0
-                            start_sample(:,t) = 1;
-                        end
-                        end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1})-1;
-                        interval(:,t) = start_sample(:,t):end_sample(:,t);
-                    end
-            end
-    case 2
-        switch trace_type
-            case 1
-        %          start_time = [0.4,5.6]; %[sec] %[0,5]
-                 start_time=[0.4, stim1_X{x_value(1)}(1,1).*dt+0.4];
-                 duration =2.5;
-                    for t=1:length(start_time);
-                     start_sample(:,t) = ceil(start_time(t).*sf{1});
-                        if start_time(t)==0
-                            start_sample(:,t) = 1;
-                        end
-                      end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1})-1;
-                      interval(:,t) = start_sample(:,t):end_sample(:,t);
-                    end 
-            case 2
-                 start_sample =stim2_X{x_value(1)}(1,1)-0.1.*sf{1};  %start 100ms before sensory stim
-        %          duration = 1; %[sec]
-                galvano_nstim = Param.facade(6);
-                galvano_freq = Param.facade(7);
-                duration = galvano_nstim./galvano_freq+0.05;
-                end_sample = start_sample+duration.*sf{1}-1;
-                interval(:,1) = round(start_sample:end_sample);
-                interval(:,2) = interval(:,1);
-                
-           case 3
-                 start_time = [0.4,stim1_X{x_value(1)}(1,1).*dt+0.4]; %[sec] %[0,5]
-                 duration = 4; %[sec] 
-                    for t=1:length(start_time);
-                     start_sample(:,t) = ceil(start_time(t).*sf{1});
-                        if start_time(t)==0
-                            start_sample(:,t) = 1;
-                        end
-                        end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1})-1;
-                        interval(:,t) = start_sample(:,t):end_sample(:,t);
-                    end
-        end
-end
+        %%
+        intervals_to_analyze
+        %%
+%     switch trace_type
+%         case 1
+%             x_value=[1,1];
+%         case 2
+%             x_value=[2:3]; %2:3; %[1,1];
+%         case 3
+%             x_value=[2,1]; %for apont. activity takes the "before" from x-value 2 and the "after" from x-value 1. enables taking longer interval
+% end
+% clear  duration start_time start_sample end_sample interval interval_mat interval_plot x y patch_xdata patch_ydata yex ylim_data sem_xdata sem_ydata sem_cdata
+% coeffs=[]; 
+% switch exp_type
+%     case 1
+%         switch trace_type
+%             case 1
+%                  start_time = [0.4,5.6]; %[sec] %[0,5]
+%                  duration = 2.5; %[sec] 
+%                     for t=1:length(start_time);
+%                      start_sample(:,t) = ceil(start_time(t).*sf{1});
+%                         if start_time(t)==0
+%                             start_sample(:,t) = 1;
+%                         end
+%                       end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1})-1;
+%                       interval(:,t) = start_sample(:,t):end_sample(:,t);
+%                     end 
+%             case 2
+%                  start_sample =stim2_X{x_value(1)}(1,1)-0.1.*sf{1};  %start 100ms before sensory stim
+%         %          duration = 1; %[sec]
+%                 galvano_nstim = Param.facade(6);
+%                 galvano_freq = Param.facade(7);
+%                 duration = galvano_nstim./galvano_freq+0.05;
+%                 end_sample = start_sample+duration.*sf{1}-1;
+%                 interval(:,1) = round(start_sample:end_sample);
+%                 interval(:,2) = interval(:,1);
+%             case 3
+%                  start_time = [0.4,5.6]; %[sec] %[0,5]
+%                  duration = 4; %[sec] 
+%                     for t=1:length(start_time);
+%                      start_sample(:,t) = ceil(start_time(t).*sf{1});
+%                         if start_time(t)==0
+%                             start_sample(:,t) = 1;
+%                         end
+%                         end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1})-1;
+%                         interval(:,t) = start_sample(:,t):end_sample(:,t);
+%                     end
+%             end
+%     case 2
+%         switch trace_type
+%             case 1
+%         %          start_time = [0.4,5.6]; %[sec] %[0,5]
+%                  start_time=[0.4, stim1_X{x_value(1)}(1,1).*dt+0.4];
+%                  duration =2.5;
+%                     for t=1:length(start_time);
+%                      start_sample(:,t) = ceil(start_time(t).*sf{1});
+%                         if start_time(t)==0
+%                             start_sample(:,t) = 1;
+%                         end
+%                       end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1})-1;
+%                       interval(:,t) = start_sample(:,t):end_sample(:,t);
+%                     end 
+%             case 2
+%                  start_sample =stim2_X{x_value(1)}(1,1)-0.1.*sf{1};  %start 100ms before sensory stim
+%         %          duration = 1; %[sec]
+%                 galvano_nstim = Param.facade(6);
+%                 galvano_freq = Param.facade(7);
+%                 duration = galvano_nstim./galvano_freq+0.05;
+%                 end_sample = start_sample+duration.*sf{1}-1;
+%                 interval(:,1) = round(start_sample:end_sample);
+%                 interval(:,2) = interval(:,1);
+%                 
+%            case 3
+%                  start_time = [0.4,stim1_X{x_value(1)}(1,1).*dt+0.4]; %[sec] %[0,5]
+%                  duration = 4; %[sec] 
+%                     for t=1:length(start_time);
+%                      start_sample(:,t) = ceil(start_time(t).*sf{1});
+%                         if start_time(t)==0
+%                             start_sample(:,t) = 1;
+%                         end
+%                         end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1})-1;
+%                         interval(:,t) = start_sample(:,t):end_sample(:,t);
+%                     end
+%         end
+% end
+%%
 for t=1:2
 %% Subtract mean from the interval (fragment of trace)
 data_LFP{t}=Ch2_data_filt(interval(:,t),:,x_value(t));
@@ -571,6 +581,9 @@ hold off
         
         cc_spont(fileind).fname = fname;
         cc_spont(fileind).win_duration = duration;
+        cc_spont(fileind).trace_type_input = trace_type_input;
+        cc_spont(fileind).analyze_time_before_train = analyze_time_before_train;
+        cc_spont(fileind).V = analyze_train_only_flag;
         cc_spont(fileind).BP50HzLFP=BP50HzLFP_flag; %removing 50Hz noise from LFP signal
         cc_spont(fileind).BP50HzVm=BP50HzVm_flag; %removing 50Hz noise from Vm signal
         cc_spont(fileind).BPLFP_flag=BPLFP_flag; %filtering LFP 
@@ -599,6 +612,9 @@ hold off
     if trace_type==2
         cc_evoked(fileind).fname = fname;
         cc_evoked(fileind).win_duration = duration;
+        cc_evoked(fileind).trace_type_input = trace_type_input;
+        cc_evoked(fileind).analyze_time_before_train = analyze_time_before_train;
+        cc_evoked(fileind).V = analyze_train_only_flag;
         cc_evoked(fileind).BP50HzLFP=BP50HzLFP_flag; %removing 50Hz noise from LFP signal
         cc_evoked(fileind).BP50HzVm=BP50HzVm_flag; %removing 50Hz noise from Vm signal
         cc_evoked(fileind).BPLFP_flag=BPLFP_flag; %filtering LFP 

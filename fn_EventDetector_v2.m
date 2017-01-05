@@ -11,7 +11,7 @@
 
 
 
-function [voltages, starting, amplitude, ampPos, halfWidth, halfWidthS, halfWidthE] = EventDetector_v2(voltages, dt, finalAmp_Thres, doPlot,I_temp)
+function [voltages, starting, amplitude, ampPos, halfWidth, halfWidthS, halfWidthE] =fn_EventDetector_v2(voltages, dt, finalAmp_Thres, doPlot,I_temp)
 starting = [];
 amplitude = [];
 ampPos = [];

@@ -1,72 +1,67 @@
 %% for opening workspace saved 
 clear all
- global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
-load NBES_Files_v2
-peaks_for_xls=[]; peak_for_xls_mean=[]; 
-save_flag= 1;
+global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
+ global exp_type
+exp_type=2; %1-NBES, 2-ChAT
+trace_type_input=1; %
+analyze_time_before_train=0.1;
+analyze_train_only_flag=0;
+save_flag= 0;
 print_flag=1;
-data_vec_all = []; data_vec_residual_all = [];
-files_to_analyze =[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
-% for fileind=1;
+norm_flag=0;
+BP50HzLFP_flag=0; %removing 50Hz noise from LFP signal
+BP50HzVm_flag=0; %removing 50Hz noise from Vm signal
+BPLFP_flag=0; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
+bp_manual_LFP=[0.1,150]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
+BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
+bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
+clear color_table
+    color_table=[0 0 0; [30,75,14]/256; [136 137 138]/256; [112,172,90]/256; [216 22 22]/256; [255 153 153]/256];
+    whisker_stim_color(1,:)=[255 153 153]/256; %[239 188 86]/256;
+%%
+switch exp_type
+    case 1
+        files_to_analyze =[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
+        cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
+        load NBES_Files_v2
+        legend_string={'NB+', 'NB-'};
+        path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis';
+
+    case 2
+        files_to_analyze =[74,76,77,80,82]; %,84,87];
+        cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
+        load ChAT_Files_v3
+        legend_string={'Light On', 'Light Off'};
+        path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis';
+end
+        
     for fileind=1:length(files_to_analyze) ;
     close all
     channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
-    clear data_no_spike_no_DC
     fname = files(files_to_analyze(fileind)).extracted_name;        
     path = files(files_to_analyze(fileind)).extracted_path;
     cd(path)
     load(fname) 
-    color_table=[0 0 0;color_table(1:6,:)];
- %%   
-                sf{1} = Param.sf_Vm;
-                sf{2} = Param.sf_I1;
-                sf{3} = Param.sf_V2;
-                sf{4} = Param.sf_I2;
-                dt=1/sf{channel};
-                             
-                sf_airpuff = Param.sf_airpuff; %[1/sec]
-                dt_airpuff = 1/sf_airpuff;
-                sf_galvano = Param.sf_galvano; %[1/sec]
-                dt_galvano = 1/sf_galvano;  
-%                 stim_temp=stim2_X{2}(:,1);
-%                 stim2_X=[];
-%                 stim2_X{2}=stim_temp; stim2_X{3}=stim_temp;
-%                 
-%% low-pass filtering below 300Hz     
-lp=300;
-                for xx=1:3
-    for trace= 1:size(data_no_spikes{channel},2)    
-            jj=data_no_spikes{channel}(:,trace,xx);
-            data_no_spikes{channel}(:,trace,xx)=bandPass_fft_IL_NEW2016(jj,dt,-1,lp,0,0); 
-    end
-                end
-              %% 
-   for trace_type= 1;%1:2; %1:2;  %1 for spont., 2 for evoked
-     interval=[];       
-            x_value=[1,1];    
-            
-                 start_time = [0.4,5.6]; %[sec] %[0,5]
-                 duration = 2.5; %[sec] 
-                 epoch_length=0.5; %[sec]
-                 epochs=round(duration/epoch_length); 
-                    for t=1:length(start_time);
-                     start_sample(:,t) = ceil(start_time(t).*sf{1});
-                        if start_time(t)==0
-                            start_sample(:,t) = 1;
-                        end
-                      end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1})-1;
-                      interval(:,t) = start_sample(:,t):end_sample(:,t);
-                      finalAmp_Thres = 2 ;
-                    end                  
-%% detect events
-% for i=1:10;
-% voltages_input = data_no_spikes{channel}(i/dt:(i+1)/dt,1,2);
+     %%
+   Ch2_data= raw_data{3}./20; %dividing by the LFP gain           
+    current_data=data_no_spikes{channel};    
+    galvano_nstim = Param.facade(6);
+    galvano_freq = Param.facade(7);
+
+data_preprocessing 
+ %%    
+   for trace_type=trace_type_input %1 for spont., 2 for evoked
+         interval=[];       
+    intervals_to_analyze 
+            epoch_length=0.5; %[sec]
+                 epochs=round(duration/epoch_length);    
+                  finalAmp_Thres = 2 ;
+                            
         for t=1:2;
             event_start_vec{t}=[];  event_onVal_vec{t} = [];  event_amplitude_vec{t} =  [];    event_ampPos_vec{t} =  []; 
             event_ampVal_vec{t} = [];     event_halfWidth_vec{t} =  [];   event_halfWidthS_vec{t} =  []; 
             event_halfWidthE_vec{t} =  [];       
-          for trace=1:size(data_no_spikes{1},2)    
+          for trace=1:size(current_data,2)    
               event_start{t,trace}=[];                      event_onVal{t,trace} = [];
             event_amplitude{t,trace} =  [];             event_ampPos{t,trace} =  [];             event_ampVal{t,trace} = [];
             event_halfWidth{t,trace} =  [];            event_halfWidthS{t,trace} =  [];             event_halfWidthE{t,trace} =  []; 
@@ -75,10 +70,10 @@ lp=300;
                   starting=[]; amplitude=[]; ampPos=[]; halfWidth=[]; halfWidthS=[]; halfWidthE=[];
                   peak_start_int = interval(1+sf{1}*epoch_length*(epoch-1),t);
                   peak_end_int = interval(sf{1}*epoch_length*epoch,t);
-        voltages_input = data_no_spikes{1}(peak_start_int:peak_end_int,trace,x_value(t));
+        voltages_input = current_data(peak_start_int:peak_end_int,trace,x_value(t));
         doPlot = 0;
         I_temp=0;
-        [voltages, tmp_starting,tmp_amplitude, tmp_ampPos, halfWidth,tmp_halfWidthS, tmp_halfWidthE] = EventDetector_v2(voltages_input, dt, finalAmp_Thres, doPlot,I_temp);
+        [voltages, tmp_starting,tmp_amplitude, tmp_ampPos, halfWidth,tmp_halfWidthS, tmp_halfWidthE] = fn_EventDetector_v2(voltages_input, dt, finalAmp_Thres, doPlot,I_temp);
         title(['t=', num2str(t), ' trace ',num2str(trace)]); 
         set(gca,'ylim',[-60 -30])
 %          pause
@@ -98,32 +93,31 @@ lp=300;
          end         
         halfWidth=(halfWidthE-halfWidthS).*dt.*1000; %in msec
             event_start{t,trace} =  [event_start{t,trace};  starting];            
-            event_onVal{t,trace} = [event_onVal{t,trace}; data_no_spikes{1}(starting,trace,x_value(t))];
+            event_onVal{t,trace} = [event_onVal{t,trace}; current_data(starting,trace,x_value(t))];
             event_amplitude{t,trace} =  [event_amplitude{t,trace}; amplitude]; 
             event_ampPos{t,trace} =  [event_ampPos{t,trace}; ampPos]; 
-            event_ampVal{t,trace} = [event_ampVal{t,trace}; data_no_spikes{1}(ampPos,trace,x_value(t))];
+            event_ampVal{t,trace} = [event_ampVal{t,trace}; current_data(ampPos,trace,x_value(t))];
             event_halfWidth{t,trace} =  [event_halfWidth{t,trace}; halfWidth]; 
             event_halfWidthS{t,trace} =  [event_halfWidthS{t,trace}; halfWidthS]; 
             event_halfWidthE{t,trace} =  [event_halfWidthE{t,trace}; halfWidthE]; 
     end        
             %% visualize the detected events on the trace            
-            figure(1); clf
-            hold on
-                     h1=plot([1:size(data_no_spikes{channel},1)].*dt, data_no_spikes{channel}(:,trace,x_value(t)),'k');
-                     h2=scatter(event_start{t,trace}*dt,data_no_spikes{channel}(event_start{t,trace},trace,x_value(t)),'r','fill'); %mark event onset
-                     h3=scatter(event_ampPos{t,trace}*dt,data_no_spikes{channel}(event_ampPos{t,trace},trace,x_value(t)),'b','fill'); %mark event peak
-                   if t==1;  set(gca,'xlim',[0.4 2.9]); end
-                   if t==2;  set(gca,'xlim',[5.6 8.1]); end
-                   set(gca,'ylim',[-50 -10]);
-                     hold off
-pause
-% cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\10_20Hz\single trials'
+%             figure(1); clf
+%             hold on
+%                      h1=plot([1:size(current_data,1)].*dt, current_data(:,trace,x_value(t)),'k');
+%                      h2=scatter(event_start{t,trace}*dt,current_data(event_start{t,trace},trace,x_value(t)),'r','fill'); %mark event onset
+%                      h3=scatter(event_ampPos{t,trace}*dt,current_data(event_ampPos{t,trace},trace,x_value(t)),'b','fill'); %mark event peak
+%                     set(gca,'xlim',[start_time(t) start_time(t)+duration]);               
+% %                    set(gca,'ylim',[-50 -10]);
+%                      hold off
+% pause
+% cd(path_output)
 %  if t==1;
 % print(1,['detection example - ongoing NB-, trace ', num2str(trace)],'-dpng','-r600','-opengl')
-% % saveas(1,'detection example - evoked NB-.fig') 
+% % saveas(1,'detection example - evoked NB-','fig') 
 %  else if t==2
 %   print(1,['detection example - ongoing NB+, trace ', num2str(trace)],'-dpng','-r600','-opengl')
-% % saveas(1,'detection example - evoked NB+.fig') 
+% % saveas(1,'detection example - evoked NB+','fig') 
 %      end
 %  end
 %%              
@@ -138,13 +132,21 @@ pause
             event_halfWidthE_vec{t} =  [event_halfWidthE_vec{t}(:); event_halfWidthE{t,trace}(:)];             
           end
            event_count(1,t)=length(event_start_vec{t}(:));
-           event_freq(1,t) = event_count(1,t)/(duration*size(data_no_spikes{1},2));
+           event_freq(1,t) = event_count(1,t)/(duration*size(current_data,2));
         end
    end
+
         %organizing the data in structure:  
             event_ongoing(fileind).cells=files_to_analyze;
-            event_ongoing(fileind).analysis_mfile='Analyze_NBES_ongoing_10_20Hz_single_trials_v2.m';
-            event_ongoing(fileind).lp=lp;
+            event_ongoing(fileind).analysis_mfile='Analyze_by_single_trials_ongoing_v2.m';
+            event_ongoing(fileind).fname = fname;
+            event_ongoing(fileind).trace_type_input = trace_type_input;
+            event_ongoing(fileind).BP50HzLFP=BP50HzLFP_flag; %removing 50Hz noise from LFP signal
+            event_ongoing(fileind).BP50HzVm=BP50HzVm_flag; %removing 50Hz noise from Vm signal
+            event_ongoing(fileind).BPLFP_flag=BPLFP_flag; %filtering LFP 
+            event_ongoing(fileind).BPLFP=bp_filt_LFP; %the BP frequency filter for  LFP, used if BPLFP_flag=1
+            event_ongoing(fileind).BPVm_flag=BPVm_flag; %filtering Vm 
+            event_ongoing(fileind).BPVm=bp_filt_Vm; %the BP frequency filter for Vm, used if BPVm_flag=1
             event_ongoing(fileind).finalAmp_Thres=finalAmp_Thres;
             event_ongoing(fileind).start_sample=start_sample;
             event_ongoing(fileind).end_sample=end_sample;
@@ -452,28 +454,15 @@ hold off
         title(['Spontaneous event onset value,  p=' num2str(event_ongoing_stat.wilcoxon_p_onVal_m)] ,'FontSize', 20,'fontname', 'arial');   
         %% save figures
 if save_flag==1
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\10_20Hz\single trials\ongoing'
+cd(path_output)
 print(g1,'Spontaneous event frequency','-dpng','-r600','-opengl')
-saveas(g1,'Spontaneous event frequency.fig') 
+saveas(g1,'Spontaneous event frequency','fig') 
 print(g2,'Spontaneous event amplitude','-dpng','-r600','-opengl')
-saveas(g2,'Spontaneous event amplitude.fig') 
+saveas(g2,'Spontaneous event amplitude','fig') 
 print(g3,'Spontaneous event half-width','-dpng','-r600','-opengl')
-saveas(g3,'Spontaneous event half-width.fig') 
+saveas(g3,'Spontaneous event half-width','fig') 
 print(g4,'Spontaneous event onset value','-dpng','-r600','-opengl')
-saveas(g4,'Spontaneous event onset value.fig') 
+saveas(g4,'Spontaneous event onset value','fig') 
 filename='Spontaneous activity'; 
 save(filename, 'files_to_analyze', 'event_ongoing', 'event_ongoing_stat')
 end
-%% Plotting parameters along the stim train
-% color_table_rand = rand(length(files_to_analyze),3);
-%     if print_flag==1;
-% h1=figure;
-%         figure(h1);     
-%         hold on
-%         errorbar([1:size(peak_amp{3},2)], mean(peak_amp{3}./peak_amp{2},1),std(peak_amp{3}./peak_amp{2},0,1),'k-', 'LineWidth',1.5,'marker','o','markerfacecolor','k')
-%         line([0;12],[1;1],'linestyle','--','linewidth',2,'color','b')
-%         hold off
-%         xlabel('Stim. serial number' ,'FontSize', 16);
-%         ylabel('Mean Response Amplitude [mV]' ,'FontSize', 16);    
-%         title(['Mean Response Amplitude - local baseline,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);     
-%         

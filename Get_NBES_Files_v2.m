@@ -3156,7 +3156,7 @@ files(81).offset = 0;          %need to subtract the offset
 
 files(82).name = '2016-12-08-003.exp2';
 files(82).path = 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Raw Data';
-files(82).extracted_name = 'f83_2016-12-08-003_protocol ES+galvano train+test'; %protocol current inj+ES+galvano train+test_VC %protocol ES+galvano train+test %protocol IC test
+files(82).extracted_name = 'f82_2016-12-08-003_protocol ES+galvano train+test'; %protocol current inj+ES+galvano train+test_VC %protocol ES+galvano train+test %protocol IC test
 files(82).extracted_path = 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
 files(82).animal = 'ChAT-Ai32(+/+;+/-) #26 BD 1.9.16';
 files(82).cell = 57;

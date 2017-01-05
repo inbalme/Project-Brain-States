@@ -125,7 +125,6 @@ plot_data_ff = (-1).*plot_data_var./plot_data_mean;
         DC=20.*(0:length(trace_ind)-1);
         DC=wextend('addrow', 'per', DC, l);
         trace_to_plot = plot_data(:,trace_ind, x_value(1))+DC ; %DC is added just to make space between the traces
-        x2lim=[stim2_X{x_value(1)}(1,1).*dt-0.5,stim2_X{x_value(1)}(1,1).*dt+2];
         tmp1=[]; %spacer instead of stim1_X, so that the light stim. will not be plotted
         lineprops1={'LineWidth',1.2,'color', [0 0 0]};
         [Fig1,h1]= fn_Plot_Trace_v2(trace_to_plot, dt, dt,tmp1 , dt, stim2_X{x_value(1)},lineprops1);       
@@ -1260,139 +1259,6 @@ clear data_no_spike_no_DC
         [peaks_stat(stim_num).wilcoxon_p_Amplitude_noise2, peaks_stat(stim_num).wilcoxon_h_Amplitude_noise2]= signrank(peaks_stat(stim_num).Amplitude_noise2(:,1),peaks_stat(stim_num).Amplitude_noise2(:,2));
         [peaks_stat(stim_num).ttest_h_change_Amplitude_noise2, peaks_stat(stim_num).ttest_p_change_Amplitude_noise2]= ttest(peaks_stat(stim_num).change_Amplitude_noise2);
         [peaks_stat(stim_num).wilcoxon_p_change_Amplitude_noise2, peaks_stat(stim_num).wilcoxon_h_change_Amplitude_noise2]= signrank(peaks_stat(stim_num).change_Amplitude_noise2);
-%% erase?  
-%             %Compare Vm STD before and during sensory stim, both cases without NB stimulation 
-%         peaks_stat(stim_num).sensory_stim_pre_STD=[peak_pre_response_STD{2}(:,stim_num),  peak_Vm_res_train_STD{2}(:,stim_num)];
-%         peaks_stat(stim_num).sensory_stim_pre_STD_m=nanmean(peaks_stat(stim_num).sensory_stim_pre_STD,1);
-%         peaks_stat(stim_num).sensory_stim_pre_STD_std=nanstd(peaks_stat(stim_num).sensory_stim_pre_STD,0,1);
-%         peaks_stat(stim_num).change_sensory_stim_pre_STD=[(peak_Vm_res_train_STD{2}(:,stim_num)-peak_pre_response_STD{2}(:,stim_num))./abs(peak_pre_response_STD{2}(:,stim_num))].*100; %percent change
-%         peaks_stat(stim_num).change_sensory_stim_pre_STD_m=nanmean(peaks_stat(stim_num).change_sensory_stim_pre_STD,1);
-%         peaks_stat(stim_num).change_sensory_stim_pre_STD_std=nanstd(peaks_stat(stim_num).change_sensory_stim_pre_STD,0,1);
-%         %testing for normal distribution       
-%         [peaks_stat(stim_num).lillietest_h_sensory_stim_pre_STD, peaks_stat(stim_num).lillietest_p_sensory_stim_pre_STD] = lillietest(peaks_stat(stim_num).sensory_stim_pre_STD(:,2)- peaks_stat(stim_num).sensory_stim_pre_STD(:,1));
-%         [peaks_stat(stim_num).lillietest_h_change_sensory_stim_pre_STD, peaks_stat(stim_num).lillietest_p_change_sensory_stim_pre_STD] = lillietest( peaks_stat(stim_num).change_sensory_stim_pre_STD);
-%         %paired ttest 
-%         [peaks_stat(stim_num).ttest_h_sensory_stim_pre_STD, peaks_stat(stim_num).ttest_p_sensory_stim_pre_STD]= ttest(peaks_stat(stim_num).sensory_stim_pre_STD(:,1),peaks_stat(stim_num).sensory_stim_pre_STD(:,2));   
-%         [peaks_stat(stim_num).wilcoxon_p_sensory_stim_pre_STD, peaks_stat(stim_num).wilcoxon_h_sensory_stim_pre_STD]= signrank(peaks_stat(stim_num).sensory_stim_pre_STD(:,1),peaks_stat(stim_num).sensory_stim_pre_STD(:,2));
-%         [peaks_stat(stim_num).ttest_h_change_sensory_stim_pre_STD, peaks_stat(stim_num).ttest_p_change_sensory_stim_pre_STD]= ttest(peaks_stat(stim_num).change_sensory_stim_pre_STD);
-%         [peaks_stat(stim_num).wilcoxon_p_change_sensory_stim_pre_STD, peaks_stat(stim_num).wilcoxon_h_change_sensory_stim_pre_STD]= signrank(peaks_stat(stim_num).change_sensory_stim_pre_STD);
-%                                     
-%                 
-% %                 %Compare Vm STD before and during sensory stim, both cases without NB stimulation 
-%         peaks_stat(stim_num).sensory_stim_post_STD=[peak_Vm_res_train_STD{2}(:,stim_num),  peak_post_train_STD{2}(:,stim_num)];  
-%         peaks_stat(stim_num).sensory_stim_post_STD_m=nanmean(peaks_stat(stim_num).sensory_stim_post_STD,1);
-%         peaks_stat(stim_num).sensory_stim_post_STD_std=nanstd(peaks_stat(stim_num).sensory_stim_post_STD,0,1);
-%         peaks_stat(stim_num).change_sensory_stim_post_STD=[(peak_post_train_STD{2}(:,stim_num)-peak_Vm_res_train_STD{2}(:,stim_num))./abs(peak_Vm_res_train_STD{2}(:,stim_num))].*100; %percent change
-%         peaks_stat(stim_num).change_sensory_stim_post_STD_m=nanmean(peaks_stat(stim_num).change_sensory_stim_post_STD,1);
-%         peaks_stat(stim_num).change_sensory_stim_post_STD_std=nanstd(peaks_stat(stim_num).change_sensory_stim_post_STD,0,1);
-%         %testing for normal distribution       
-%         [peaks_stat(stim_num).lillietest_h_sensory_stim_post_STD, peaks_stat(stim_num).lillietest_p_sensory_stim_post_STD] = lillietest(peaks_stat(stim_num).sensory_stim_post_STD(:,2)- peaks_stat(stim_num).sensory_stim_post_STD(:,1));
-%         [peaks_stat(stim_num).lillietest_h_change_sensory_stim_post_STD, peaks_stat(stim_num).lillietest_p_change_sensory_stim_post_STD] = lillietest( peaks_stat(stim_num).change_sensory_stim_post_STD);
-%         %paired ttest 
-%         [peaks_stat(stim_num).ttest_h_sensory_stim_post_STD, peaks_stat(stim_num).ttest_p_sensory_stim_post_STD]= ttest(peaks_stat(stim_num).sensory_stim_post_STD(:,1),peaks_stat(stim_num).sensory_stim_post_STD(:,2));   
-%         [peaks_stat(stim_num).wilcoxon_p_sensory_stim_post_STD, peaks_stat(stim_num).wilcoxon_h_sensory_stim_post_STD]= signrank(peaks_stat(stim_num).sensory_stim_post_STD(:,1),peaks_stat(stim_num).sensory_stim_post_STD(:,2));
-%         [peaks_stat(stim_num).ttest_h_change_sensory_stim_post_STD, peaks_stat(stim_num).ttest_p_change_sensory_stim_post_STD]= ttest(peaks_stat(stim_num).change_sensory_stim_post_STD);
-%         [peaks_stat(stim_num).wilcoxon_p_change_sensory_stim_post_STD, peaks_stat(stim_num).wilcoxon_h_change_sensory_stim_post_STD]= signrank(peaks_stat(stim_num).change_sensory_stim_post_STD);
-%      
-%                     %Compare Vm STD before and during sensory stim, both cases WITH NB stimulation 
-%         peaks_stat(stim_num).sensory_stim_pre_STD_NB=[peak_pre_response_STD{3}(:,stim_num),  peak_Vm_res_train_STD{3}(:,stim_num)];
-%         peaks_stat(stim_num).sensory_stim_pre_STD_NB_m=nanmean(peaks_stat(stim_num).sensory_stim_pre_STD_NB,1);
-%         peaks_stat(stim_num).sensory_stim_pre_STD_NB_std=nanstd(peaks_stat(stim_num).sensory_stim_pre_STD_NB,0,1);
-%         peaks_stat(stim_num).change_sensory_stim_pre_STD_NB=[(peak_Vm_res_train_STD{3}(:,stim_num)-peak_pre_response_STD{3}(:,stim_num))./abs(peak_pre_response_STD{3}(:,stim_num))].*100; %percent change
-%         peaks_stat(stim_num).change_sensory_stim_pre_STD_NB_m=nanmean(peaks_stat(stim_num).change_sensory_stim_pre_STD_NB,1);
-%         peaks_stat(stim_num).change_sensory_stim_pre_STD_NB_std=nanstd(peaks_stat(stim_num).change_sensory_stim_pre_STD_NB,0,1);
-%         %testing for normal distribution       
-%         [peaks_stat(stim_num).lillietest_h_sensory_stim_pre_STD_NB, peaks_stat(stim_num).lillietest_p_sensory_stim_pre_STD_NB] = lillietest(peaks_stat(stim_num).sensory_stim_pre_STD_NB(:,2)- peaks_stat(stim_num).sensory_stim_pre_STD_NB(:,1));
-%         [peaks_stat(stim_num).lillietest_h_change_sensory_stim_pre_STD_NB, peaks_stat(stim_num).lillietest_p_change_sensory_stim_pre_STD_NB] = lillietest( peaks_stat(stim_num).change_sensory_stim_pre_STD_NB);
-%         %paired ttest 
-%         [peaks_stat(stim_num).ttest_h_sensory_stim_pre_STD_NB, peaks_stat(stim_num).ttest_p_sensory_stim_pre_STD_NB]= ttest(peaks_stat(stim_num).sensory_stim_pre_STD_NB(:,1),peaks_stat(stim_num).sensory_stim_pre_STD_NB(:,2));   
-%         [peaks_stat(stim_num).wilcoxon_p_sensory_stim_pre_STD_NB, peaks_stat(stim_num).wilcoxon_h_sensory_stim_pre_STD_NB]= signrank(peaks_stat(stim_num).sensory_stim_pre_STD_NB(:,1),peaks_stat(stim_num).sensory_stim_pre_STD_NB(:,2));
-%         [peaks_stat(stim_num).ttest_h_change_sensory_stim_pre_STD_NB, peaks_stat(stim_num).ttest_p_change_sensory_stim_pre_STD_NB]= ttest(peaks_stat(stim_num).change_sensory_stim_pre_STD_NB);
-%         [peaks_stat(stim_num).wilcoxon_p_change_sensory_stim_pre_STD_NB, peaks_stat(stim_num).wilcoxon_h_change_sensory_stim_pre_STD_NB]= signrank(peaks_stat(stim_num).change_sensory_stim_pre_STD_NB);
-%                                     
-%                 
-% %                 %Compare Vm STD before and during sensory stim, both cases WITH NB stimulation 
-%         peaks_stat(stim_num).sensory_stim_post_STD_NB=[peak_Vm_res_train_STD{3}(:,stim_num),  peak_post_train_STD{3}(:,stim_num)];  
-%         peaks_stat(stim_num).sensory_stim_post_STD_NB_m=nanmean(peaks_stat(stim_num).sensory_stim_post_STD_NB,1);
-%         peaks_stat(stim_num).sensory_stim_post_STD_NB_std=nanstd(peaks_stat(stim_num).sensory_stim_post_STD_NB,0,1);
-%         peaks_stat(stim_num).change_sensory_stim_post_STD_NB=[(peak_post_train_STD{3}(:,stim_num)-peak_Vm_res_train_STD{3}(:,stim_num))./abs(peak_Vm_res_train_STD{3}(:,stim_num))].*100; %percent change
-%         peaks_stat(stim_num).change_sensory_stim_post_STD_NB_m=nanmean(peaks_stat(stim_num).change_sensory_stim_post_STD_NB,1);
-%         peaks_stat(stim_num).change_sensory_stim_post_STD_NB_std=nanstd(peaks_stat(stim_num).change_sensory_stim_post_STD_NB,0,1);
-%         %testing for normal distribution       
-%         [peaks_stat(stim_num).lillietest_h_sensory_stim_post_STD_NB, peaks_stat(stim_num).lillietest_p_sensory_stim_post_STD_NB] = lillietest(peaks_stat(stim_num).sensory_stim_post_STD_NB(:,2)- peaks_stat(stim_num).sensory_stim_post_STD_NB(:,1));
-%         [peaks_stat(stim_num).lillietest_h_change_sensory_stim_post_STD_NB, peaks_stat(stim_num).lillietest_p_change_sensory_stim_post_STD_NB] = lillietest( peaks_stat(stim_num).change_sensory_stim_post_STD_NB);
-%         %paired ttest 
-%         [peaks_stat(stim_num).ttest_h_sensory_stim_post_STD_NB, peaks_stat(stim_num).ttest_p_sensory_stim_post_STD_NB]= ttest(peaks_stat(stim_num).sensory_stim_post_STD_NB(:,1),peaks_stat(stim_num).sensory_stim_post_STD_NB(:,2));   
-%         [peaks_stat(stim_num).wilcoxon_p_sensory_stim_post_STD_NB, peaks_stat(stim_num).wilcoxon_h_sensory_stim_post_STD_NB]= signrank(peaks_stat(stim_num).sensory_stim_post_STD_NB(:,1),peaks_stat(stim_num).sensory_stim_post_STD_NB(:,2));
-%         [peaks_stat(stim_num).ttest_h_change_sensory_stim_post_STD_NB, peaks_stat(stim_num).ttest_p_change_sensory_stim_post_STD_NB]= ttest(peaks_stat(stim_num).change_sensory_stim_post_STD_NB);
-%         [peaks_stat(stim_num).wilcoxon_p_change_sensory_stim_post_STD_NB, peaks_stat(stim_num).wilcoxon_h_change_sensory_stim_post_STD_NB]= signrank(peaks_stat(stim_num).change_sensory_stim_post_STD_NB);
-%  
-%         %Compare Vm trial to trial variability before and during sensory stim, both cases without NB stimulation 
-%         peaks_stat(stim_num).sensory_stim_pre_VAR=[peak_pre_response_VAR{2}(:,stim_num),  peak_Vm_res_train_VAR{2}(:,stim_num)];
-%         peaks_stat(stim_num).sensory_stim_pre_VAR_m=nanmean(peaks_stat(stim_num).sensory_stim_pre_VAR,1);
-%         peaks_stat(stim_num).sensory_stim_pre_VAR_std=nanstd(peaks_stat(stim_num).sensory_stim_pre_VAR,0,1);
-%         peaks_stat(stim_num).change_sensory_stim_pre_VAR=[(peak_Vm_res_train_VAR{2}(:,stim_num)-peak_pre_response_VAR{2}(:,stim_num))./abs(peak_pre_response_VAR{2}(:,stim_num))].*100; %percent change
-%         peaks_stat(stim_num).change_sensory_stim_pre_VAR_m=nanmean(peaks_stat(stim_num).change_sensory_stim_pre_VAR,1);
-%         peaks_stat(stim_num).change_sensory_stim_pre_VAR_std=nanstd(peaks_stat(stim_num).change_sensory_stim_pre_VAR,0,1);
-%         %testing for normal distribution       
-%         [peaks_stat(stim_num).lillietest_h_sensory_stim_pre_VAR, peaks_stat(stim_num).lillietest_p_sensory_stim_pre_VAR] = lillietest(peaks_stat(stim_num).sensory_stim_pre_VAR(:,2)- peaks_stat(stim_num).sensory_stim_pre_VAR(:,1));
-%         [peaks_stat(stim_num).lillietest_h_change_sensory_stim_pre_VAR, peaks_stat(stim_num).lillietest_p_change_sensory_stim_pre_VAR] = lillietest( peaks_stat(stim_num).change_sensory_stim_pre_VAR);
-%         %paired ttest 
-%         [peaks_stat(stim_num).ttest_h_sensory_stim_pre_VAR, peaks_stat(stim_num).ttest_p_sensory_stim_pre_VAR]= ttest(peaks_stat(stim_num).sensory_stim_pre_VAR(:,1),peaks_stat(stim_num).sensory_stim_pre_VAR(:,2));   
-%         [peaks_stat(stim_num).wilcoxon_p_sensory_stim_pre_VAR, peaks_stat(stim_num).wilcoxon_h_sensory_stim_pre_VAR]= signrank(peaks_stat(stim_num).sensory_stim_pre_VAR(:,1),peaks_stat(stim_num).sensory_stim_pre_VAR(:,2));
-%         [peaks_stat(stim_num).ttest_h_change_sensory_stim_pre_VAR, peaks_stat(stim_num).ttest_p_change_sensory_stim_pre_VAR]= ttest(peaks_stat(stim_num).change_sensory_stim_pre_VAR);
-%         [peaks_stat(stim_num).wilcoxon_p_change_sensory_stim_pre_VAR, peaks_stat(stim_num).wilcoxon_h_change_sensory_stim_pre_VAR]= signrank(peaks_stat(stim_num).change_sensory_stim_pre_VAR);
-%                                     
-%                 
-% %                 %Compare Vm trial to trial variability before and during sensory stim, both cases without NB stimulation 
-%         peaks_stat(stim_num).sensory_stim_post_VAR=[peak_Vm_res_train_VAR{2}(:,stim_num),  peak_post_train_VAR{2}(:,stim_num)];  
-%         peaks_stat(stim_num).sensory_stim_post_VAR_m=nanmean(peaks_stat(stim_num).sensory_stim_post_VAR,1);
-%         peaks_stat(stim_num).sensory_stim_post_VAR_std=nanstd(peaks_stat(stim_num).sensory_stim_post_VAR,0,1);
-%         peaks_stat(stim_num).change_sensory_stim_post_VAR=[(peak_post_train_VAR{2}(:,stim_num)-peak_Vm_res_train_VAR{2}(:,stim_num))./abs(peak_Vm_res_train_VAR{2}(:,stim_num))].*100; %percent change
-%         peaks_stat(stim_num).change_sensory_stim_post_VAR_m=nanmean(peaks_stat(stim_num).change_sensory_stim_post_VAR,1);
-%         peaks_stat(stim_num).change_sensory_stim_post_VAR_std=nanstd(peaks_stat(stim_num).change_sensory_stim_post_VAR,0,1);
-%         %testing for normal distribution       
-%         [peaks_stat(stim_num).lillietest_h_sensory_stim_post_VAR, peaks_stat(stim_num).lillietest_p_sensory_stim_post_VAR] = lillietest(peaks_stat(stim_num).sensory_stim_post_VAR(:,2)- peaks_stat(stim_num).sensory_stim_post_VAR(:,1));
-%         [peaks_stat(stim_num).lillietest_h_change_sensory_stim_post_VAR, peaks_stat(stim_num).lillietest_p_change_sensory_stim_post_VAR] = lillietest( peaks_stat(stim_num).change_sensory_stim_post_VAR);
-%         %paired ttest 
-%         [peaks_stat(stim_num).ttest_h_sensory_stim_post_VAR, peaks_stat(stim_num).ttest_p_sensory_stim_post_VAR]= ttest(peaks_stat(stim_num).sensory_stim_post_VAR(:,1),peaks_stat(stim_num).sensory_stim_post_VAR(:,2));   
-%         [peaks_stat(stim_num).wilcoxon_p_sensory_stim_post_VAR, peaks_stat(stim_num).wilcoxon_h_sensory_stim_post_VAR]= signrank(peaks_stat(stim_num).sensory_stim_post_VAR(:,1),peaks_stat(stim_num).sensory_stim_post_VAR(:,2));
-%         [peaks_stat(stim_num).ttest_h_change_sensory_stim_post_VAR, peaks_stat(stim_num).ttest_p_change_sensory_stim_post_VAR]= ttest(peaks_stat(stim_num).change_sensory_stim_post_VAR);
-%         [peaks_stat(stim_num).wilcoxon_p_change_sensory_stim_post_VAR, peaks_stat(stim_num).wilcoxon_h_change_sensory_stim_post_VAR]= signrank(peaks_stat(stim_num).change_sensory_stim_post_VAR);
-%      
-%                     %Compare Vm trial to trial variability before and during sensory stim, both cases WITH NB stimulation 
-%         peaks_stat(stim_num).sensory_stim_pre_VAR_NB=[peak_pre_response_VAR{3}(:,stim_num),  peak_Vm_res_train_VAR{3}(:,stim_num)];
-%         peaks_stat(stim_num).sensory_stim_pre_VAR_NB_m=nanmean(peaks_stat(stim_num).sensory_stim_pre_VAR_NB,1);
-%         peaks_stat(stim_num).sensory_stim_pre_VAR_NB_std=nanstd(peaks_stat(stim_num).sensory_stim_pre_VAR_NB,0,1);
-%         peaks_stat(stim_num).change_sensory_stim_pre_VAR_NB=[(peak_Vm_res_train_VAR{3}(:,stim_num)-peak_pre_response_VAR{3}(:,stim_num))./abs(peak_pre_response_VAR{3}(:,stim_num))].*100; %percent change
-%         peaks_stat(stim_num).change_sensory_stim_pre_VAR_NB_m=nanmean(peaks_stat(stim_num).change_sensory_stim_pre_VAR_NB,1);
-%         peaks_stat(stim_num).change_sensory_stim_pre_VAR_NB_std=nanstd(peaks_stat(stim_num).change_sensory_stim_pre_VAR_NB,0,1);
-%         %testing for normal distribution       
-%         [peaks_stat(stim_num).lillietest_h_sensory_stim_pre_VAR_NB, peaks_stat(stim_num).lillietest_p_sensory_stim_pre_VAR_NB] = lillietest(peaks_stat(stim_num).sensory_stim_pre_VAR_NB(:,2)- peaks_stat(stim_num).sensory_stim_pre_VAR_NB(:,1));
-%         [peaks_stat(stim_num).lillietest_h_change_sensory_stim_pre_VAR_NB, peaks_stat(stim_num).lillietest_p_change_sensory_stim_pre_VAR_NB] = lillietest( peaks_stat(stim_num).change_sensory_stim_pre_VAR_NB);
-%         %paired ttest 
-%         [peaks_stat(stim_num).ttest_h_sensory_stim_pre_VAR_NB, peaks_stat(stim_num).ttest_p_sensory_stim_pre_VAR_NB]= ttest(peaks_stat(stim_num).sensory_stim_pre_VAR_NB(:,1),peaks_stat(stim_num).sensory_stim_pre_VAR_NB(:,2));   
-%         [peaks_stat(stim_num).wilcoxon_p_sensory_stim_pre_VAR_NB, peaks_stat(stim_num).wilcoxon_h_sensory_stim_pre_VAR_NB]= signrank(peaks_stat(stim_num).sensory_stim_pre_VAR_NB(:,1),peaks_stat(stim_num).sensory_stim_pre_VAR_NB(:,2));
-%         [peaks_stat(stim_num).ttest_h_change_sensory_stim_pre_VAR_NB, peaks_stat(stim_num).ttest_p_change_sensory_stim_pre_VAR_NB]= ttest(peaks_stat(stim_num).change_sensory_stim_pre_VAR_NB);
-%         [peaks_stat(stim_num).wilcoxon_p_change_sensory_stim_pre_VAR_NB, peaks_stat(stim_num).wilcoxon_h_change_sensory_stim_pre_VAR_NB]= signrank(peaks_stat(stim_num).change_sensory_stim_pre_VAR_NB);
-%                                     
-%                 
-% %                 %Compare Vm trial to trial variability during and after sensory stim, both cases WITH NB stimulation 
-%         peaks_stat(stim_num).sensory_stim_post_VAR_NB=[peak_Vm_res_train_VAR{3}(:,stim_num),  peak_post_train_VAR{3}(:,stim_num)];  
-%         peaks_stat(stim_num).sensory_stim_post_VAR_NB_m=nanmean(peaks_stat(stim_num).sensory_stim_post_VAR_NB,1);
-%         peaks_stat(stim_num).sensory_stim_post_VAR_NB_std=nanstd(peaks_stat(stim_num).sensory_stim_post_VAR_NB,0,1);
-%         peaks_stat(stim_num).change_sensory_stim_post_VAR_NB=[(peak_post_train_VAR{3}(:,stim_num)-peak_Vm_res_train_VAR{3}(:,stim_num))./abs(peak_Vm_res_train_VAR{3}(:,stim_num))].*100; %percent change
-%         peaks_stat(stim_num).change_sensory_stim_post_VAR_NB_m=nanmean(peaks_stat(stim_num).change_sensory_stim_post_VAR_NB,1);
-%         peaks_stat(stim_num).change_sensory_stim_post_VAR_NB_std=nanstd(peaks_stat(stim_num).change_sensory_stim_post_VAR_NB,0,1);
-%         %testing for normal distribution       
-%         [peaks_stat(stim_num).lillietest_h_sensory_stim_post_VAR_NB, peaks_stat(stim_num).lillietest_p_sensory_stim_post_VAR_NB] = lillietest(peaks_stat(stim_num).sensory_stim_post_VAR_NB(:,2)- peaks_stat(stim_num).sensory_stim_post_VAR_NB(:,1));
-%         [peaks_stat(stim_num).lillietest_h_change_sensory_stim_post_VAR_NB, peaks_stat(stim_num).lillietest_p_change_sensory_stim_post_VAR_NB] = lillietest( peaks_stat(stim_num).change_sensory_stim_post_VAR_NB);
-%         %paired ttest 
-%         [peaks_stat(stim_num).ttest_h_sensory_stim_post_VAR_NB, peaks_stat(stim_num).ttest_p_sensory_stim_post_VAR_NB]= ttest(peaks_stat(stim_num).sensory_stim_post_VAR_NB(:,1),peaks_stat(stim_num).sensory_stim_post_VAR_NB(:,2));   
-%         [peaks_stat(stim_num).wilcoxon_p_sensory_stim_post_VAR_NB, peaks_stat(stim_num).wilcoxon_h_sensory_stim_post_VAR_NB]= signrank(peaks_stat(stim_num).sensory_stim_post_VAR_NB(:,1),peaks_stat(stim_num).sensory_stim_post_VAR_NB(:,2));
-%         [peaks_stat(stim_num).ttest_h_change_sensory_stim_post_VAR_NB, peaks_stat(stim_num).ttest_p_change_sensory_stim_post_VAR_NB]= ttest(peaks_stat(stim_num).change_sensory_stim_post_VAR_NB);
-%         [peaks_stat(stim_num).wilcoxon_p_change_sensory_stim_post_VAR_NB, peaks_stat(stim_num).wilcoxon_h_change_sensory_stim_post_VAR_NB]= signrank(peaks_stat(stim_num).change_sensory_stim_post_VAR_NB);
-%                
 %%        
   % creating matrices with the value of h to plot asterisks when significant  
   if peaks_stat(stim_num).lillietest_h_per10_lat==0
@@ -1497,53 +1363,14 @@ clear data_no_spike_no_DC
 %% Plot parameters along the train stim - version 1: line+errorbars of percent change
   %creatig matrices with the value of h to plot asterisks when significant  
 %   for stim_num=1:11;
-%   if peaks_stat(stim_num).lillietest_h_change_per10_lat==0
-%         h_per10_lat(1,stim_num)=peaks_stat(stim_num).ttest_h_change_per10_lat; 
-%   else  h_per10_lat(1,stim_num)=peaks_stat(stim_num).wilcoxon_h_change_per10_lat; 
-%   end
-%   if peaks_stat(stim_num).lillietest_h_change_baseline_local==0
-%         h_baseline_local(1,stim_num)=peaks_stat(stim_num).ttest_h_change_baseline_local; 
-%   else h_baseline_local(1,stim_num)=peaks_stat(stim_num).wilcoxon_h_change_baseline_local; 
-%   end
-%   if peaks_stat(stim_num).lillietest_h_change_Vm_res_STD==0      
-%         h_Vm_res_STD(1,stim_num)=peaks_stat(stim_num).ttest_h_change_Vm_res_STD; 
-%   else h_Vm_res_STD(1,stim_num)=peaks_stat(stim_num).wilcoxon_h_change_Vm_res_STD; 
-%   end
-%   if peaks_stat(stim_num).lillietest_h_change_Vm_res_M==0      
-%         h_Vm_res_M(1,stim_num)=peaks_stat(stim_num).ttest_h_change_Vm_res_M; 
-%   else h_Vm_res_M(1,stim_num)=peaks_stat(stim_num).wilcoxon_h_change_Vm_res_M; 
-%   end
-%   if peaks_stat(stim_num).lillietest_h_change_val==0      
-%         h_val(1,stim_num)=peaks_stat(stim_num).ttest_h_change_val; 
-%   else h_val(1,stim_num)=peaks_stat(stim_num).wilcoxon_h_change_val; 
-%   end
 %   if peaks_stat(stim_num).lillietest_h_change_amp==0      
 %         h_amp(1,stim_num)=peaks_stat(stim_num).ttest_h_change_amp; 
 %   else h_amp(1,stim_num)=peaks_stat(stim_num).wilcoxon_h_change_amp; 
 %   end
-%   if peaks_stat(stim_num).lillietest_h_change_amp_abs==0     
-%         h_amp_abs(1,stim_num)=peaks_stat(stim_num).ttest_h_change_amp_abs; 
-%   else h_amp_abs(1,stim_num)=peaks_stat(stim_num).wilcoxon_h_change_amp_abs; 
-%   end
-%   if peaks_stat(stim_num).lillietest_h_change_latency==0      
-%         h_latency(1,stim_num)=peaks_stat(stim_num).ttest_h_change_latency; 
-%   else  h_latency(1,stim_num)=peaks_stat(stim_num).wilcoxon_h_change_latency; 
-%   end
-%   if peaks_stat(stim_num).lillietest_h_change_half_width==0      
-%         h_half_width(1,stim_num)=peaks_stat(stim_num).ttest_h_change_half_width; 
-%   else h_half_width(1,stim_num)=peaks_stat(stim_num).wilcoxon_h_change_half_width; 
-%   end
 %     end
 %     %getting the x-axis (stimulus number) and y-axis for the asterisks of significance
-%      s_per10_lat=find(h_per10_lat==1);
-%      s_baseline_local=find(h_baseline_local==1);
-%      s_Vm_res_STD=find(h_Vm_res_STD==1);
-%      s_Vm_res_M=find(h_Vm_res_M==1);
-%      s_val=find(h_val==1);
 %      s_amp=find(h_amp==1);
-%      s_amp_abs=find(h_amp_abs==1);
-%      s_latency=find(h_latency==1);
-%      s_half_width=find(h_half_width==1);
+
 % close all
 %     if print_flag==1;
 % h1=figure;        
@@ -1557,113 +1384,6 @@ clear data_no_spike_no_DC
 %         xlabel('Stim. serial number' ,'FontSize', 16);
 %         ylabel('Mean Response Amplitude [%change]' ,'FontSize', 16);    
 %         title(['Mean Response Amplitude - local baseline,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);     
-%         
-%          h2=figure;
-%         figure(h2);         
-%         hold on
-%         errorbar([1:size(change_amp_abs_mat,2)], nanmean(change_amp_abs_mat,1),nanstd(change_amp_abs_mat,0,1),'k-', 'LineWidth',1.5,'marker','o','markerfacecolor','k')       
-%         ylim_data=[get(gca,'ylim')]';
-%         p_amp_abs=max(ylim_data).*ones(size(s_amp_abs));
-%         plot(s_amp_abs,p_amp_abs,'k*')
-%         line([0;12],[0;0],'linestyle','--','linewidth',2,'color','b')
-%         hold off
-%         xlabel('Stim. serial number' ,'FontSize', 16);
-%         ylabel('Mean Response Amplitude [%change]' ,'FontSize', 16);     
-%         title(['Mean Response Amplitude - global baseline, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);     
-% 
-% 
-%          h3=figure;
-%         figure(h3);     
-%         hold on
-%         errorbar([1:size(change_latency_mat,2)], nanmean(change_latency_mat,1),nanstd(change_latency_mat,0,1),'k-', 'LineWidth',1.5,'marker','o','markerfacecolor','k')    
-%         ylim_data=[get(gca,'ylim')]';
-%         p_latency=max(ylim_data).*ones(size(s_latency));
-%         plot(s_latency,p_latency,'k*')
-%         line([0;12],[0;0],'linestyle','--','linewidth',2,'color','b')
-%         hold off
-%         xlabel('Stim. serial number' ,'FontSize', 16);
-%         ylabel('Mean Peak Latency [%change]' ,'FontSize', 16);     
-%         title(['Mean Peak Latency, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);     
-% 
-% 
-%         h4=figure;
-%         figure(h4);  
-%         
-%         hold on
-%         errorbar([1:size(change_per10_lat_mat,2)], nanmean(change_per10_lat_mat,1),nanstd(change_per10_lat_mat,0,1),'k-', 'LineWidth',1.5,'marker','o','markerfacecolor','k')     
-%          ylim_data=[get(gca,'ylim')]';
-%         p_per10_lat=max(ylim_data).*ones(size(s_per10_lat));       
-%         plot(s_per10_lat,p_per10_lat,'k*')
-%         line([0;12],[0;0],'linestyle','--','linewidth',2,'color','b')
-%         hold off
-%         xlabel('Stim. serial number' ,'FontSize', 16);
-%         ylabel('Mean Onset Latency [%change]' ,'FontSize', 16);     
-%         title(['Mean Onset Latency, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);    
-% 
-%          h5=figure;
-%         figure(h5);     
-%         hold on
-%         errorbar([1:size(change_half_width_mat,2)], nanmean(change_half_width_mat,1),nanstd(change_half_width_mat,0,1),'k-', 'LineWidth',1.5,'marker','o','markerfacecolor','k')      
-%         ylim_data=[get(gca,'ylim')]';
-%         p_half_width=max(ylim_data).*ones(size(s_half_width));               
-%         plot(s_half_width,p_half_width,'k*')
-%         line([0;12],[0;0],'linestyle','--','linewidth',2,'color','b')
-%         hold off
-%         xlabel('Stim. serial number' ,'FontSize', 16);
-%         ylabel('Mean half width [%change]' ,'FontSize', 16);     
-%         title(['Mean half width, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);    
-% 
-%          h6=figure;
-%         figure(h6);     
-%         hold on
-%         errorbar([1:size(change_val_mat,2)], nanmean(change_val_mat,1),nanstd(change_val_mat,0,1),'k-', 'LineWidth',1.5,'marker','o','markerfacecolor','k')        
-%          ylim_data=[get(gca,'ylim')]';
-%         p_val=max(ylim_data).*ones(size(s_val));     
-%         plot(s_val,p_val,'k*')
-%         line([0;12],[0;0],'linestyle','--','linewidth',2,'color','b')
-%         hold off
-%         xlabel('Stim. serial number' ,'FontSize', 16);
-%         ylabel('Mean peak value [%change]' ,'FontSize', 16);     
-%         title(['Mean peak value, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
-%  
-%          h7=figure;
-%         figure(h7);     
-%         hold on
-%         errorbar([1:size(change_baseline_local_mat,2)], nanmean(change_baseline_local_mat,1),nanstd(change_baseline_local_mat,0,1),'k-', 'LineWidth',1.5,'marker','o','markerfacecolor','k')        
-%          ylim_data=[get(gca,'ylim')]';
-%         p_baseline_local=max(ylim_data).*ones(size(s_baseline_local));     
-%         plot(s_baseline_local,p_baseline_local,'k*')
-%         line([0;12],[0;0],'linestyle','--','linewidth',2,'color','b')
-%         hold off
-%         xlabel('Stim. serial number' ,'FontSize', 16);
-%         ylabel('Mean local baseline [%change]' ,'FontSize', 16);    
-%         title(['Mean local baseline, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
-%         
-%         h8=figure;
-%         figure(h8);     
-%         hold on
-%         errorbar([1:size(change_baseline_local_mat,2)], nanmean(change_baseline_local_mat,1),nanstd(change_baseline_local_mat,0,1),'k-', 'LineWidth',1.5,'marker','o','markerfacecolor','k')       
-%          ylim_data=[get(gca,'ylim')]';
-%         p_Vm_res_M=max(ylim_data).*ones(size(s_Vm_res_M));    
-%         plot(s_Vm_res_M,p_Vm_res_M,'k*')
-%         line([0;12],[0;0],'linestyle','--','linewidth',2,'color','b')
-%         hold off
-%         xlabel('Stim. serial number' ,'FontSize', 16);
-%         ylabel('Vm [%change]' ,'FontSize', 16);    
-%         title(['Mean Vm response, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
-%         
-%          h9=figure;
-%         hold on
-%         errorbar([1:size(change_Vm_res_STD_mat,2)], nanmean(change_Vm_res_STD_mat,1),nanstd(change_Vm_res_STD_mat,0,1),'k-', 'LineWidth',1.5,'marker','o','markerfacecolor','k')       
-%          ylim_data=[get(gca,'ylim')]';
-%         p_Vm_res_STD=max(ylim_data).*ones(size(s_Vm_res_STD));  
-%         plot(s_Vm_res_STD,p_Vm_res_STD,'k*')
-%         line([0;12],[0;0],'linestyle','--','linewidth',2,'color','b')
-%         hold off
-%         xlabel('Stim. serial number' ,'FontSize', 16);
-%         ylabel('Vm STD [%change]' ,'FontSize', 16);    
-%         title(['Mean Vm response STD, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
-%         
 %     end
     %% Plot parameters along the train stim - version 2:line+errorbars for each case (NB-,NB+), showing the values
 %     close all
@@ -1970,7 +1690,7 @@ print(g1,['Mean Response Amplitude_stim ',num2str(stim_num)],'-dpng','-r600','-o
 %         set(gca, 'xlim', [min_line max_line], 'ylim', [min_line max_line],'FontSize', 30);
 % end
  
-%% rmANOVA with matlab function - Vm STD 
+%% rmANOVA with built-in matlab function - Vm STD 
 pre_response_STD_noNB(:,1)= peaks_stat(1).pre_response_STD(:,1);
 pre_response_STD_NB(:,1)= peaks_stat(1).pre_response_STD(:,2);
 Vm_res_STD_meanstim_noNB(:,1)=peaks_stat(1).Vm_res_STD_meanstim(:,1);

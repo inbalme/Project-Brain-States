@@ -1,13 +1,29 @@
 %% for opening workspace saved 
 clear all
- global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
-load NBES_Files_v2
-peaks_for_xls=[]; peak_for_xls_mean=[]; 
+global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data
+ global exp_type
+exp_type=1; %1-NBES, 2-ChAT
 save_flag= 0;
-print_flag=1;
-data_vec_all = []; data_vec_residual_all = [];
-files_to_analyze =[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
+print_flag=0;
+LPF_flag=1;
+lp=300;
+
+switch exp_type
+    case 1
+        files_to_analyze =46; %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
+        cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
+        load NBES_Files_v2
+        legend_string={'NB+', 'NB-'};
+        path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\single trial analysis evoked';
+
+    case 2
+        files_to_analyze =[74,76,77,80,82,84,87];
+        cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
+        load ChAT_Files_v3
+        legend_string={'Light On', 'Light Off'};
+        path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary\single trial analysis evoked';
+end
+        
 % for fileind=1;
     for fileind=1:length(files_to_analyze) ;
     close all
@@ -29,18 +45,17 @@ files_to_analyze =[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,
                 dt_airpuff = 1/sf_airpuff;
                 sf_galvano = Param.sf_galvano; %[1/sec]
                 dt_galvano = 1/sf_galvano;  
-%                 stim_temp=stim2_X{2}(:,1);
-%                 stim2_X=[];
-%                 stim2_X{2}=stim_temp; stim2_X{3}=stim_temp;
-%                 
-%% low-pass filtering below 300Hz  
+  current_data=data_no_spikes{channel};
+    current_data_filt=[];      
+%% low-pass filtering below 300Hz       
 lp=300;
-                for xx=1:3
-    for trace= 1:size(data_no_spikes{channel},2)    
-            jj=data_no_spikes{channel}(:,trace,xx);
-            data_no_spikes{channel}(:,trace,xx)=bandPass_fft_IL_NEW2016(jj,dt,-1,lp,0,0); 
-    end
-                end 
+        for xx=1:3
+            for trace= 1:size(current_data,2)    
+                    jj=current_data(:,trace,xx);
+                    current_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(jj,dt,-1,lp,0,0); 
+            end
+        end
+
               %% 
    for trace_type= 2;%1:2; %1:2;  %1 for spont., 2 for evoked
      interval=[]; 
@@ -58,9 +73,9 @@ lp=300;
                         finalAmp_Thres = -1 ; %negative values are interpreted in terms of std. positive values are fixed amplitude in mV       
 %% detect events
 % for i=1:10;
-% voltages_input = data_no_spikes{channel}(i/dt:(i+1)/dt,1,2);
+% voltages_input = current_data(i/dt:(i+1)/dt,1,2);
         for t=1:2;
-          for trace=1:size(data_no_spikes{1},2)             
+          for trace=1:size(current_data,2)             
               for stim_num=1:11; %1:galvano_nstim;
                   count=0;
                   event_on_nonspecific{t,stim_num,trace}=[]; event_amplitude_nonspecific{t,stim_num,trace}=[]; event_ampPos_nonspecific{t,stim_num,trace}=[];
@@ -75,7 +90,7 @@ lp=300;
 %                   peak_end_int = interval(stim_ISI*(stim_num+1),t);
 %                   peak_start_int = interval(1,t);
 %                   peak_end_int = interval(end,t);
-        voltages_input = data_no_spikes{1}(peak_start_int:peak_end_int,trace,x_value(t));
+        voltages_input = current_data(peak_start_int:peak_end_int,trace,x_value(t));
 %         finalAmp_Thres = 1 ;
         doPlot = 0;
         I_temp=0;
@@ -133,7 +148,7 @@ lp=300;
 %           if ~isempty(tmp)
 %              halfWidthE(tmp)=next_stim_pos;
 %              halfWidth(tmp)=halfWidthE(tmp)-halfWidthS(tmp)*dt;
-%              [amplitude(tmp),ampPos(tmp)]=max(data_no_spikes{1}(starting(tmp): halfWidthE(tmp),trace,x_value(t))); 
+%              [amplitude(tmp),ampPos(tmp)]=max(current_data(starting(tmp): halfWidthE(tmp),trace,x_value(t))); 
 %       %need to recalculate the halfwidth according to the new amplitude. I leave it for now...
 %         end
 
@@ -188,11 +203,11 @@ lp=300;
             failures{t,stim_num,trace}=0;
             event_start{t,stim_num,trace} =  starting(1);
             event_on{t,stim_num,trace} =  (starting(1)-stim2_X{x_value(t)}(1,stim_num))*dt*1000; %in msec
-            event_onVal{t,stim_num,trace} = data_no_spikes{1}(starting(1),trace,x_value(t));
+            event_onVal{t,stim_num,trace} = current_data(starting(1),trace,x_value(t));
             event_amplitude{t,stim_num,trace} =  amplitude(1); 
             event_ampPos{t,stim_num,trace} =  ampPos(1); 
             event_ampDel{t,stim_num,trace} =  (ampPos(1)-stim2_X{x_value(t)}(1,stim_num))*dt*1000;  %in msec
-            event_ampVal{t,stim_num,trace} = data_no_spikes{1}(ampPos(1),trace,x_value(t));
+            event_ampVal{t,stim_num,trace} = current_data(ampPos(1),trace,x_value(t));
             event_halfWidth{t,stim_num,trace} =  halfWidth(1); 
             event_halfWidthS{t,stim_num,trace} =  halfWidthS(1); 
             event_halfWidthE{t,stim_num,trace} =  halfWidthE(1); 
@@ -211,9 +226,9 @@ lp=300;
         event_nonspecific_count{t,stim_num,trace}=count;
 %    figure(2); %stops whenever there is nan... need to fix
 %             hold on
-%                      h1=plot([1:size(data_no_spikes{channel},1)].*dt, data_no_spikes{channel}(:,trace,x_value(t)),'k');
-%                      h2=scatter(event_start{t,stim_num,trace}(:)*dt,data_no_spikes{channel}(event_start{t,stim_num,trace}(:),trace,x_value(t)),'r','fill'); %mark event onset
-%                      h3=scatter(event_ampPos{t,stim_num,trace}(:)*dt,data_no_spikes{channel}(event_ampPos{t,stim_num,trace}(:),trace,x_value(t)),'b','fill'); %mark event peak
+%                      h1=plot([1:size(current_data,1)].*dt, current_data(:,trace,x_value(t)),'k');
+%                      h2=scatter(event_start{t,stim_num,trace}(:)*dt,current_data(event_start{t,stim_num,trace}(:),trace,x_value(t)),'r','fill'); %mark event onset
+%                      h3=scatter(event_ampPos{t,stim_num,trace}(:)*dt,current_data(event_ampPos{t,stim_num,trace}(:),trace,x_value(t)),'b','fill'); %mark event peak
 %                      hold off
 % pause
               end
