@@ -6,13 +6,13 @@ exp_type=2; %1-NBES, 2-ChAT
 trace_type_input=1; %
 analyze_time_before_train=0.1;
 analyze_train_only_flag=0;
-save_flag= 0;
+save_flag= 1;
 print_flag=1;
 norm_flag=0;
 BP50HzLFP_flag=0; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=0; %removing 50Hz noise from Vm signal
 BPLFP_flag=0; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
-bp_manual_LFP=[0.1,150]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
+bp_manual_LFP=[1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
 bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 clear color_table
@@ -25,14 +25,22 @@ switch exp_type
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};
-        path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis';
+        path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Spontaneous';
+        a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
+        if a==0;
+            mkdir(path_output);
+        end        
 
     case 2
-        files_to_analyze =[74,76,77,80,82]; %,84,87];
+        files_to_analyze =[74,76,77,80,82,84,87]; %,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};
-        path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis';
+        path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Spontaneous';
+        a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
+        if a==0;
+            mkdir(path_output);
+        end        
 end
         
     for fileind=1:length(files_to_analyze) ;
@@ -49,6 +57,15 @@ end
     galvano_freq = Param.facade(7);
 
 data_preprocessing 
+
+clear color_table    
+    whisker_stim_color(1,:)=[255 153 153]/256; %[239 188 86]/256;
+    switch exp_type
+            case 1 
+                color_table=[0 0 0; [216 22 22]/256;  [136 137 138]/256; [255 153 153]/256; [30,75,14]/256; [112,172,90]/256];  
+            case 2
+                color_table=[0 0 0; [0 0 204]/256;  [136 137 138]/256; [255 153 153]/256; [30,75,14]/256; [112,172,90]/256];  
+        end
  %%    
    for trace_type=trace_type_input %1 for spont., 2 for evoked
          interval=[];       
@@ -352,13 +369,13 @@ g1=figure;
 hold on
 line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(tmp_X(:,1), mean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-line(linex,liney,'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
+% line(linex,liney,'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 text(1.5,my,asterisk_sp,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
 hold off
 y1limits=get(gca,'ylim');
         x1limits = [0.75 2.25];  x1ticks = [1,2];
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'ylim',[-1,20],'fontsize',28,'linewidth',1,...
-        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'NB-','NB+'} ,'box', 'off'); %'fontweight', 'bold', 
+        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('Frequency [Hz]', 'FontSize', 28,'fontname', 'arial');
         title(['Spontaneous event Frequency, p=' num2str(event_ongoing_stat.wilcoxon_p_freq)] ,'FontSize', 20,'fontname', 'arial');   
 %%
@@ -386,7 +403,7 @@ g2=figure;
 hold on
 line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(tmp_X(:,1), mean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-line(linex,liney,'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
+% line(linex,liney,'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 text(1.5,my,asterisk_sp,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
 hold off
         x1limits = [0.75 2.25];
@@ -395,7 +412,7 @@ hold off
 %         y1limits = [0 1.1];
 %         y1ticks = [0,0.5,1];
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
-        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'NB-','NB+'} ,'box', 'off'); %'fontweight', 'bold', 
+        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('Amplitude [mV]', 'FontSize', 28,'fontname', 'arial');
         title(['Spontaneous event Amplitude,  p=' num2str(event_ongoing_stat.wilcoxon_p_amplitude_m)] ,'FontSize', 20,'fontname', 'arial');   
 %%
@@ -422,7 +439,7 @@ g3=figure;
 hold on
 line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(tmp_X(:,1), mean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-line(linex,liney,'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
+% line(linex,liney,'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 text(1.5,my,asterisk_sp,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
 
 hold off
@@ -431,7 +448,7 @@ hold off
 %         y1limits = [0 1.1];
 %         y1ticks = [0,0.5,1];
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
-        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'NB-','NB+'} ,'box', 'off'); %'fontweight', 'bold', 
+        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('Half-width [mS]', 'FontSize', 28,'fontname', 'arial');
         title(['Spontaneous event Half-width,  p=' num2str(event_ongoing_stat.wilcoxon_p_halfWidth_m)] ,'FontSize', 20,'fontname', 'arial');   
 %%
@@ -449,7 +466,7 @@ hold off
 %         y1limits = [0 1.1];
 %         y1ticks = [0,0.5,1];
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
-        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'NB-','NB+'} ,'box', 'off'); %'fontweight', 'bold', 
+        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('Event Onset value [mV]', 'FontSize', 28,'fontname', 'arial');
         title(['Spontaneous event onset value,  p=' num2str(event_ongoing_stat.wilcoxon_p_onVal_m)] ,'FontSize', 20,'fontname', 'arial');   
         %% save figures

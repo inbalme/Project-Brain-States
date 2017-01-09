@@ -1,17 +1,37 @@
 
 %%
 clear all
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
-load NBES_Files_v2
+ global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data
+ global exp_type
+exp_type=2; %1-NBES, 2-ChAT
+channel = 1;
+save_flag= 0;
+print_flag=1;
 
-spike_det_threshold = [1 6 nan; 8 6 nan; 17 5 nan; 22 6 nan; 23 2.5 nan; 26 3 nan; 27 1.5 nan; 28 1.5 nan; 33 2 nan; 55 5 nan; 60 2 nan]; %35 2 nan; %29 2 nan; 
+switch exp_type
+    case 1
+        files_to_analyze =[1,8,17,22,23,26,27,28,33,55,60];
+        cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
+        load NBES_Files_v2
+        legend_string={'NB+', 'NB-'};
+        path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
+        spike_det_threshold = [1 6 nan; 8 6 nan; 17 5 nan; 22 6 nan; 23 2.5 nan; 26 3 nan; 27 1.5 nan; 28 1.5 nan; 33 2 nan; 55 5 nan; 60 2 nan]; %35 2 nan; %29 2 nan; 
+
+    case 2
+        files_to_analyze =[74,77];
+        cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
+        load ChAT_Files_v3
+        legend_string={'Light On', 'Light Off'};
+        path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Raster+PSTH';
+         spike_det_threshold = [74 10 nan; 77 10 nan];
+end
+
     for i=1:size(spike_det_threshold,1);
         fileind = spike_det_threshold(i,1);
         spikes_stat=[];
-    clearvars -except files spike_det_threshold fileind i spikes_stat spikes_for_xls_mean spikes
-    channel = 1;
-    print_flag = 1;
-    save_flag = 0;
+    clearvars -except files spike_det_threshold fileind i spikes_stat  spikes channel save_flag print_flag files_to_analyze...
+        legend_string path_output exp_type
+  
     if channel==1||channel==2
         threshold = spike_det_threshold(spike_det_threshold(:,1)==fileind,2);
         cell_ch=1;
@@ -25,8 +45,14 @@ spike_det_threshold = [1 6 nan; 8 6 nan; 17 5 nan; 22 6 nan; 23 2.5 nan; 26 3 na
     cd(path)
     load(fname) 
     
-    clear color_table
-    color_table=[0 0 0; [216 22 22]/256; [136 137 138]/256; [255 153 153]/256];
+    clear color_table    
+    whisker_stim_color(1,:)=[255 153 153]/256; %[239 188 86]/256;
+    switch exp_type
+        case 1
+            color_table=[0 0 0; [30,75,14]/256; [136 137 138]/256; [112,172,90]/256; [216 22 22]/256; [255 153 153]/256];
+        case 2
+            color_table=[0 0 0; [30,75,14]/256; [136 137 138]/256; [112,172,90]/256; [0 0 204]/256; [255 153 153]/256];
+    end
 %% For cell attached
 
 sf = Param.sf_Vm;
@@ -47,7 +73,7 @@ dt_galvano = 1/Param.sf_galvano;
 
     data_HP(:,:,x_value) = fn_High_Pass (raw_data{channel}(:,:,x_value), sf, high_pass_freq);
     data_HP(:,:,x_value) = fn_Low_Pass (data_HP(:,:,x_value), sf, low_pass_freq);    
-        if ES_flag(x_value)==1
+        if exp_type==1&&ES_flag(x_value)==1
             data_HP(29990:35010,:,x_value) =nan; %Ignoring the ES artifact
         end
  
@@ -143,7 +169,7 @@ for t=1:2;
 %         pause
                 %save figure  
                     if save_flag==1;
-                        cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
+                        cd(path_output)
                         filename=['file', num2str(fileind), ' spontaneous activity NB-'];
                         saveas(f(1),['file', num2str(fileind), ' spontaneous activity NB-'],'fig'); 
                         print(f(1),filename,'-dpng','-r600','-opengl')    
@@ -196,7 +222,7 @@ for x_value = 2:3; %size(data.x_value,2)
 %         pause
                 %save figure  
                     if save_flag==1;
-                        cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
+                        cd(path_output)
                         filename=['file', num2str(fileind), ' whisker evoked activity NB-'];
                         saveas(f(3),['file', num2str(fileind), ' whisker evoked activity NB-'],'fig'); 
                         print(f(3),filename,'-dpng','-r600','-opengl') 
@@ -204,7 +230,7 @@ for x_value = 2:3; %size(data.x_value,2)
                         saveas(f(4),['file', num2str(fileind), ' whisker evoked activity NB+'],'fig'); 
                         print(f(4),filename,'-dpng','-r600','-opengl') 
                     end
-    close all
+%     close all
 end
 %% Making raster+PSTH plots - one x_value in each figure
 % if print_flag==1;
@@ -557,7 +583,7 @@ end
         [spikes_stat(stim_num).ttest_h_MI, spikes_stat(stim_num).ttest_p_MI]= ttest(spikes_stat(stim_num).MI(:,1));   
         [spikes_stat(stim_num).wilcoxon_p_MI, spikes_stat(stim_num).wilcoxon_h_MI]= signrank(spikes_stat(stim_num).MI(:,1));
 
-         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
+         cd(path_output)
         save('extracellular_spikes_500ms','spikes','spikes_stat')
 
 %% SNR
@@ -598,7 +624,7 @@ hold off
         title(['SNR Index, n=', num2str(size(SNR_Y,2)), ', p=', num2str(spikes_stat.ttest_p_SNR)])
         
         %save figure  
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
+cd(path_output)
 filename='SNR';
 saveas(gcf,filename,'fig'); 
 print(gcf,filename,'-dpng','-r600','-opengl') 
@@ -638,7 +664,7 @@ hold off
         ylabel('Response [#spikes/train]', 'FontSize', 28,'fontname', 'arial');
         title(['Response Modulation, n=', num2str(size(Res_mod_Y,2)), ', p=', num2str(spikes_stat.wilcoxon_p_res_modulation)])
 %save figure  
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
+cd(path_output)
 filename='Response_modulation';
 saveas(gcf,filename,'fig'); 
 print(gcf,filename,'-dpng','-r600','-opengl') 
@@ -681,7 +707,7 @@ hold off
         ylabel('Modulation Index', 'FontSize', 20,'fontname', 'arial');
 %         title(['Modulation Index, n=', num2str(size(MI_Y,2)), ', p=', num2str(spikes_stat.wilcoxon_p_MI)])
 %save figure  
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
+cd(path_output)
 filename='Modulation index';
 saveas(gcf,'Modulation index.fig'); 
 print(gcf,filename,'-dpng','-r600','-opengl') 
@@ -723,7 +749,7 @@ hold off
         title(['Response Latency, n=', num2str(size(latency_Y,2)), ', p=', num2str(spikes_stat.ttest_p_latency)])
         
         %save figure  
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
+cd(path_output)
 filename='Latency';
 saveas(gcf,filename,'fig'); 
 print(gcf,filename,'-dpng','-r600','-opengl') 
@@ -765,7 +791,7 @@ hold off
         title(['Response Jitter, n=', num2str(size(latency_std_Y,2)), ', p=', num2str(spikes_stat.ttest_p_latency_std)])
         
         %save figure  
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
+cd (path_output)
 filename='Latency STD';
 saveas(gcf,filename,'fig'); 
 print(gcf,filename,'-dpng','-r600','-opengl') 
@@ -807,7 +833,7 @@ hold off
         title(['Success Rate to First Stim, n=', num2str(size(success_rate_Y,2)), ', p=', num2str(spikes_stat.wilcoxon_p_success_rate)])
         
         %save figure  
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
+cd(path_output)
 filename='Success Rate';
 saveas(gcf,filename,'fig'); 
 print(gcf,filename,'-dpng','-r600','-opengl') 
@@ -848,7 +874,7 @@ hold off
         title(['Failures to First Stim, n=', num2str(size(failures_Y,2)), ', p=', num2str(spikes_stat.wilcoxon_p_success_rate)])
         
         %save figure  
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
+cd(path_output) 
 filename='Failures';
 saveas(gcf,filename,'fig'); 
 print(gcf,filename,'-dpng','-r600','-opengl') 

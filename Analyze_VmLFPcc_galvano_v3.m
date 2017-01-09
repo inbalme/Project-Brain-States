@@ -30,9 +30,9 @@ norm_flag=0;
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 BPLFP_flag=1; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
-bp_manual_LFP=[0.1,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
+bp_manual_LFP=[1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
-bp_manual_Vm=[0.1,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
+bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
     
 switch exp_type
     case 1
@@ -43,7 +43,7 @@ switch exp_type
         legend_string_shuff={'NB+ shuffled', 'NB- shuffled'};       
 
     case 2
-        files_to_analyze =[76,77,80,82,84]; %87
+        files_to_analyze =[76,77,80,82,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};

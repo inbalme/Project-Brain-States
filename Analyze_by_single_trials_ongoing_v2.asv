@@ -3,7 +3,7 @@ clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
 exp_type=2; %1-NBES, 2-ChAT
-trace_type_input=3; %
+trace_type_input=1; %
 analyze_time_before_train=0.1;
 analyze_train_only_flag=0;
 save_flag= 0;
@@ -25,14 +25,22 @@ switch exp_type
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};
-        path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis';
+        path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Spontaneous';
+        a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
+        if a==0;
+            mkdir(path_output);
+        end        
 
     case 2
-        files_to_analyze =[74,76,77,80,82]; %,84,87];
+        files_to_analyze =[74,76,77,80,82,84]; %,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};
-        path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis';
+        path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Spontaneous';
+        a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
+        if a==0;
+            mkdir(path_output);
+        end        
 end
         
     for fileind=1:length(files_to_analyze) ;
@@ -49,6 +57,8 @@ end
     galvano_freq = Param.facade(7);
 
 data_preprocessing 
+
+
  %%    
    for trace_type=trace_type_input %1 for spont., 2 for evoked
          interval=[];       
@@ -56,9 +66,7 @@ data_preprocessing
             epoch_length=0.5; %[sec]
                  epochs=round(duration/epoch_length);    
                   finalAmp_Thres = 2 ;
-                  
-  
-           
+                            
         for t=1:2;
             event_start_vec{t}=[];  event_onVal_vec{t} = [];  event_amplitude_vec{t} =  [];    event_ampPos_vec{t} =  []; 
             event_ampVal_vec{t} = [];     event_halfWidth_vec{t} =  [];   event_halfWidthS_vec{t} =  []; 
@@ -104,15 +112,15 @@ data_preprocessing
             event_halfWidthE{t,trace} =  [event_halfWidthE{t,trace}; halfWidthE]; 
     end        
             %% visualize the detected events on the trace            
-            figure(1); clf
-            hold on
-                     h1=plot([1:size(current_data,1)].*dt, current_data(:,trace,x_value(t)),'k');
-                     h2=scatter(event_start{t,trace}*dt,current_data(event_start{t,trace},trace,x_value(t)),'r','fill'); %mark event onset
-                     h3=scatter(event_ampPos{t,trace}*dt,current_data(event_ampPos{t,trace},trace,x_value(t)),'b','fill'); %mark event peak
-                    set(gca,'xlim',[start_time(t) start_time(t)+duration]);               
-%                    set(gca,'ylim',[-50 -10]);
-                     hold off
-pause
+%             figure(1); clf
+%             hold on
+%                      h1=plot([1:size(current_data,1)].*dt, current_data(:,trace,x_value(t)),'k');
+%                      h2=scatter(event_start{t,trace}*dt,current_data(event_start{t,trace},trace,x_value(t)),'r','fill'); %mark event onset
+%                      h3=scatter(event_ampPos{t,trace}*dt,current_data(event_ampPos{t,trace},trace,x_value(t)),'b','fill'); %mark event peak
+%                     set(gca,'xlim',[start_time(t) start_time(t)+duration]);               
+% %                    set(gca,'ylim',[-50 -10]);
+%                      hold off
+% pause
 % cd(path_output)
 %  if t==1;
 % print(1,['detection example - ongoing NB-, trace ', num2str(trace)],'-dpng','-r600','-opengl')
@@ -137,34 +145,18 @@ pause
            event_freq(1,t) = event_count(1,t)/(duration*size(current_data,2));
         end
    end
-   exp_type=2; %1-NBES, 2-ChAT
-trace_type_input=3; %
-analyze_time_before_train=0.1;
-analyze_train_only_flag=0;
-save_flag= 0;
-print_flag=1;
-norm_flag=0;
-BP50HzLFP_flag=0; %removing 50Hz noise from LFP signal
-BP50HzVm_flag=0; %removing 50Hz noise from Vm signal
-BPLFP_flag=0; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
-bp_manual_LFP=[0.1,150]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
-BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
-bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 
         %organizing the data in structure:  
             event_ongoing(fileind).cells=files_to_analyze;
             event_ongoing(fileind).analysis_mfile='Analyze_by_single_trials_ongoing_v2.m';
-            event_evoked(fileind).fname = fname;
-            event_evoked(fileind).win_duration = duration;
-            event_evoked(fileind).trace_type_input = trace_type_input;
-            event_evoked(fileind).analyze_time_before_train = analyze_time_before_train;
-            event_evoked(fileind).V = analyze_train_only_flag;
-            event_evoked(fileind).BP50HzLFP=BP50HzLFP_flag; %removing 50Hz noise from LFP signal
-            event_evoked(fileind).BP50HzVm=BP50HzVm_flag; %removing 50Hz noise from Vm signal
-            event_evoked(fileind).BPLFP_flag=BPLFP_flag; %filtering LFP 
-            event_evoked(fileind).BPLFP=bp_filt_LFP; %the BP frequency filter for  LFP, used if BPLFP_flag=1
-            event_evoked(fileind).BPVm_flag=BPVm_flag; %filtering Vm 
-            event_evoked(fileind).BPVm=bp_filt_Vm; %the BP frequency filter for Vm, used if BPVm_flag=1
+            event_ongoing(fileind).fname = fname;
+            event_ongoing(fileind).trace_type_input = trace_type_input;
+            event_ongoing(fileind).BP50HzLFP=BP50HzLFP_flag; %removing 50Hz noise from LFP signal
+            event_ongoing(fileind).BP50HzVm=BP50HzVm_flag; %removing 50Hz noise from Vm signal
+            event_ongoing(fileind).BPLFP_flag=BPLFP_flag; %filtering LFP 
+            event_ongoing(fileind).BPLFP=bp_filt_LFP; %the BP frequency filter for  LFP, used if BPLFP_flag=1
+            event_ongoing(fileind).BPVm_flag=BPVm_flag; %filtering Vm 
+            event_ongoing(fileind).BPVm=bp_filt_Vm; %the BP frequency filter for Vm, used if BPVm_flag=1
             event_ongoing(fileind).finalAmp_Thres=finalAmp_Thres;
             event_ongoing(fileind).start_sample=start_sample;
             event_ongoing(fileind).end_sample=end_sample;

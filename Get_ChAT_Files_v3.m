@@ -3220,7 +3220,7 @@ files(87).electrode_resist = [6.5,7];
 files(87).depth = [376,430];
 files(87).pr_whisker = 'C4';
 files(87).adj_whisker = [];                                            
-files(87).headers = [22:30];
+files(87).headers = [18:21,23:30];
 files(87).protocol = 10;
 files(87).stim_type = 8;                        % 1=spont , 2=light alone, 3=puff alone, 4=puff+light, 5=galvano alone, 6=galvano+light, 7=protocol light only, 8=protocol galvano
 files(87).EEG_flag = 0;
