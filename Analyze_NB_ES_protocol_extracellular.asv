@@ -238,7 +238,7 @@ for x_value = 2:3; %size(data.x_value,2)
                 case 1
                     x2tickslabel = [0:1:x2limits(2)-x2limits(1)];
                 case 2
-                    x2tickslabel = [0:1:x2limits(2)-x2limits(1)];
+                     x2tickslabel = [0:1:x2limits(2)-x2limits(1)];
             end
    axes('position', position_PSTH);
    hold on

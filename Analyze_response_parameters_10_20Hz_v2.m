@@ -15,9 +15,9 @@ clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
  channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
-exp_type=2; %1-NBES, 2-ChAT
+exp_type=1; %1-NBES, 2-ChAT
 % trace_type_input=[3,2]; %1:3
-save_flag= 1;
+save_flag= 0;
 print_flag=1;
 norm_flag=0;
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
@@ -47,15 +47,13 @@ end
 switch exp_type
     case 1 
         path_output=['D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\',path_output];   
-        cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary'
         a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
         if a==0;
             mkdir(path_output);
         end
         cd(path_output)       
     case 2
-        path_output=['D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary\',path_output]; 
-        cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary'
+        path_output=['D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary\',path_output];        
         a = exist(path_output,'dir'); %a will be 7 if a folder "name" exists and 0 otherwise
         if a==0;
             mkdir(path_output);
@@ -252,8 +250,8 @@ for x_value = 2:3;
                 Vm_res_train_CV(:,1) = mean(std(data_train_response(:,:,x_value),0,2)./mean(data_train_response(:,:,x_value),2)); %mean CV across traces (trial-to-trial)
                 Vm_res_train_M_resid(:,1) = mean(mean(data_train_response_resid(:,:,x_value),2)); %mean across traces (trial-to-trial)
         
-        %looking at the 400ms after the train:
-                post_train_interval(:,1) = round(end_sample+0.1*sf{1}:end_sample+0.4*sf{1}-1);           
+        %looking at the 300ms after the train:
+                post_train_interval(:,1) = round(end_sample+0.1*sf{1}:end_sample+0.3*sf{1}-1);           
                 data_post_train_response(:,:,x_value) = current_data(post_train_interval,:,x_value);
                 data_post_train_response_resid(:,:,x_value) = fn_Subtract_Mean(data_post_train_response(:,:,x_value));  
                 post_train_M(:,1) = mean(mean(data_post_train_response(:,:,x_value),2)); %mean along the trace and across traces (trial-to-trial)
@@ -1365,7 +1363,7 @@ clear data_no_spike_no_DC
     %% Plot parameters along the train stim - version 3:bars+error bars of the mean values   
     h2=figure;     
     barwidth1=0.3;
-    nstim=1:10;
+    nstim=1:11;
         hold on
         errbar_h=errorbar([1:size(peak_amp{2}(:,nstim),2)]-0.3,nanmean(peak_amp{2}(:,nstim),1),zeros(1,size(peak_amp{2}(:,nstim),2)), nanstd(peak_amp{2}(:,nstim),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         errbar_h=errorbar([1:size(peak_amp{3}(:,nstim),2)],nanmean(peak_amp{3}(:,nstim),1),zeros(1,size(peak_amp{3}(:,nstim),2)), nanstd(peak_amp{3}(:,nstim),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
@@ -1956,7 +1954,27 @@ text(3,my,asterisk_after,'HorizontalAlignment', 'center','verticalAlignment','bo
         'ticklength', [0.010 0.010],'fontname', 'arial','FontSize', 16,'xticklabel',{'Before','During','After'} ,'box', 'off'); %'fontweight', 'bold', 
         xlabel('Sensory Stimulation' ,'FontSize', 16);
         ylabel('Mean Vm [mV]' ,'FontSize', 16);    
-        title(['Mean Vm, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);    
+        title(['Mean Vm, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
+        %% Plot parameters along the train stim - version 3:bars+error bars of the mean values  
+        %under construction, and not used because I am using the single
+        %trial analysis for that
+%     j3=figure;     
+%     barwidth1=0.3;
+%     nstim=1:11;
+%         hold on
+%         errbar_h=errorbar([1:size(peak_amp{2}(:,nstim),2)]-0.3,nanmean(peak_amp{2}(:,nstim),1),zeros(1,size(peak_amp{2}(:,nstim),2)), nanstd(peak_amp{2}(:,nstim),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         errbar_h=errorbar([1:size(peak_amp{3}(:,nstim),2)],nanmean(peak_amp{3}(:,nstim),1),zeros(1,size(peak_amp{3}(:,nstim),2)), nanstd(peak_amp{3}(:,nstim),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         bar([1:size(peak_amp{2}(:,nstim),2)]-0.3, nanmean(peak_amp{2}(:,nstim),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+%         bar([1:size(peak_amp{3}(:,nstim),2)], nanmean(peak_amp{3}(:,nstim),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+%   set(gca,'xlim',[0, length(nstim)+1],'xtick',[nstim], 'fontsize',16);
+%         ylim_data=[get(gca,'ylim')]';
+%         p_amp=max(ylim_data).*ones(size(s_amp));
+%         plot(s_amp-0.15,p_amp,'k*')
+%         hold off
+%         xlabel('Stim. serial number' ,'FontSize', 16);
+%         ylabel('Amplitude [mV]' ,'FontSize', 16);    
+%         title(['Mean Response Amplitude - local baseline,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+%        
 %%        
         % Plot SNR1 (noise is from the Vm during the train)
 stim_num=1;
@@ -2110,32 +2128,6 @@ hold off
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('Noise Amplitude', 'FontSize', 28,'fontname', 'arial');
         title(['Amplitude noise2, n=' num2str(length(files_to_analyze)) ', p=' num2str(peaks_stat(stim_num).wilcoxon_p_Amplitude_noise2)] ,'FontSize', 20,'fontname', 'arial');   
-
-        %% averaging peak amplitude over train stimuli - under construction!
-        
-%          peaks_stat(stim_num).peak_amp_meanstim=[nanmean(peak_amp{2}(:,:),2), nanmean(peak_amp{3}(:,:),2)];
-%           [peaks_stat(stim_num).wilcoxon_p_peak_amp_meanstim, peaks_stat(stim_num).wilcoxon_h_peak_amp_meanstim]= signrank(peaks_stat(stim_num).peak_amp_meanstim(:,1),peaks_stat(stim_num).peak_amp_meanstim(:,2));   
-% [p,h]=signrank(peak_amp{3}(:,2),peak_amp{3}(:,3));
-%         amp_meanstim_Y=peaks_stat(stim_num).Amplitude_noise2';
-% Amplitude_noise2_X(1,:)=ones(1,size(Amplitude_noise2_Y,2));
-% Amplitude_noise2_X(2,:)=2*ones(1,size(Amplitude_noise2_Y,2));
-% E =peaks_stat(stim_num).Amplitude_noise2_std;
-%         k20=figure;
-% hold on
-% line(Amplitude_noise2_X,Amplitude_noise2_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-% errorbar(Amplitude_noise2_X(:,1), mean(Amplitude_noise2_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-% % boxplot(peaks_stat(stim_num).Amplitude_noise2);
-% hold off
-%         x1limits = [0.75 2.25];
-%         x1ticks = [1,2];
-% %         y1limits = [0 1.1];
-% %         y1ticks = [0,0.5,1];
-%         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
-%         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
-%         ylabel('Noise Amplitude', 'FontSize', 28,'fontname', 'arial');
-%         title(['Amplitude noise2, n=' num2str(length(files_to_analyze)) ', p=' num2str(peaks_stat(stim_num).wilcoxon_p_Amplitude_noise2)] ,'FontSize', 20,'fontname', 'arial');   
-
-       
         %% save figures
 if save_flag==1
 %     switch exp_type
@@ -2195,16 +2187,9 @@ saveas(j2,'Vm M_Before During After Sensory stim_v4', 'fig')
 print(j2,'Vm M_Before During After Sensory stim_v4','-dpng','-r600','-opengl') 
 end
 
-%% t-tests within cell    
-%     for fileind=1:length(files_to_analyze) ;%           
-%                for stim_num=1:max(peak_for_xls_mean(peak_for_xls_mean(:,1)==fileind,2));
-%                     [peaks(fileind).val_ttest_h(stim_num), peaks(fileind).val_ttest_p(stim_num)]=ttest(peaks(fileind).stim_num(stim_num).val(:,2),peaks(fileind).stim_num(stim_num).val(:,3));
-%                     [peaks(fileind).amp_ttest_h(stim_num), peaks(fileind).amp_ttest_p(stim_num)]=ttest(peaks(fileind).stim_num(stim_num).amp(:,2),peaks(fileind).stim_num(stim_num).amp(:,3));                    
-%                end%                
-%     end
+
  %%
 % filename =  'SNR_plot_12_cells'; %'F62P6X6+9_zero_traces+std+mean_zoom-in';
-% cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\n13';
 % % cd 'd:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations';
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
 % print (6, '-deps', filename)

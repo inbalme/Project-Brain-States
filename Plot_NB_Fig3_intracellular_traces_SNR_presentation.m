@@ -47,18 +47,18 @@ evoked_mean_f16_zoom_ax = get(gcf, 'children');
 evoked_std_f16_zoom = open('f16_std_x2+3_mean-subt_v2.fig');    
 evoked_std_f16_zoom_ax = get(gcf, 'children');
 
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\10_20Hz'
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\LFP_50Hz+BP Vm_ 50Hz+BP'
 
-VmM = open('Vm M_Before During After Sensory stim_v3.fig');    
+VmM = open('Vm M_Before During After Sensory stim_v4.fig');    
 VmM_ax = get(gcf, 'children');
 
 VmSTD = open('Vm STD_Before During After Sensory stim_v2.fig');    
 VmSTD_ax = get(gcf, 'children');
 
-Peak_amp = open('Train Amplitude Local_v2.fig');    
+Peak_amp = open('Train Amplitude Local.fig');    
 Peak_amp_ax = get(gcf, 'children');
 
-SNR = open('SNR1_v2.fig');    
+SNR = open('SNR1.fig');    
 SNR_ax = get(gcf, 'children');
 
 Amplitude_Signal = open('Amplitude_Signal_v2.fig');    
@@ -256,7 +256,7 @@ set(VmM_ax_copy(1),'position',[0.9 VmM_pos_top+0.015 0.08 0.04])
 %     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Q', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Presentation Figures'
-filename='Fig 3 intracellular traces+SNR_f16_v2';
-saveas(F,'Fig 3 intracellular traces+SNR_f16_v2.fig'); 
+filename='Fig 3 intracellular traces+SNR_f16_v3';
+saveas(F,filename,'fig'); 
 print(F,filename,'-dpng','-r600','-opengl') 
 print(F, '-depsc2', filename);

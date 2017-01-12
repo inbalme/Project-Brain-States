@@ -47,15 +47,13 @@ end
 switch exp_type
     case 1 
         path_output=['D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\',path_output];   
-        cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary'
         a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
         if a==0;
             mkdir(path_output);
         end
         cd(path_output)       
     case 2
-        path_output=['D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary\',path_output]; 
-        cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary'
+        path_output=['D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary\',path_output];        
         a = exist(path_output,'dir'); %a will be 7 if a folder "name" exists and 0 otherwise
         if a==0;
             mkdir(path_output);
@@ -71,7 +69,7 @@ switch exp_type
         legend_string={'NB+', 'NB-'};       
 
     case 2
-        files_to_analyze =[74,76,77,80,82,84];
+        files_to_analyze =[74,76,77,80,82,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};
@@ -150,32 +148,32 @@ plot_data_ff = (-1).*plot_data_var./plot_data_mean;
         end
     end 
 
-       trace_ind = [2,4,5]; %1:size(plot_data,2);  %trace_ind is the numbers of traces to be plotted
-       l=size(plot_data(:,trace_ind, x_value(1)),1);
-        l=l/2-1;
-        DC=20.*(0:length(trace_ind)-1);
-        DC=wextend('addrow', 'per', DC, l);
-        trace_to_plot = plot_data(:,trace_ind, x_value(1))+DC ; %DC is added just to make space between the traces
-        tmp1=[]; %spacer instead of stim1_X, so that the light stim. will not be plotted
-        lineprops1={'LineWidth',1.2,'color', [0 0 0]};
-        [Fig1,h1]= fn_Plot_Trace_v2(trace_to_plot, dt, dt,tmp1 , dt, stim2_X{x_value(1)},lineprops1);       
-        hline = findobj(gcf, 'type', 'line'); set(hline(1:end),'color',[0 0 0]);
-        y1lim=[get(gca,'ylim')]';
-        trace_to_plot = plot_data(:,trace_ind, x_value(2))+DC ;
-        lineprops2={'LineWidth',1.2,'color', [0 0 1]};
-        [Fig2,h2]= fn_Plot_Trace_v2(trace_to_plot, dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)},lineprops2);
-         hline = findobj(gcf, 'type', 'line'); set(hline(1:end),'color',[0 0 1]);
-        set(gca,'ylim',y1lim);
-%         [Fig3,h3]= fn_Plot_Trace_v2(plot_data_mean(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
-%         ylabel('mean Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
+%        trace_ind = [2,4,5]; %1:size(plot_data,2);  %trace_ind is the numbers of traces to be plotted
+%        l=size(plot_data(:,trace_ind, x_value(1)),1);
+%         l=l/2-1;
+%         DC=20.*(0:length(trace_ind)-1);
+%         DC=wextend('addrow', 'per', DC, l);
+%         trace_to_plot = plot_data(:,trace_ind, x_value(1))+DC ; %DC is added just to make space between the traces
+%         tmp1=[]; %spacer instead of stim1_X, so that the light stim. will not be plotted
+%         lineprops1={'LineWidth',1.2,'color', [0 0 0]};
+%         [Fig1,h1]= fn_Plot_Trace_v2(trace_to_plot, dt, dt,tmp1 , dt, stim2_X{x_value(1)},lineprops1);       
+%         hline = findobj(gcf, 'type', 'line'); set(hline(1:end),'color',[0 0 0]);
+%         y1lim=[get(gca,'ylim')]';
+%         trace_to_plot = plot_data(:,trace_ind, x_value(2))+DC ;
+%         lineprops2={'LineWidth',1.2,'color', [0 0 1]};
+%         [Fig2,h2]= fn_Plot_Trace_v2(trace_to_plot, dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)},lineprops2);
+%          hline = findobj(gcf, 'type', 'line'); set(hline(1:end),'color',[0 0 1]);
+%         set(gca,'ylim',y1lim);
+% %         [Fig3,h3]= fn_Plot_Trace_v2(plot_data_mean(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
+% %         ylabel('mean Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
+% % %         hline = findobj(gcf, 'type', 'line'); set(hline(13),'color',[0 0 0]);  set(hline(14),'color',[0 0 1]);
+% %         [Fig4,h4] = fn_Plot_Trace_v2(plot_data_std(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
+% %         ylabel('std Vm [mV]', 'FontSize', 16);          
+%         [Fig5,h5]= fn_Plot_Trace_v2(plot_data_mean(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});        
+%         ylabel('mean Vm [mV]', 'FontSize', 16);  legend(legend_string); legend('boxoff','Location','northeast'); 
 % %         hline = findobj(gcf, 'type', 'line'); set(hline(13),'color',[0 0 0]);  set(hline(14),'color',[0 0 1]);
-%         [Fig4,h4] = fn_Plot_Trace_v2(plot_data_std(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
-%         ylabel('std Vm [mV]', 'FontSize', 16);          
-        [Fig5,h5]= fn_Plot_Trace_v2(plot_data_mean(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});        
-        ylabel('mean Vm [mV]', 'FontSize', 16);  legend(legend_string); legend('boxoff','Location','northeast'); 
-%         hline = findobj(gcf, 'type', 'line'); set(hline(13),'color',[0 0 0]);  set(hline(14),'color',[0 0 1]);
-        [Fig6,h6] = fn_Plot_Trace_v2(plot_data_std(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
-        ylabel('std Vm [mV]', 'FontSize', 16);  legend(legend_string); legend('boxoff','Location','northeast');
+%         [Fig6,h6] = fn_Plot_Trace_v2(plot_data_std(:,x_value), dt, dt, stim1_X{channel}, dt, stim2_X{x_value(2)});
+%         ylabel('std Vm [mV]', 'FontSize', 16);  legend(legend_string); legend('boxoff','Location','northeast');
 
      
 %% saving figures
@@ -252,8 +250,8 @@ for x_value = 2:3;
                 Vm_res_train_CV(:,1) = mean(std(data_train_response(:,:,x_value),0,2)./mean(data_train_response(:,:,x_value),2)); %mean CV across traces (trial-to-trial)
                 Vm_res_train_M_resid(:,1) = mean(mean(data_train_response_resid(:,:,x_value),2)); %mean across traces (trial-to-trial)
         
-        %looking at the 400ms after the train:
-                post_train_interval(:,1) = round(end_sample+0.1*sf{1}:end_sample+0.4*sf{1}-1);           
+        %looking at the 300ms after the train:
+                post_train_interval(:,1) = round(end_sample+0.1*sf{1}:end_sample+0.3*sf{1}-1);           
                 data_post_train_response(:,:,x_value) = current_data(post_train_interval,:,x_value);
                 data_post_train_response_resid(:,:,x_value) = fn_Subtract_Mean(data_post_train_response(:,:,x_value));  
                 post_train_M(:,1) = mean(mean(data_post_train_response(:,:,x_value),2)); %mean along the trace and across traces (trial-to-trial)
@@ -1365,7 +1363,7 @@ clear data_no_spike_no_DC
     %% Plot parameters along the train stim - version 3:bars+error bars of the mean values   
     h2=figure;     
     barwidth1=0.3;
-    nstim=1:10;
+    nstim=1:11;
         hold on
         errbar_h=errorbar([1:size(peak_amp{2}(:,nstim),2)]-0.3,nanmean(peak_amp{2}(:,nstim),1),zeros(1,size(peak_amp{2}(:,nstim),2)), nanstd(peak_amp{2}(:,nstim),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         errbar_h=errorbar([1:size(peak_amp{3}(:,nstim),2)],nanmean(peak_amp{3}(:,nstim),1),zeros(1,size(peak_amp{3}(:,nstim),2)), nanstd(peak_amp{3}(:,nstim),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
@@ -1454,7 +1452,7 @@ E =peaks_stat(stim_num).adapt_amp_std;
         g2=figure;
 hold on
 line(adapt_amp_X,adapt_amp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-errorbar(adapt_amp_X(:,1), mean(adapt_amp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
+errorbar(adapt_amp_X(:,1), nanmean(adapt_amp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
 % boxplot(peaks_stat(stim_num).adapt_amp)
 hold off
         x1limits = [0.75 2.25];  x1ticks = [1,2];       
@@ -1900,7 +1898,7 @@ hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'Lege
 % [legh,objh,outh,outm] = legend('NB Off','NB On','Location','northeast');
 l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
 ylim_data=[get(gca,'ylim')]';
-my=max(ylim_data)+1;
+my=min(ylim_data)+5;
 %   my=-1*max([peaks_stat(1).pre_response_M_std,peaks_stat(1).Vm_res_M_meanstim_std,peaks_stat(1).post_train_M_std])*1.1+max([peaks_stat(1).pre_response_M_m,peaks_stat(1).Vm_res_M_meanstim_m,peaks_stat(1).post_train_M_m]); 
 linex=[1-0.15; 2-0.15];
 liney=[my-0.1; my-0.1];
@@ -1956,7 +1954,25 @@ text(3,my,asterisk_after,'HorizontalAlignment', 'center','verticalAlignment','bo
         'ticklength', [0.010 0.010],'fontname', 'arial','FontSize', 16,'xticklabel',{'Before','During','After'} ,'box', 'off'); %'fontweight', 'bold', 
         xlabel('Sensory Stimulation' ,'FontSize', 16);
         ylabel('Mean Vm [mV]' ,'FontSize', 16);    
-        title(['Mean Vm, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);    
+        title(['Mean Vm, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
+        %% Plot parameters along the train stim - version 3:bars+error bars of the mean values   
+    j3=figure;     
+    barwidth1=0.3;
+    nstim=1:11;
+        hold on
+        errbar_h=errorbar([1:size(peak_amp{2}(:,nstim),2)]-0.3,nanmean(peak_amp{2}(:,nstim),1),zeros(1,size(peak_amp{2}(:,nstim),2)), nanstd(peak_amp{2}(:,nstim),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        errbar_h=errorbar([1:size(peak_amp{3}(:,nstim),2)],nanmean(peak_amp{3}(:,nstim),1),zeros(1,size(peak_amp{3}(:,nstim),2)), nanstd(peak_amp{3}(:,nstim),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        bar([1:size(peak_amp{2}(:,nstim),2)]-0.3, nanmean(peak_amp{2}(:,nstim),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+        bar([1:size(peak_amp{3}(:,nstim),2)], nanmean(peak_amp{3}(:,nstim),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+  set(gca,'xlim',[0, length(nstim)+1],'xtick',[nstim], 'fontsize',16);
+        ylim_data=[get(gca,'ylim')]';
+        p_amp=max(ylim_data).*ones(size(s_amp));
+        plot(s_amp-0.15,p_amp,'k*')
+        hold off
+        xlabel('Stim. serial number' ,'FontSize', 16);
+        ylabel('Amplitude [mV]' ,'FontSize', 16);    
+        title(['Mean Response Amplitude - local baseline,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+       
 %%        
         % Plot SNR1 (noise is from the Vm during the train)
 stim_num=1;
@@ -2110,32 +2126,6 @@ hold off
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('Noise Amplitude', 'FontSize', 28,'fontname', 'arial');
         title(['Amplitude noise2, n=' num2str(length(files_to_analyze)) ', p=' num2str(peaks_stat(stim_num).wilcoxon_p_Amplitude_noise2)] ,'FontSize', 20,'fontname', 'arial');   
-
-        %% averaging peak amplitude over train stimuli - under construction!
-        
-%          peaks_stat(stim_num).peak_amp_meanstim=[nanmean(peak_amp{2}(:,:),2), nanmean(peak_amp{3}(:,:),2)];
-%           [peaks_stat(stim_num).wilcoxon_p_peak_amp_meanstim, peaks_stat(stim_num).wilcoxon_h_peak_amp_meanstim]= signrank(peaks_stat(stim_num).peak_amp_meanstim(:,1),peaks_stat(stim_num).peak_amp_meanstim(:,2));   
-% [p,h]=signrank(peak_amp{3}(:,2),peak_amp{3}(:,3));
-%         amp_meanstim_Y=peaks_stat(stim_num).Amplitude_noise2';
-% Amplitude_noise2_X(1,:)=ones(1,size(Amplitude_noise2_Y,2));
-% Amplitude_noise2_X(2,:)=2*ones(1,size(Amplitude_noise2_Y,2));
-% E =peaks_stat(stim_num).Amplitude_noise2_std;
-%         k20=figure;
-% hold on
-% line(Amplitude_noise2_X,Amplitude_noise2_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-% errorbar(Amplitude_noise2_X(:,1), mean(Amplitude_noise2_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-% % boxplot(peaks_stat(stim_num).Amplitude_noise2);
-% hold off
-%         x1limits = [0.75 2.25];
-%         x1ticks = [1,2];
-% %         y1limits = [0 1.1];
-% %         y1ticks = [0,0.5,1];
-%         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
-%         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
-%         ylabel('Noise Amplitude', 'FontSize', 28,'fontname', 'arial');
-%         title(['Amplitude noise2, n=' num2str(length(files_to_analyze)) ', p=' num2str(peaks_stat(stim_num).wilcoxon_p_Amplitude_noise2)] ,'FontSize', 20,'fontname', 'arial');   
-
-       
         %% save figures
 if save_flag==1
 %     switch exp_type
@@ -2195,16 +2185,9 @@ saveas(j2,'Vm M_Before During After Sensory stim_v4', 'fig')
 print(j2,'Vm M_Before During After Sensory stim_v4','-dpng','-r600','-opengl') 
 end
 
-%% t-tests within cell    
-%     for fileind=1:length(files_to_analyze) ;%           
-%                for stim_num=1:max(peak_for_xls_mean(peak_for_xls_mean(:,1)==fileind,2));
-%                     [peaks(fileind).val_ttest_h(stim_num), peaks(fileind).val_ttest_p(stim_num)]=ttest(peaks(fileind).stim_num(stim_num).val(:,2),peaks(fileind).stim_num(stim_num).val(:,3));
-%                     [peaks(fileind).amp_ttest_h(stim_num), peaks(fileind).amp_ttest_p(stim_num)]=ttest(peaks(fileind).stim_num(stim_num).amp(:,2),peaks(fileind).stim_num(stim_num).amp(:,3));                    
-%                end%                
-%     end
+
  %%
 % filename =  'SNR_plot_12_cells'; %'F62P6X6+9_zero_traces+std+mean_zoom-in';
-% cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\n13';
 % % cd 'd:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations';
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH';
 % print (6, '-deps', filename)

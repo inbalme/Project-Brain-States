@@ -549,8 +549,7 @@ hold off
         %% Save figures    
         cd(path_output)
    if save_flag==1
-        switch trace_type
-            case 1
+       if trace_type==1 || trace_type==3         
                 saveas(Fig{fileind}(trace_type),['Vm-LFP_spont_stim1_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'fig') 
                 print(Fig{fileind}(trace_type),['Vm-LFP_spont_stim1_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'-dpng','-r600','-opengl') 
                 saveas(Fig{fileind}(trace_type+3),['Vm-LFP_spont_stim1_On_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'fig') 
@@ -561,7 +560,7 @@ hold off
                 print(Fig{fileind}(trace_type+9),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'actual_data'],'-dpng','-r600','-opengl') 
                 saveas(Fig{fileind}(trace_type+12),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'shuffled_data'],'fig') 
                 print(Fig{fileind}(trace_type+12),['Vm-LFPcc_spont_f' num2str(files_to_analyze(fileind)), 'shuffled_data'],'-dpng','-r600','-opengl') 
-
+       end
 
             case 2
                 saveas(Fig{fileind}(trace_type),['Vm-LFP_evoked_stim1_Off_f' num2str(files_to_analyze(fileind)),'_t', num2str(trace)],'fig') 
