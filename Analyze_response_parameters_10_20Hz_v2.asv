@@ -88,7 +88,12 @@ end
         current_data=data_no_spikes{channel};
         galvano_nstim = Param.facade(6);
         galvano_freq = Param.facade(7);
-   data_preprocessing 
+   data_preprocessing
+   
+    if ~isempty(current_data_filt)
+     current_data=current_data_filt;
+    end
+ 
         clear color_table    
         whisker_stim_color(1,:)=[255 153 153]/256; %[239 188 86]/256;
         switch exp_type
@@ -1824,7 +1829,6 @@ ylim_data=[get(gca,'ylim')]';
   my=max([peaks_stat(1).pre_response_STD_std,peaks_stat(1).Vm_res_STD_meanstim_std,peaks_stat(1).post_train_STD_std])*1.1+max([peaks_stat(1).pre_response_STD_m,peaks_stat(1).Vm_res_STD_meanstim_m,peaks_stat(1).post_train_STD_m]); 
 linex=[1-0.15; 2-0.15];
 liney=[my-0.1; my-0.1];
-asterisk_sensory='*';
         if VmSTD_stat.p_before{1,1} >0.05 
     asterisk_before='n.s.';
 else if VmSTD_stat.p_before{1,1}<0.05 && VmSTD_stat.p_before{1,1}>0.01
@@ -1902,7 +1906,6 @@ my=min(ylim_data)+5;
 %   my=-1*max([peaks_stat(1).pre_response_M_std,peaks_stat(1).Vm_res_M_meanstim_std,peaks_stat(1).post_train_M_std])*1.1+max([peaks_stat(1).pre_response_M_m,peaks_stat(1).Vm_res_M_meanstim_m,peaks_stat(1).post_train_M_m]); 
 linex=[1-0.15; 2-0.15];
 liney=[my-0.1; my-0.1];
-asterisk_sensory='*';
         if VmM_stat.p_before{1,1} >0.05 
     asterisk_before='n.s.';
 else if VmM_stat.p_before{1,1}<0.05 && VmM_stat.p_before{1,1}>0.01
@@ -1955,24 +1958,26 @@ text(3,my,asterisk_after,'HorizontalAlignment', 'center','verticalAlignment','bo
         xlabel('Sensory Stimulation' ,'FontSize', 16);
         ylabel('Mean Vm [mV]' ,'FontSize', 16);    
         title(['Mean Vm, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
-        %% Plot parameters along the train stim - version 3:bars+error bars of the mean values   
-    j3=figure;     
-    barwidth1=0.3;
-    nstim=1:11;
-        hold on
-        errbar_h=errorbar([1:size(peak_amp{2}(:,nstim),2)]-0.3,nanmean(peak_amp{2}(:,nstim),1),zeros(1,size(peak_amp{2}(:,nstim),2)), nanstd(peak_amp{2}(:,nstim),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-        errbar_h=errorbar([1:size(peak_amp{3}(:,nstim),2)],nanmean(peak_amp{3}(:,nstim),1),zeros(1,size(peak_amp{3}(:,nstim),2)), nanstd(peak_amp{3}(:,nstim),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-        bar([1:size(peak_amp{2}(:,nstim),2)]-0.3, nanmean(peak_amp{2}(:,nstim),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
-        bar([1:size(peak_amp{3}(:,nstim),2)], nanmean(peak_amp{3}(:,nstim),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
-  set(gca,'xlim',[0, length(nstim)+1],'xtick',[nstim], 'fontsize',16);
-        ylim_data=[get(gca,'ylim')]';
-        p_amp=max(ylim_data).*ones(size(s_amp));
-        plot(s_amp-0.15,p_amp,'k*')
-        hold off
-        xlabel('Stim. serial number' ,'FontSize', 16);
-        ylabel('Amplitude [mV]' ,'FontSize', 16);    
-        title(['Mean Response Amplitude - local baseline,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
-       
+        %% Plot parameters along the train stim - version 3:bars+error bars of the mean values  
+        %under construction, and not used because I am using the single
+        %trial analysis for that
+%     j3=figure;     
+%     barwidth1=0.3;
+%     nstim=1:11;
+%         hold on
+%         errbar_h=errorbar([1:size(peak_amp{2}(:,nstim),2)]-0.3,nanmean(peak_amp{2}(:,nstim),1),zeros(1,size(peak_amp{2}(:,nstim),2)), nanstd(peak_amp{2}(:,nstim),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         errbar_h=errorbar([1:size(peak_amp{3}(:,nstim),2)],nanmean(peak_amp{3}(:,nstim),1),zeros(1,size(peak_amp{3}(:,nstim),2)), nanstd(peak_amp{3}(:,nstim),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         bar([1:size(peak_amp{2}(:,nstim),2)]-0.3, nanmean(peak_amp{2}(:,nstim),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+%         bar([1:size(peak_amp{3}(:,nstim),2)], nanmean(peak_amp{3}(:,nstim),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+%   set(gca,'xlim',[0, length(nstim)+1],'xtick',[nstim], 'fontsize',16);
+%         ylim_data=[get(gca,'ylim')]';
+%         p_amp=max(ylim_data).*ones(size(s_amp));
+%         plot(s_amp-0.15,p_amp,'k*')
+%         hold off
+%         xlabel('Stim. serial number' ,'FontSize', 16);
+%         ylabel('Amplitude [mV]' ,'FontSize', 16);    
+%         title(['Mean Response Amplitude - local baseline,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+%        
 %%        
         % Plot SNR1 (noise is from the Vm during the train)
 stim_num=1;

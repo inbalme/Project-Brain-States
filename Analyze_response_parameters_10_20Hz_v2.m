@@ -15,14 +15,14 @@ clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
  channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
-exp_type=1; %1-NBES, 2-ChAT
+exp_type=2; %1-NBES, 2-ChAT
 % trace_type_input=[3,2]; %1:3
-save_flag= 0;
+save_flag= 1;
 print_flag=1;
 norm_flag=0;
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
-BPLFP_flag=1; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
+BPLFP_flag=0; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
 bp_manual_LFP=[0.1,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
 bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
@@ -63,7 +63,7 @@ end
 
 switch exp_type
     case 1
-        files_to_analyze =[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
+        files_to_analyze =[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};       
@@ -88,7 +88,12 @@ end
         current_data=data_no_spikes{channel};
         galvano_nstim = Param.facade(6);
         galvano_freq = Param.facade(7);
-   data_preprocessing 
+   data_preprocessing
+   
+    if ~isempty(current_data_filt)
+     current_data=current_data_filt;
+    end
+ 
         clear color_table    
         whisker_stim_color(1,:)=[255 153 153]/256; %[239 188 86]/256;
         switch exp_type
@@ -136,7 +141,7 @@ plot_data_mean = mean(plot_data,2);
 plot_data_std =  std(data_no_spike_no_DC{channel},0,2);
 % plot_data_var=var(plot_data,0,2);
 plot_data_var=var(data_no_spike_no_DC{channel},0,2);
-plot_data_ff = (-1).*plot_data_var./plot_data_mean; 
+% plot_data_ff = (-1).*plot_data_var./plot_data_mean; 
     if exp_type==1;
         for i=1:length(x_value)
             if ES_flag(x_value(i))==1
@@ -1824,7 +1829,6 @@ ylim_data=[get(gca,'ylim')]';
   my=max([peaks_stat(1).pre_response_STD_std,peaks_stat(1).Vm_res_STD_meanstim_std,peaks_stat(1).post_train_STD_std])*1.1+max([peaks_stat(1).pre_response_STD_m,peaks_stat(1).Vm_res_STD_meanstim_m,peaks_stat(1).post_train_STD_m]); 
 linex=[1-0.15; 2-0.15];
 liney=[my-0.1; my-0.1];
-asterisk_sensory='*';
         if VmSTD_stat.p_before{1,1} >0.05 
     asterisk_before='n.s.';
 else if VmSTD_stat.p_before{1,1}<0.05 && VmSTD_stat.p_before{1,1}>0.01
@@ -1898,11 +1902,10 @@ hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'Lege
 % [legh,objh,outh,outm] = legend('NB Off','NB On','Location','northeast');
 l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
 ylim_data=[get(gca,'ylim')]';
-my=min(ylim_data)+5;
+my=min(ylim_data)+2;
 %   my=-1*max([peaks_stat(1).pre_response_M_std,peaks_stat(1).Vm_res_M_meanstim_std,peaks_stat(1).post_train_M_std])*1.1+max([peaks_stat(1).pre_response_M_m,peaks_stat(1).Vm_res_M_meanstim_m,peaks_stat(1).post_train_M_m]); 
 linex=[1-0.15; 2-0.15];
 liney=[my-0.1; my-0.1];
-asterisk_sensory='*';
         if VmM_stat.p_before{1,1} >0.05 
     asterisk_before='n.s.';
 else if VmM_stat.p_before{1,1}<0.05 && VmM_stat.p_before{1,1}>0.01

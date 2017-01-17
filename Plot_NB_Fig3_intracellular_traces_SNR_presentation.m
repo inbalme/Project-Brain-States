@@ -55,8 +55,8 @@ VmM_ax = get(gcf, 'children');
 VmSTD = open('Vm STD_Before During After Sensory stim_v2.fig');    
 VmSTD_ax = get(gcf, 'children');
 
-Peak_amp = open('Train Amplitude Local.fig');    
-Peak_amp_ax = get(gcf, 'children');
+% Peak_amp = open('Train Amplitude Local.fig');    
+% Peak_amp_ax = get(gcf, 'children');
 
 SNR = open('SNR1.fig');    
 SNR_ax = get(gcf, 'children');
@@ -67,7 +67,9 @@ Amplitude_Signal_ax = get(gcf, 'children');
 Amplitude_Noise = open('Amplitude_Noise1_v2.fig');    
 Amplitude_Noise_ax = get(gcf, 'children');
 
-
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Evoked'
+Peak_amp = open('Evoked Amplitude.fig');    
+Peak_amp_ax = get(gcf, 'children');
 
 
 %%

@@ -1,13 +1,14 @@
 %% for opening workspace saved 
+close all
 clear all
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
 load NBES_Files_v2
 peaks_for_xls=[]; peak_for_xls_mean=[]; 
-save_flag= 1;
-print_flag=1;
+save_flag= 0;
+print_flag=0;
 data_vec_all = []; data_vec_residual_all = [];
-files_to_analyze =[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
+files_to_analyze =[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
 % for fileind=1;
     for fileind=1:length(files_to_analyze) ;
     close all
@@ -78,9 +79,9 @@ lp=300;
         voltages_input = data_no_spikes{1}(peak_start_int:peak_end_int,trace,x_value(t));
         doPlot = 0;
         I_temp=0;
-        [voltages, tmp_starting,tmp_amplitude, tmp_ampPos, halfWidth,tmp_halfWidthS, tmp_halfWidthE] = EventDetector_v2(voltages_input, dt, finalAmp_Thres, doPlot,I_temp);
-        title(['t=', num2str(t), ' trace ',num2str(trace)]); 
-        set(gca,'ylim',[-60 -30])
+        [voltages, tmp_starting,tmp_amplitude, tmp_ampPos, halfWidth,tmp_halfWidthS, tmp_halfWidthE] = fn_EventDetector_v2(voltages_input, dt, finalAmp_Thres, doPlot,I_temp);
+%         title(['t=', num2str(t), ' trace ',num2str(trace)]); 
+%         set(gca,'ylim',[-60 -30])
 %          pause
        
     %correcting to the real locations in the trace
@@ -106,17 +107,22 @@ lp=300;
             event_halfWidthS{t,trace} =  [event_halfWidthS{t,trace}; halfWidthS]; 
             event_halfWidthE{t,trace} =  [event_halfWidthE{t,trace}; halfWidthE]; 
     end        
-            %% visualize the detected events on the trace            
+            %% visualize the detected events on the trace     
+      if print_flag==1
             figure(1); clf
             hold on
                      h1=plot([1:size(data_no_spikes{channel},1)].*dt, data_no_spikes{channel}(:,trace,x_value(t)),'k');
                      h2=scatter(event_start{t,trace}*dt,data_no_spikes{channel}(event_start{t,trace},trace,x_value(t)),'r','fill'); %mark event onset
                      h3=scatter(event_ampPos{t,trace}*dt,data_no_spikes{channel}(event_ampPos{t,trace},trace,x_value(t)),'b','fill'); %mark event peak
+                     h4=scatter(event_halfWidthS{t,trace}*dt,data_no_spikes{channel}(event_halfWidthS{t,trace},trace,x_value(t)),'c','fill'); %mark event half-width start
+                     h5=scatter(event_halfWidthE{t,trace}*dt,data_no_spikes{channel}(event_halfWidthE{t,trace},trace,x_value(t)),'g','fill'); %mark event  half-width end
+
                    if t==1;  set(gca,'xlim',[0.4 2.9]); end
                    if t==2;  set(gca,'xlim',[5.6 8.1]); end
-                   set(gca,'ylim',[-50 -10]);
+%                    set(gca,'ylim',[-50 -10]);
                      hold off
-pause
+        pause
+      end
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\10_20Hz\single trials'
 %  if t==1;
 % print(1,['detection example - ongoing NB-, trace ', num2str(trace)],'-dpng','-r600','-opengl')

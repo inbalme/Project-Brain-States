@@ -13,16 +13,16 @@
 %                 11 - NBES: 3 currents+galvano train+test (6 x-values)
 
 clear all
-% close all
+close all
 cc_stat=[]; cc_spont=[]; cc_evoked=[]; cc=[]; cc_shuffled_it=[]; cc_shuff_sub=[];
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X
  
  global exp_type
-exp_type=2; %1-NBES, 2-ChAT
-trace_type_input=[3,2]; %1:3
+exp_type=1; %1-NBES, 2-ChAT
+trace_type_input=[3,2]; %[3,2]; %for exp_type=2 use [1,2]
 analyze_time_before_train=0.1;
 analyze_train_only_flag=0;
-save_flag= 1;
+save_flag=1;
 print_flag=1;
 norm_flag=0;
 % LPF_flag=1;
@@ -30,8 +30,8 @@ norm_flag=0;
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 BPLFP_flag=1; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
-bp_manual_LFP=[1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
-BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
+bp_manual_LFP=[0.1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
+BPVm_flag=0; %filtering LFP and Vm same as LFP was filtered in the multiclamp
 bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
     
 switch exp_type
@@ -70,88 +70,9 @@ end
     galvano_nstim = Param.facade(6);
     galvano_freq = Param.facade(7);
     data_preprocessing
-  %%   
-%                 sf{1} = Param.sf_Vm;
-%                 sf{2} = Param.sf_I1;
-%                 sf{3} = Param.sf_V2;
-%                 sf{4} = Param.sf_I2;
-%                 dt=1/sf{channel};
-%                              
-%                 sf_airpuff = Param.sf_airpuff; %[1/sec]
-%                 dt_airpuff = 1/sf_airpuff;
-%                 sf_galvano = Param.sf_galvano; %[1/sec]
-%                 dt_galvano = 1/sf_galvano;   
-%     Ch2_data= raw_data{3}./20; %dividing by the LFP gain           
-% %     raw_data{3} = raw_data{3}./20; %dividing by the LFP gain
-%     current_data=data_no_spikes{channel};
-%     current_data_filt=[]; Ch2_data_filt=[];
-% 
-% %% bandpass filtering to remove 50Hz noise from LFP and Vm.
-% if BP50HzLFP_flag==1;
-%     if isempty(Ch2_data_filt)
-%         tmpMat=Ch2_data;
-%     else
-%         tmpMat=Ch2_data_filt;
-%     end
-%         for xx=1:3
-%             for trace= 1:size(tmpMat,2)    
-%                     jl=tmpMat(:,trace,xx);
-%                     Ch2_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(jl,dt,49,51,1,0); %filtering out 50Hz noise from LFP and Vm
-%             end
-%         end
-% end
-% tmpMat=[];
-% 
-% if BP50HzVm_flag==1;
-%     if isempty(current_data_filt)
-%         tmpMat=current_data;
-%     else
-%         tmpMat=current_data_filt;
-%     end
-%         for xx=1:3
-%             for trace= 1:size(current_data,2)    
-%                 jm=tmpMat(:,trace,xx);
-%                 current_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(jm,dt,49,51,1,0); %filtering out 50Hz noise from LFP and Vm
-%             end
-%         end
-% end
-%  tmpMat=[];
-% bp_filt_LFP=files(files_to_analyze(fileind)).V2_filter;
-% if BPLFP_flag==1;  %filtering both LFP and VM same as LFP was filtered during the experiment via multiclamp
-%     if ~isempty(bp_manual_LFP)
-%         bp_filt_LFP=bp_manual_LFP;
-%     end
-%         if isempty(Ch2_data_filt)
-%         tmpMat=Ch2_data;
-%     else
-%         tmpMat=Ch2_data_filt;
-%         end
-%        
-%         for xx=1:3
-%             for trace= 1:size(tmpMat,2)   
-%                 kl=tmpMat(:,trace,xx);
-%                  Ch2_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(kl,dt,bp_filt_LFP(1),bp_filt_LFP(2),0,0); %filtering out 50Hz noise from LFP and Vm
-%             end
-%         end
-% end
-%  tmpMat=[];
-%  bp_filt_Vm=files(files_to_analyze(fileind)).V2_filter; 
-% if BPVm_flag==1;  %filtering both LFP and VM same as LFP was filtered during the experiment via multiclamp
-%     if ~isempty(bp_manual_Vm)
-%         bp_filt_Vm=bp_manual_Vm;
-%     end      
-%         if isempty(current_data_filt)
-%             tmpMat=current_data;
-%         else
-%             tmpMat=current_data_filt;
-%         end
-%     for xx=1:3
-%         for trace= 1:size(tmpMat,2)   
-%                km=tmpMat(:,trace,xx);
-%                current_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(km,dt,bp_filt_Vm(1),bp_filt_Vm(2),0,0); %filtering Vm same as LFP
-%         end
-%     end
-% end
+   if ~isempty(current_data_filt)
+     current_data=current_data_filt;
+ end
 %% set the path for saving figures and variables
 if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1 && BPLFP_flag==1
     path_output=['LFP_50Hz+BP Vm_ 50Hz+BP\BP',num2str(bp_manual_Vm(1)),'-',num2str(bp_manual_Vm(2))];
@@ -289,7 +210,7 @@ data_LFP{t}=Ch2_data_filt(interval(:,t),:,x_value(t));
 data_LFP_noDC{t} = fn_Subtract_Mean(data_LFP{t});
 data_Vm{t}=current_data(interval(:,t),:,x_value(t));   
 data_Vm_noDC{t} = fn_Subtract_Mean(data_Vm{t});
-data_Vm_filt{t}=current_data_filt(interval(:,t),:,x_value(t));
+data_Vm_filt{t}=current_data(interval(:,t),:,x_value(t));
 data_Vm_filt_noDC{t} = fn_Subtract_Mean(data_Vm_filt{t});
 
 %normalize data (so that a general decrease in the power of the trace will not affect the correlations:
@@ -1015,8 +936,8 @@ mv_shuff_stat.ANOVA=ranovatbl_mv_shuff;
 mv_shuff_stat.multcomp_NBbySS=NBbySS_mv_shuff;
 mv_shuff_stat.multcomp_SSbyNB=SSbyNB_mv;
 mv_shuff_stat.rmANOVA_p=max_val_rmANOVA_p;
-mv_shuff_stat.evoked_p=max_val_p_evoked;
-mv_shuff_stat.spont_p=max_val_p_spont;
+mv_shuff_stat.evoked_p=max_val_shuff_p_evoked;
+mv_shuff_stat.spont_p=max_val_shuff_p_spont;
          %% Paired plot of spont+evoked non-normalized max peak absolute values
 CC_Y_max_val_sp=cc_stat.spont.max_val';
 CC_X_sp(1,:)=ones(1,size(CC_Y_max_val_sp,2));

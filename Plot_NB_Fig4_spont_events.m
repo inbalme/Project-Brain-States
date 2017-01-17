@@ -10,8 +10,7 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\10_20Hz'
 spont_Vm_5prcentile = open('Vm_5prcentile_ongoing.fig');    
 spont_Vm_5prcentile_ax = get(gcf, 'children');
 
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\10_20Hz\single trials\ongoing'
-
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Spontaneous'
 spont_event_freq = open('Spontaneous event frequency.fig');    
 spont_event_freq_ax = get(gcf, 'children');
 
@@ -87,7 +86,7 @@ annotation('textbox', [spont_Vm_5prcentile_pos(1,1),spont_Vm_5prcentile_pos_top 
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 
 
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Presentation Figures'
 filename='Fig 4 spont events';
 saveas(F,'Fig 4 spont events.fig'); 
 print(F,filename,'-dpng','-r600','-opengl') 

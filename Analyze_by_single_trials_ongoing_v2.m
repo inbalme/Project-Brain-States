@@ -7,13 +7,13 @@ trace_type_input=1; %
 analyze_time_before_train=0.1;
 analyze_train_only_flag=0;
 save_flag= 1;
-print_flag=1;
+print_flag=0;
 norm_flag=0;
 BP50HzLFP_flag=0; %removing 50Hz noise from LFP signal
-BP50HzVm_flag=0; %removing 50Hz noise from Vm signal
+BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 BPLFP_flag=0; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
 bp_manual_LFP=[1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
-BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
+BPVm_flag=1; %filtering Vm
 bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 clear color_table
     color_table=[0 0 0; [30,75,14]/256; [136 137 138]/256; [112,172,90]/256; [216 22 22]/256; [255 153 153]/256];
@@ -58,6 +58,10 @@ end
 
 data_preprocessing 
 
+ if ~isempty(current_data_filt)
+     current_data=current_data_filt;
+ end
+ 
 clear color_table    
     whisker_stim_color(1,:)=[255 153 153]/256; %[239 188 86]/256;
     switch exp_type
@@ -91,8 +95,8 @@ clear color_table
         doPlot = 0;
         I_temp=0;
         [voltages, tmp_starting,tmp_amplitude, tmp_ampPos, halfWidth,tmp_halfWidthS, tmp_halfWidthE] = fn_EventDetector_v2(voltages_input, dt, finalAmp_Thres, doPlot,I_temp);
-        title(['t=', num2str(t), ' trace ',num2str(trace)]); 
-        set(gca,'ylim',[-60 -30])
+%         title(['t=', num2str(t), ' trace ',num2str(trace)]); 
+%         set(gca,'ylim',[-60 -30])
 %          pause
        
     %correcting to the real locations in the trace
@@ -118,16 +122,20 @@ clear color_table
             event_halfWidthS{t,trace} =  [event_halfWidthS{t,trace}; halfWidthS]; 
             event_halfWidthE{t,trace} =  [event_halfWidthE{t,trace}; halfWidthE]; 
     end        
-            %% visualize the detected events on the trace            
-%             figure(1); clf
-%             hold on
-%                      h1=plot([1:size(current_data,1)].*dt, current_data(:,trace,x_value(t)),'k');
-%                      h2=scatter(event_start{t,trace}*dt,current_data(event_start{t,trace},trace,x_value(t)),'r','fill'); %mark event onset
-%                      h3=scatter(event_ampPos{t,trace}*dt,current_data(event_ampPos{t,trace},trace,x_value(t)),'b','fill'); %mark event peak
-%                     set(gca,'xlim',[start_time(t) start_time(t)+duration]);               
-% %                    set(gca,'ylim',[-50 -10]);
-%                      hold off
-% pause
+            %% visualize the detected events on the trace         
+        if print_flag==1
+            figure(1); clf
+            hold on
+                     h1=plot([1:size(current_data,1)].*dt, current_data(:,trace,x_value(t)),'k');
+                     h2=scatter(event_start{t,trace}*dt,current_data(event_start{t,trace},trace,x_value(t)),'r','fill'); %mark event onset
+                     h3=scatter(event_ampPos{t,trace}*dt,current_data(event_ampPos{t,trace},trace,x_value(t)),'b','fill'); %mark event peak
+                     h4=scatter(event_halfWidthS{t,trace}*dt,current_data(event_halfWidthS{t,trace},trace,x_value(t)),'c','fill'); %mark event half-width start
+                     h5=scatter(event_halfWidthE{t,trace}*dt,current_data(event_halfWidthE{t,trace},trace,x_value(t)),'g','fill'); %mark event  half-width end
+                    set(gca,'xlim',[start_time(t) start_time(t)+duration]);               
+%                    set(gca,'ylim',[-70 -10]);
+                     hold off
+                pause
+        end
 % cd(path_output)
 %  if t==1;
 % print(1,['detection example - ongoing NB-, trace ', num2str(trace)],'-dpng','-r600','-opengl')
@@ -226,8 +234,8 @@ clear color_table
         norm_event_freq_noES(:,1)= tmp(:,1)./tmp(:,1);
         norm_event_freq_ES(:,1)= tmp(:,2)./tmp(:,1);
         event_ongoing_stat.norm_freq = [norm_event_freq_noES, norm_event_freq_ES];
-        event_ongoing_stat.freq_m= mean(tmp,1);
-        event_ongoing_stat.freq_std= std(tmp,0,1);
+        event_ongoing_stat.freq_m= nanmean(tmp,1);
+        event_ongoing_stat.freq_std= nanstd(tmp,0,1);
         %testing for normal distribution
         diff_event_freq= tmp(:,2)- tmp(:,1);
         [event_ongoing_stat.lillietest_h_freq, event_ongoing_stat.lillietest_p_freq] = lillietest(diff_event_freq);
@@ -244,8 +252,8 @@ clear color_table
         norm_event_onVal_m_noES(:,1)= tmp(:,1)./tmp(:,1);
         norm_event_onVal_m_ES(:,1)= tmp(:,2)./tmp(:,1);
         event_ongoing_stat.norm_onVal_m = [norm_event_onVal_m_noES, norm_event_onVal_m_ES];
-        event_ongoing_stat.onVal_m_m= mean(tmp,1);
-        event_ongoing_stat.onVal_m_std= std(tmp,0,1);
+        event_ongoing_stat.onVal_m_m= nanmean(tmp,1);
+        event_ongoing_stat.onVal_m_std= nanstd(tmp,0,1);
         %testing for normal distribution
         diff_event_onVal_m= tmp(:,2)- tmp(:,1);
         [event_ongoing_stat.lillietest_h_onVal_m, event_ongoing_stat.lillietest_p_onVal_m] = lillietest(diff_event_onVal_m);
@@ -262,8 +270,8 @@ clear color_table
         norm_event_onVal_std_noES(:,1)= tmp(:,1)./tmp(:,1);
         norm_event_onVal_std_ES(:,1)= tmp(:,2)./tmp(:,1);
         event_ongoing_stat.norm_onVal_std = [norm_event_onVal_std_noES, norm_event_onVal_std_ES];
-        event_ongoing_stat.onVal_std_m= mean(tmp,1);
-        event_ongoing_stat.onVal_std_std= std(tmp,0,1);
+        event_ongoing_stat.onVal_std_m= nanmean(tmp,1);
+        event_ongoing_stat.onVal_std_std= nanstd(tmp,0,1);
         %testing for normal distribution
         diff_event_onVal_std= tmp(:,2)- tmp(:,1);
         [event_ongoing_stat.lillietest_h_onVal_std, event_ongoing_stat.lillietest_p_onVal_std] = lillietest(diff_event_onVal_std);
@@ -280,8 +288,8 @@ clear color_table
         norm_event_ampVal_m_noES(:,1)= tmp(:,1)./tmp(:,1);
         norm_event_ampVal_m_ES(:,1)= tmp(:,2)./tmp(:,1);
         event_ongoing_stat.norm_ampVal_m = [norm_event_ampVal_m_noES, norm_event_ampVal_m_ES];
-        event_ongoing_stat.ampVal_m_m= mean(tmp,1);
-        event_ongoing_stat.ampVal_m_std= std(tmp,0,1);
+        event_ongoing_stat.ampVal_m_m= nanmean(tmp,1);
+        event_ongoing_stat.ampVal_m_std= nanstd(tmp,0,1);
         %testing for normal distribution
         diff_event_ampVal_m= tmp(:,2)- tmp(:,1);
         [event_ongoing_stat.lillietest_h_ampVal_m, event_ongoing_stat.lillietest_p_ampVal_m] = lillietest(diff_event_ampVal_m);
@@ -298,8 +306,8 @@ clear color_table
         norm_event_ampVal_std_noES(:,1)= tmp(:,1)./tmp(:,1);
         norm_event_ampVal_std_ES(:,1)= tmp(:,2)./tmp(:,1);
         event_ongoing_stat.norm_ampVal_std = [norm_event_ampVal_std_noES, norm_event_ampVal_std_ES];
-        event_ongoing_stat.ampVal_std_m= mean(tmp,1);
-        event_ongoing_stat.ampVal_std_std= std(tmp,0,1);
+        event_ongoing_stat.ampVal_std_m= nanmean(tmp,1);
+        event_ongoing_stat.ampVal_std_std= nanstd(tmp,0,1);
         %testing for normal distribution
         diff_event_ampVal_std= tmp(:,2)- tmp(:,1);
         [event_ongoing_stat.lillietest_h_ampVal_std, event_ongoing_stat.lillietest_p_ampVal_std] = lillietest(diff_event_ampVal_std);
@@ -316,8 +324,8 @@ clear color_table
         norm_event_amplitude_m_noES(:,1)= tmp(:,1)./tmp(:,1);
         norm_event_amplitude_m_ES(:,1)= tmp(:,2)./tmp(:,1);
         event_ongoing_stat.norm_amplitude_m = [norm_event_amplitude_m_noES, norm_event_amplitude_m_ES];
-        event_ongoing_stat.amplitude_m_m= mean(tmp,1);
-        event_ongoing_stat.amplitude_m_std= std(tmp,0,1);
+        event_ongoing_stat.amplitude_m_m= nanmean(tmp,1);
+        event_ongoing_stat.amplitude_m_std= nanstd(tmp,0,1);
         %testing for normal distribution
         diff_event_amplitude_m= tmp(:,2)- tmp(:,1);
         [event_ongoing_stat.lillietest_h_amplitude_m, event_ongoing_stat.lillietest_p_amplitude_m] = lillietest(diff_event_amplitude_m);
@@ -334,8 +342,8 @@ clear color_table
         norm_event_halfWidth_m_noES(:,1)= tmp(:,1)./tmp(:,1);
         norm_event_halfWidth_m_ES(:,1)= tmp(:,2)./tmp(:,1);
         event_ongoing_stat.norm_halfWidth_m = [norm_event_halfWidth_m_noES, norm_event_halfWidth_m_ES];
-        event_ongoing_stat.halfWidth_m_m= mean(tmp,1);
-        event_ongoing_stat.halfWidth_m_std= std(tmp,0,1);
+        event_ongoing_stat.halfWidth_m_m= nanmean(tmp,1);
+        event_ongoing_stat.halfWidth_m_std= nanstd(tmp,0,1);
         %testing for normal distribution
         diff_event_halfWidth_m= tmp(:,2)- tmp(:,1);
         [event_ongoing_stat.lillietest_h_halfWidth_m, event_ongoing_stat.lillietest_p_halfWidth_m] = lillietest(diff_event_halfWidth_m);
@@ -368,7 +376,7 @@ liney=[my ;my ];
 g1=figure;
 hold on
 line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-errorbar(tmp_X(:,1), mean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
+errorbar(tmp_X(:,1), nanmean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
 % line(linex,liney,'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 text(1.5,my,asterisk_sp,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
 hold off
@@ -396,13 +404,13 @@ else if event_ongoing_stat.wilcoxon_p_amplitude_m<0.05 && event_ongoing_stat.wil
     end
 end
 linex=[1;2];
-my=max(max(event_ongoing_stat.amplitude_m))*1.1; 
+my=max(max(event_ongoing_stat.amplitude_m))*1-2; 
 liney=[my ;my ];
 
 g2=figure;
 hold on
 line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-errorbar(tmp_X(:,1), mean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
+errorbar(tmp_X(:,1), nanmean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
 % line(linex,liney,'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 text(1.5,my,asterisk_sp,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
 hold off
@@ -438,7 +446,7 @@ liney=[my ;my ];
 g3=figure;
 hold on
 line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-errorbar(tmp_X(:,1), mean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
+errorbar(tmp_X(:,1), nanmean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
 % line(linex,liney,'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 text(1.5,my,asterisk_sp,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
 
@@ -459,7 +467,7 @@ E = event_ongoing_stat.onVal_m_std;
 g4=figure;
 hold on
 line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-errorbar(tmp_X(:,1), mean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
+errorbar(tmp_X(:,1), nanmean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
 hold off
         x1limits = [0.75 2.25];
         x1ticks = [1,2];

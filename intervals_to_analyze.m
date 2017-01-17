@@ -52,7 +52,7 @@ switch exp_type
         switch trace_type
             case 1
                  start_time=[0.4, stim1_X{x_value(1)}(1,1).*dt+0.4];
-                 duration =(stim1_X{x_value(1)}(2,1)-stim1_X{x_value(1)}(1,1)).*dt;
+                 duration =(stim1_X{x_value(1)}(2,1)-stim1_X{x_value(1)}(1,1)).*dt-0.4;
                     for t=1:length(start_time);
                      start_sample(:,t) = ceil(start_time(t).*sf{1});
                         if start_time(t)==0

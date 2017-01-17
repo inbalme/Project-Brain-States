@@ -6,7 +6,7 @@ close all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
  channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
-exp_type=1; %1-NBES, 2-ChAT
+exp_type=2; %1-NBES, 2-ChAT
 % trace_type_input=[3,2]; %1:3
 save_flag= 0;
 print_flag=0;
@@ -54,7 +54,7 @@ end
 
 switch exp_type
     case 1
-        files_to_analyze =84; %[62,72,75,82,84]; 
+        files_to_analyze =82; %[62,72,75,82,84]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};       
@@ -110,7 +110,7 @@ Rin_x3_curr_inj(1,2)=Vm_x3_curr_inj(1,2)./mean(mean(raw_data{2}(curr_inj_interva
 
 curr_inj_interval_before=[round((curr_inj_1)*sf{1}):round((curr_inj_1_end)*sf{1})];
 curr_inj_interval_after=[round((curr_inj_2)*sf{1}):round((curr_inj_2_end)*sf{1})];
-for trace=1:7;
+for trace=1:5;
 Iinj=Param.facade(21)/2.5;
 curr_inj_del=[Param.facade(20), Param.facade(20)+Param.facade(22)+Param.facade(23)];
 curr_inj_duration=Param.facade(22);
