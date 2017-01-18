@@ -15,9 +15,9 @@ clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
  channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
-exp_type=2; %1-NBES, 2-ChAT
+exp_type=1; %1-NBES, 2-ChAT
 % trace_type_input=[3,2]; %1:3
-save_flag= 1;
+save_flag= 0;
 print_flag=1;
 norm_flag=0;
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
@@ -63,7 +63,7 @@ end
 
 switch exp_type
     case 1
-        files_to_analyze =[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
+        files_to_analyze =46; %[8,10,12,14,15,16,22,37,40,1,46,48,52,58,72,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};       
@@ -73,6 +73,12 @@ switch exp_type
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};
+        
+     case 3
+        files_to_analyze =[8,10,12,14,15,16,22,37,40,1,46,48,52,58,72,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
+        cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
+        load NBES_Files_v2
+        legend_string={'NB+', 'NB-'};     
 end
         
 % for fileind=1;
@@ -85,7 +91,7 @@ end
     load(fname) 
     %%
         Ch2_data= raw_data{3}./20; %dividing by the LFP gain           
-        current_data=data_no_spikes{channel};
+        current_data=data_no_spikes{channel}; %raw_data{channel}; 
         galvano_nstim = Param.facade(6);
         galvano_freq = Param.facade(7);
    data_preprocessing

@@ -22,7 +22,7 @@ exp_type=1; %1-NBES, 2-ChAT
 trace_type_input=[3,2]; %[3,2]; %for exp_type=2 use [1,2]
 analyze_time_before_train=0.1;
 analyze_train_only_flag=0;
-save_flag=1;
+save_flag=0;
 print_flag=1;
 norm_flag=0;
 % LPF_flag=1;
@@ -283,10 +283,10 @@ subplot(2*length(trace),1,2*tr_ind)
         end
         
         %plotting scale bar
-horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
     hold off
     ylim_data=[get(gca,'ylim')]';
     xlim_data=[get(gca,'xlim')]';
@@ -305,8 +305,8 @@ horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0
         end
         
         %plotting scale bar
- horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh./20), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+ horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh./20), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
     hold off  
     set(gca,'xlim',xlim_data)
     set(gca, 'visible', 'off') ;
@@ -340,10 +340,10 @@ subplot(2*length(trace),1,2*tr_ind)
         end
         
         %plotting scale bar
-horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
     hold off
     ylim_data=[get(gca,'ylim')]';
     xlim_data=[get(gca,'xlim')]';
@@ -362,8 +362,8 @@ horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0
         end
         
         %plotting scale bar
- horiz_vert=0;        lengthh=0.5;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+ horiz_vert=0;        lengthh=0.5;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
     hold off  
     set(gca,'xlim',xlim_data)
     set(gca, 'visible', 'off') ;

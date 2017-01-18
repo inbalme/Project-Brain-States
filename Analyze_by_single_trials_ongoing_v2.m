@@ -2,7 +2,7 @@
 clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
-exp_type=2; %1-NBES, 2-ChAT
+exp_type=1; %1-NBES, 2-ChAT
 trace_type_input=1; %
 analyze_time_before_train=0.1;
 analyze_train_only_flag=0;
@@ -21,7 +21,7 @@ clear color_table
 %%
 switch exp_type
     case 1
-        files_to_analyze =[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
+        files_to_analyze =[8,10,12,14,15,16,22,37,40,1,44,46,48,52,58,72,75,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};

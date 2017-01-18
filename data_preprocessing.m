@@ -22,7 +22,7 @@ if BP50HzLFP_flag==1;
     else
         tmpMat=Ch2_data_filt;
     end
-        for xx=1:3
+        for xx=1:size(current_data,3);
             for trace= 1:size(tmpMat,2)    
                     jl=tmpMat(:,trace,xx);
                     Ch2_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(jl,dt,49,51,1,0); %filtering out 50Hz noise from LFP and Vm
@@ -37,7 +37,7 @@ if BP50HzVm_flag==1;
     else
         tmpMat=current_data_filt;
     end
-        for xx=1:3
+        for xx=1:size(current_data,3);
             for trace= 1:size(current_data,2)    
                 jm=tmpMat(:,trace,xx);
                 current_data_filt(:,trace,xx)=bandPass_fft_IL_NEW2016(jm,dt,49,51,1,0); %filtering out 50Hz noise from LFP and Vm
@@ -56,7 +56,7 @@ if BPLFP_flag==1;  %filtering both LFP and VM same as LFP was filtered during th
         tmpMat=Ch2_data_filt;
         end
        
-        for xx=1:3
+        for xx=1:size(current_data,3);
             for trace= 1:size(tmpMat,2)   
                 kl=tmpMat(:,trace,xx);
                 if bp_filt_LFP(1)==0 %Low-Pass Filtering
@@ -81,7 +81,7 @@ if BPVm_flag==1;  %filtering both LFP and VM same as LFP was filtered during the
         else
             tmpMat=current_data_filt;
         end
-    for xx=1:3
+    for xx=1:size(current_data,3);
         for trace= 1:size(tmpMat,2)   
                km=tmpMat(:,trace,xx);
                      if bp_filt_Vm(1)==0 %Low-Pass Filtering out above bp_filt_Vm(2)

@@ -86,4 +86,30 @@ switch exp_type
                         interval(:,t) = start_sample(:,t):end_sample(:,t);
                     end
         end
+    case 3
+                curr_inj_del = [Param.facade(27) Param.facade(30)] ;
+            if length(Param.facade)>32
+                curr_inj_del = [Param.facade(27) Param.facade(30) Param.facade(33)];
+            end
+            curr_inj_depo = Param.facade(1);
+            curr_inj_hyper = Param.facade(2);
+            curr_inj_dur = Param.facade(7);
+            
+         start_time = curr_inj_del+0.1; %[sec] %[0,5]
+%          start_time(2) = stim2_X{x_value}(1,end).*dt+0.1; %start 0.5 sec after the last sensory stim
+         duration = 1.2; %curr_inj_dur-0.03; %[sec] 
+            for t=1:length(start_time);
+             start_sample(:,t) = ceil(start_time(t).*sf{1});
+              start_sample(mod(start_sample(:,t),2)==1,t)=start_sample(mod(start_sample(:,t),2)==1,t)-1;                 
+                if start_time(t)==0
+                    start_sample(:,t) = 1;
+                end
+              end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1});
+             interval_temp(:,t)= start_sample(:,t):end_sample(:,t);
+              if mod(size(interval_temp(:,t),1),2)
+                   interval(:,t) =interval_temp(1:end-1,t);
+              else
+                   interval(:,t) =interval_temp(:,t);
+              end
+        end             
 end

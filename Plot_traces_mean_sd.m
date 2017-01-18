@@ -5,7 +5,7 @@ clear all
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data
  global exp_type
 exp_type=2; %1-NBES, 2-ChAT
-save_flag= 1;
+save_flag= 0;
 print_flag=0;
 % short_flag=0; %1- short trace, 0- long trace
 baseline_flag=0; %adding dashed line under traces
@@ -189,10 +189,10 @@ switch exp_type
 end
 
         %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc2=0.05;
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
 
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
@@ -220,10 +220,10 @@ switch exp_type
         line(stim1_X{1}.*dt,stim1_Y,'LineWidth',6,'Color','b') 
 end
 % %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=12;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=12;perc1=[]; perc2=0.05;
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
 ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
@@ -252,10 +252,10 @@ switch exp_type
         line(stim1_X{1}.*dt,stim1_Y,'LineWidth',6,'Color','b') 
 end
 % %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=1;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=12;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=1;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=0.05;
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
         
         ylabel('Vm SD [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
@@ -277,10 +277,10 @@ xlim_data=get(gca,'xlim');
 set(rec1,'Position',[x_axis_Sshort(1,1)*dt,ylim_data(1),(x_axis_Sshort(1,end)-x_axis_Sshort(1,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
 
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=12;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=0.05;
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
         
 ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
@@ -304,10 +304,10 @@ if exp_type==2;
 end
 
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=12;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=0.05;
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
 ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
@@ -330,10 +330,10 @@ if exp_type==2;
 end
 
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=12;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=0.05;
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
         
 ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
@@ -356,10 +356,10 @@ if exp_type==2;
         line((stim1_X{1}-x_axis_Sshort(2,1)+x_axis_Sshort(1,1)).*dt,stim1_Y,'LineWidth',6,'Color','b') 
 end
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=1;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=12;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=1;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=0.05;
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
 
 ylabel('Vm SD [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
@@ -439,10 +439,10 @@ patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);        
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);        
 hold off
 ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
@@ -489,10 +489,10 @@ patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
         
 hold off
 ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
@@ -531,10 +531,10 @@ patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=5;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=5;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
         
 hold off
 ylabel('Mean Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
@@ -575,10 +575,10 @@ patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=1;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);hold off
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=1;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);hold off
 ylabel('Vm SD [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
@@ -640,10 +640,10 @@ patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);        
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);         
 hold off
 ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
@@ -690,10 +690,10 @@ patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
         
 hold off
 ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
@@ -732,10 +732,10 @@ patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
         
 hold off
 ylabel('Mean Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
@@ -776,10 +776,10 @@ patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=1;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [p1,p2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);hold off
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=1;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);hold off
 ylabel('Vm SD [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
