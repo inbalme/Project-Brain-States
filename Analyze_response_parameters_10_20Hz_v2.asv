@@ -15,7 +15,7 @@ clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
  channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
-exp_type=3; %1-NBES, 2-ChAT
+exp_type=1; %1-NBES, 2-ChAT
 trace_type_input=[2]; %for exp_type=2||3 use [1,2], for exp_type=1 use [3,2]
 trace_type=trace_type_input;
 analyze_time_before_train=0.1;
@@ -271,7 +271,7 @@ data_mean = mean(current_data(:,:,x_value(t)),2); %data_no_spikes %raw_data %dat
 
     %taking the response as the whole train:  
                 start_sample =stim2{t}(1,1);  %start with sensory stim
-                duration_train = galvano_nstim./galvano_freq+0.05;
+                duration_train = galvano_nstim./galvano_freq; %+0.05;
                 end_sample = start_sample+duration_train.*sf{1}-1;
                 train_interval(:,1) = round(start_sample:end_sample);           
                 data_train_response(:,:,t) = current_data(train_interval,:,x_value(t));
@@ -310,7 +310,7 @@ end
 Amplitude_noise1=mean(noise1_noDC_squared_m_sqrt);
 %alternative calculation of noise: taking the ongoing activity before the sensory stim as the noise
 for trace=1:size(data_train_response,2);
-    if start_sample-duration_train.*sf{1} < 0
+    if start_sample-duration_train.*sf{1} <= 0
         noise2(:,trace)=current_data(1:start_sample-1,trace,x_value(t));
     else
         noise2(:,trace)=current_data(start_sample-duration_train.*sf{1}:start_sample-1,trace,x_value(t));
@@ -2106,10 +2106,10 @@ text(1.5,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','bottom
 hold off
         x1limits = [0.75 2.25];
         x1ticks = [1,2];
-        y1limits = [0 7];
-        y1ticks = [0,3,6];
-        set( gca, 'xlim', x1limits,'xtick', x1ticks,'ylim', y1limits,'ytick', y1ticks,'fontsize',28,'linewidth',1,...
-        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
+%         y1limits = [0 7];
+%         y1ticks = [0,3,6];
+        set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
+        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold','ylim', y1limits,'ytick', y1ticks, 
         ylabel(['Signal Amplitude [',y_ax_units,']'], 'FontSize', 28,'fontname', 'arial');
         title(['Amplitude signal, n=' num2str(length(files_to_analyze)) ', p=' num2str(peaks_stat(stim_num).wilcoxon_p_Amplitude_signal)] ,'FontSize', 20,'fontname', 'arial');   
 
@@ -2146,8 +2146,8 @@ hold off
         x1ticks = [1,2];
 %         y1limits = [0 7];
 %         y1ticks = [0,3,6];
-        set( gca, 'xlim', x1limits,'xtick', x1ticks,'ytick', y1ticks,'fontsize',28,'linewidth',1,...
-        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 'ylim', y1limits,
+        set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
+        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 'ylim', y1limits,'ytick', y1ticks,
         ylabel(['Noise Amplitude [',y_ax_units,']'], 'FontSize', 28,'fontname', 'arial');
         title(['Amplitude noise1, n=' num2str(length(files_to_analyze)) ', p=' num2str(peaks_stat(stim_num).wilcoxon_p_Amplitude_noise1)] ,'FontSize', 20,'fontname', 'arial');   
 

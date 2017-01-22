@@ -15,7 +15,7 @@ clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
  channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
-exp_type=3; %1-NBES, 2-ChAT
+exp_type=1; %1-NBES, 2-ChAT
 trace_type_input=[2]; %for exp_type=2||3 use [1,2], for exp_type=1 use [3,2]
 trace_type=trace_type_input;
 analyze_time_before_train=0.1;
@@ -23,7 +23,7 @@ analyze_train_only_flag=0;
 save_flag= 0;
 print_flag=1;
 norm_flag=0;
-clamp_flag=3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
+clamp_flag=[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 BPLFP_flag=0; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
@@ -55,26 +55,23 @@ switch exp_type
         if a==0;
             mkdir(path_output);
         end
-        cd(path_output)       
     case 2
         path_output=['D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary\',path_output];        
         a = exist(path_output,'dir'); %a will be 7 if a folder "name" exists and 0 otherwise
         if a==0;
             mkdir(path_output);
         end
-        cd(path_output)
     case 3 
         path_output=['D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary_VC\',path_output];   
         a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
         if a==0;
             mkdir(path_output);
         end
-        cd(path_output) 
 end
 
 switch exp_type
     case 1
-        files_to_analyze =46; %[8,10,12,14,15,16,22,37,40,1,46,48,52,58,72,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
+        files_to_analyze =[16,22,46,48,52]; %[8,10,12,14,15,16,22,37,40,1,46,48,52,58,72,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};  y_ax_label={'Vm'}; y_ax_units={'mV'};    
@@ -783,15 +780,15 @@ end
                         
         %peak adaptation amplitude ratio - absolute values + relative change
         peaks_stat(stim_num).adapt_amp=[peak_adapt_amp{1}(:,stim_num),  peak_adapt_amp{2}(:,stim_num)];
-        if exp_type==1
-            peaks_stat(stim_num).adapt_amp([1,3,5,6,8,9],:)=[];
-        end
+%         if exp_type==1
+%             peaks_stat(stim_num).adapt_amp([1,3,5,6,8,9],:)=[];
+%         end
         peaks_stat(stim_num).adapt_amp_m=nanmean(peaks_stat(stim_num).adapt_amp,1);
         peaks_stat(stim_num).adapt_amp_std=nanstd(peaks_stat(stim_num).adapt_amp,0,1);
         peaks_stat(stim_num).change_adapt_amp=[(peak_adapt_amp{2}(:,stim_num)-peak_adapt_amp{1}(:,stim_num))./abs(peak_adapt_amp{1}(:,stim_num))].*100; %percent change
-        if exp_type==1
-            peaks_stat(stim_num).change_adapt_amp([1,3,5,6,8,9],:)=[];
-        end
+%         if exp_type==1
+%             peaks_stat(stim_num).change_adapt_amp([1,3,5,6,8,9],:)=[];
+%         end
         peaks_stat(stim_num).change_adapt_amp_m=nanmean(peaks_stat(stim_num).change_adapt_amp,1);
         peaks_stat(stim_num).change_adapt_amp_std=nanstd(peaks_stat(stim_num).change_adapt_amp,0,1);
         %testing for normal distribution       
