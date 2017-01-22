@@ -16,7 +16,7 @@ close all
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
 load NBES_Files_v2
 peaks_for_xls=[]; peak_for_xls_mean=[]; 
-save_flag=1;
+save_flag=0;
 print_flag=1;
 print_flag_cc=1;
 fontsize1=20;
