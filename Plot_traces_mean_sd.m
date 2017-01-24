@@ -4,9 +4,10 @@ clear all
 
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data
  global exp_type
-exp_type=2; %1-NBES, 2-ChAT
+exp_type=3; %1-NBES, 2-ChAT
 save_flag= 0;
 print_flag=0;
+clamp_flag=3; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 % short_flag=0; %1- short trace, 0- long trace
 baseline_flag=0; %adding dashed line under traces
 bl=-70; %baseline value;
@@ -57,13 +58,23 @@ switch exp_type
         files_to_analyze =[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
-        legend_string={'NB+', 'NB-'};       
+        legend_string={'NB+', 'NB-'};   y_ax_label={'Vm'}; y_ax_units={'mV'};       
 
     case 2
         files_to_analyze =87; %[74,76,77,80,82,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
-        legend_string={'Light On', 'Light Off'};
+        legend_string={'Light On', 'Light Off'};    y_ax_label={'Vm'}; y_ax_units={'mV'};  
+   case 3 
+        files_to_analyze =[42,51,61,64,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77];
+        cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
+        load NBES_Files_v2
+        legend_string={'NB+', 'NB-'};    y_ax_label={'Im'}; y_ax_units={'pA'};    
+        path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis_VC\Evoked';   
+        a = exist(path_output,'dir'); %a will be 7 if a folder "name" exists and 0 otherwise
+        if a==0;
+            mkdir(path_output);
+     end      
 end
 %% 
     for fileind=1:length(files_to_analyze);
@@ -75,10 +86,26 @@ end
     load(fname) 
     %%
     Ch2_data= raw_data{3}./20; %dividing by the LFP gain       
-    current_data=data_no_spikes{channel}; %data_no_spikes; %raw_data
-galvano_nstim = Param.facade(6);
-        galvano_freq = Param.facade(7);
+      if isempty(data_no_spikes)
+            current_data=raw_data{channel};
+             if clamp_flag==1
+                current_data=(-1).*raw_data{channel};
+            end
+            data_used='raw_data';
+        else
+        current_data=data_no_spikes{channel}; %raw_data{channel}; 
+         if clamp_flag==1
+            current_data=(-1).*data_no_spikes{channel}; %raw_data{channel};
+        end
+        data_used='data_no_spikes';
+      end
+        
    data_preprocessing 
+   
+    if ~isempty(current_data_filt)
+     current_data=current_data_filt;
+    end
+    
         clear color_table    
         whisker_stim_color(1,:)=[255 153 153]/256; %[239 188 86]/256;
         switch exp_type
@@ -86,6 +113,8 @@ galvano_nstim = Param.facade(6);
                 color_table=[0 0 0; [216 22 22]/256;  [136 137 138]/256; [255 153 153]/256; [30,75,14]/256; [112,172,90]/256];  
             case 2
                 color_table=[0 0 0; [0 0 204]/256;  [136 137 138]/256; [255 153 153]/256; [30,75,14]/256; [112,172,90]/256];  
+            case 3 
+                color_table=[0 0 0; [216 22 22]/256;  [136 137 138]/256; [255 153 153]/256; [30,75,14]/256; [112,172,90]/256];       
         end
         
 % remove outlyers:
@@ -140,6 +169,26 @@ switch exp_type
         rectangle_color= [239 239 239]/256;
         segment1=x_axis_Slong(1):stim1_X{1}(1,1);
         segment2=stim1_X{1}(1,1)+1:x_axis_Slong(end);
+    case 3
+     stim2{1}=stim2_X{2};
+     stim2{2}=stim2_X{2};
+    x_value=1:3;   
+     galvano_nstim = Param.facade(6);
+     galvano_freq = Param.facade(7);
+            if exp_type==3;
+                x_value=[clamp_flag,clamp_flag+3]; %x_value(1) is spontaneous and x_value(2) is evoked
+                stim2{1}=stim2_X{4}(1:2,:);
+                stim2{2}=stim2_X{4}(3:4,:);      
+                 galvano_nstim = Param.facade(15);
+                 galvano_freq = Param.facade(16);
+                curr_inj_del = [Param.facade(27) Param.facade(30)] ;
+                    if length(Param.facade)>32
+                        curr_inj_del = [Param.facade(27) Param.facade(30) Param.facade(33)];
+                    end
+                curr_inj_depo = Param.facade(1);
+                curr_inj_hyper = Param.facade(2);
+                curr_inj_dur = Param.facade(7);
+            end
 end
  
 

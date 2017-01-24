@@ -14,7 +14,7 @@ BP50HzLFP_flag=0; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 BPLFP_flag=0; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
 bp_manual_LFP=[1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
-BPVm_flag=0; %filtering LFP and Vm same as LFP was filtered in the multiclamp
+BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
 bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 
 %%
@@ -41,7 +41,7 @@ switch exp_type
             mkdir(path_output);
         end   
     case 3 
-        files_to_analyze =[31,38,42,51,61,64,67,69,71,74,77];
+        files_to_analyze =[42,51,61,64,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77];
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};    y_ax_label={'Im'}; y_ax_units={'pA'};    
@@ -128,8 +128,8 @@ data_preprocessing
         doPlot = 0;
         I_temp=0;
         [voltages, starting, amplitude, ampPos, halfWidth,halfWidthS, halfWidthE] = fn_EventDetector_v2(voltages_input, dt, finalAmp_Thres, doPlot,I_temp);
-        title(['t=', num2str(t), ' trace ',num2str(trace),' stim. ',num2str(stim_num)]);  
 %  figure(1); clf
+%         title(['t=', num2str(t), ' trace ',num2str(trace),' stim. ',num2str(stim_num)]);  
 %             hold on
 %                      h1=plot([1:size(voltages_input,1)].*dt, voltages_input,'k');
 %                      h2=scatter(starting*dt,voltages_input(starting),'r','fill'); %mark event onset
@@ -137,9 +137,11 @@ data_preprocessing
 % %                 set(gca,'ylim',[-50 -20]); set(gca,'xlim',[0 1.1]);  
 %           hold off
 % %         plot whisker stim
+%       if stim_num+2>size(stim2{t},2); %if there is no test stimulus in this cell
+%       else
 %         ylim_data=[get(gca,'ylim')]';
-%         patch_xdata=[stim2_X{x_value(2)}(:,1:10); flipud(stim2_X{x_value(2)}(:,1:10))];
-%         patch_xdata = (patch_xdata-interval(1,t))*dt;
+%         patch_xdata=[stim2{t}(:,stim_num+1:stim_num+2); flipud(stim2{t}(:,stim_num+1:stim_num+2))];
+%         patch_xdata = (round(patch_xdata)-peak_start_int).*dt;
 %         yex=wextend('1D','sym',ylim_data,1);
 %         l=ceil((size(patch_xdata,2)-1)/2);        %if the number of stim is odd
 %         temp_y=wextend('ac','sym',yex,l);
@@ -147,11 +149,12 @@ data_preprocessing
 %         patch_cdata=ones(size(patch_xdata));
 %         p=patch(patch_xdata,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 %         set(gca,'linewidth',1.2)
+%       end
 %           hold off           
 %          pause
 %               end   %temporary
 %           end     %temporary
-%         end     %temporary
+%         end     %temporary. real END is in line 273
 %  cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\10_20Hz\single trials'
 %  if t==1;
 % print(1,['detection example - evoked NB-, trace ', num2str(trace)],'-dpng','-r600','-opengl')
@@ -520,6 +523,11 @@ tmp=[];
     end
  %% population statistics
  clear tmp
+ 
+     h_failures_m=[];     h_onset_m=[];     h_onset_std=[];     h_amplitude_m=[];
+     h_amplitude_std=[];     h_onVal_m=[];     h_ampVal_m=[];     h_ampDel_m=[];     h_ampDel_std=[];
+     h_halfWidth_m=[];    h_halfWidth_std=[];     h_adapt_amp=[];     h_nonspecific_count_m=[];
+    
  for stim_num=1:11;
 
     %average number of failures per stim
@@ -642,7 +650,7 @@ tmp=[];
        change_amplitude_m_mat(:,stim_num)= event_evoked_stat.stim_num(stim_num).change_amplitude_m;
         %testing for normal distribution
         diff_amplitude_m= tmp(:,2)- tmp(:,1);
-        if (nnz(diff_amplitude_m))-sum(sum(isnan(diff_amplitude_m))))>4;
+        if (nnz(diff_amplitude_m)-sum(sum(isnan(diff_amplitude_m))))>4;
             [event_evoked_stat.stim_num(stim_num).lillietest_h_amplitude_m, event_evoked_stat.stim_num(stim_num).lillietest_p_amplitude_m] = lillietest(diff_amplitude_m);
             [event_evoked_stat.stim_num(stim_num).lillietest_h_change_amplitude_m, event_evoked_stat.stim_num(stim_num).lillietest_p_change_amplitude_m] = lillietest(event_evoked_stat.stim_num(stim_num).change_amplitude_m);
         %paired ttest
@@ -861,11 +869,13 @@ tmp=[];
 %   else h_nonspecific_count_m(1,stim_num)=event_evoked_stat.stim_num(stim_num).wilcoxon_h_nonspecific_count_m; 
 %    end
 
-%taking the p-values for normalized data:        
+%taking the p-values for normalized data:    
+if isfield(event_evoked_stat,'lillietest_h_change_failures_m');
         if event_evoked_stat.stim_num(stim_num).lillietest_h_change_failures_m==0      
             h_failures_m(1,stim_num)=event_evoked_stat.stim_num(stim_num).ttest_h_change_failures_m; 
   else h_failures_m(1,stim_num)=event_evoked_stat.stim_num(stim_num).wilcoxon_h_change_failures_m; 
         end
+end
      if event_evoked_stat.stim_num(stim_num).lillietest_h_change_onset_m==0      
             h_onset_m(1,stim_num)=event_evoked_stat.stim_num(stim_num).ttest_h_change_onset_m; 
   else h_onset_m(1,stim_num)=event_evoked_stat.stim_num(stim_num).wilcoxon_h_change_onset_m; 
@@ -906,9 +916,11 @@ tmp=[];
             h_halfWidth_std(1,stim_num)=event_evoked_stat.stim_num(stim_num).ttest_h_change_halfWidth_std; 
   else h_halfWidth_std(1,stim_num)=event_evoked_stat.stim_num(stim_num).wilcoxon_h_change_halfWidth_std; 
    end
-   if event_evoked_stat.stim_num(stim_num).lillietest_h_change_adapt_amp==0      
-            h_adapt_amp(1,stim_num)=event_evoked_stat.stim_num(stim_num).ttest_h_change_adapt_amp; 
-  else h_adapt_amp(1,stim_num)=event_evoked_stat.stim_num(stim_num).wilcoxon_h_change_adapt_amp; 
+   if isfield(event_evoked_stat,'lillietest_h_change_adapt_amp')
+       if event_evoked_stat.stim_num(stim_num).lillietest_h_change_adapt_amp==0      
+                h_adapt_amp(1,stim_num)=event_evoked_stat.stim_num(stim_num).ttest_h_change_adapt_amp; 
+        else h_adapt_amp(1,stim_num)=event_evoked_stat.stim_num(stim_num).wilcoxon_h_change_adapt_amp; 
+       end
    end
  if event_evoked_stat.stim_num(stim_num).lillietest_h_change_nonspecific_count_m==0      
             h_nonspecific_count_m(1,stim_num)=event_evoked_stat.stim_num(stim_num).ttest_h_change_nonspecific_count_m; 
@@ -1145,7 +1157,14 @@ hold on
         errbar_h=errorbar([1:size(ampVal_m_mat{2}(:,:),2)],nanmean(ampVal_m_mat{2}(:,:),1), nanstd(ampVal_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         bar([1:size(ampVal_m_mat{1}(:,:),2)]-0.3, nanmean(ampVal_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
         bar([1:size(ampVal_m_mat{2}(:,:),2)], nanmean(ampVal_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
-        ylim_data=[get(gca,'ylim')]';
+       ylim_data=[get(gca,'ylim')]';
+if ylim_data(2)<0
+    my=min(ylim_data)+2;
+    ylim_data=[-70 -45]; %get(gca,'ylim'); %[0 8.5];
+else
+    my=max(ylim_data)-5;
+    ylim_data(1)=0;
+end
          set(gca,'ylim',[min(ylim_data),min(ylim_data)+30])
         p_ampVal_m=min(ylim_data).*ones(size(s_ampVal_m))+5;
         plot(s_ampVal_m-0.15,p_ampVal_m,'k*')  

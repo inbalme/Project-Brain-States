@@ -15,7 +15,7 @@ clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
  channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
-exp_type=1; %1-NBES, 2-ChAT
+exp_type=3; %1-NBES, 2-ChAT
 trace_type_input=[2]; %for exp_type=2||3 use [1,2], for exp_type=1 use [3,2]
 trace_type=trace_type_input;
 analyze_time_before_train=0.1;
@@ -23,12 +23,12 @@ analyze_train_only_flag=0;
 save_flag= 0;
 print_flag=1;
 norm_flag=0;
-clamp_flag=[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
+clamp_flag=3; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 BPLFP_flag=0; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
 bp_manual_LFP=[0.1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
-BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
+BPVm_flag=0; %filtering LFP and Vm same as LFP was filtered in the multiclamp
 bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 
  %% set the path for saving figures and variables
@@ -48,26 +48,6 @@ else if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPLFP_flag==1
         end
     end
 end
-switch exp_type
-    case 1 
-        path_output=['D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\',path_output];   
-        a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
-        if a==0;
-            mkdir(path_output);
-        end
-    case 2
-        path_output=['D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary\',path_output];        
-        a = exist(path_output,'dir'); %a will be 7 if a folder "name" exists and 0 otherwise
-        if a==0;
-            mkdir(path_output);
-        end
-    case 3 
-        path_output=['D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary_VC\',path_output];   
-        a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
-        if a==0;
-            mkdir(path_output);
-        end
-end
 
 switch exp_type
     case 1
@@ -75,18 +55,32 @@ switch exp_type
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};  y_ax_label={'Vm'}; y_ax_units={'mV'};    
-
+        path_output=['D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\',path_output];   
+        a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
+            if a==0;
+                mkdir(path_output);
+            end
     case 2
         files_to_analyze =[74,76,77,80,82,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};  y_ax_label={'Vm'}; y_ax_units={'mV'};    
+         path_output=['D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary\',path_output];        
+        a = exist(path_output,'dir'); %a will be 7 if a folder "name" exists and 0 otherwise
+            if a==0;
+                mkdir(path_output);
+            end
         
      case 3
-        files_to_analyze =[31,38,42,51,61,64,67,69,71,74,77];
+        files_to_analyze =[42,51,61,64,67,69,71,74];
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
-        legend_string={'NB+', 'NB-'};    y_ax_label={'Im'}; y_ax_units={'pA'};    
+        legend_string={'NB+', 'NB-'};    y_ax_label={'Im'}; y_ax_units={'pA'};  
+        path_output=['D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary_VC\',path_output];   
+        a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
+            if a==0;
+                mkdir(path_output);
+            end
 end
         
 % for fileind=1;

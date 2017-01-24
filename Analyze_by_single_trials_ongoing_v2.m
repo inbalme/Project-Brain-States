@@ -2,29 +2,27 @@
 clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
-exp_type=1; %1-NBES, 2-ChAT
+exp_type=3; %1-NBES, 2-ChAT
 trace_type_input=1; %
 analyze_time_before_train=0.1;
 analyze_train_only_flag=0;
-save_flag= 1;
+save_flag= 0;
 print_flag=0;
 norm_flag=0;
+clamp_flag=1; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 BP50HzLFP_flag=0; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 BPLFP_flag=0; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
 bp_manual_LFP=[1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 BPVm_flag=1; %filtering Vm
 bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
-clear color_table
-    color_table=[0 0 0; [30,75,14]/256; [136 137 138]/256; [112,172,90]/256; [216 22 22]/256; [255 153 153]/256];
-    whisker_stim_color(1,:)=[255 153 153]/256; %[239 188 86]/256;
 %%
 switch exp_type
     case 1
         files_to_analyze =[8,10,12,14,15,16,22,37,40,1,44,46,48,52,58,72,75,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
-        legend_string={'NB+', 'NB-'};
+        legend_string={'NB+', 'NB-'};  y_ax_label={'Vm'}; y_ax_units={'mV'};  
         path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Spontaneous';
         a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
         if a==0;
@@ -35,12 +33,22 @@ switch exp_type
         files_to_analyze =[74,76,77,80,82,84,87]; %,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
-        legend_string={'Light On', 'Light Off'};
+        legend_string={'Light On', 'Light Off'};  y_ax_label={'Vm'}; y_ax_units={'mV'};  
         path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Spontaneous';
         a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
         if a==0;
             mkdir(path_output);
-        end        
+        end   
+    case 3 
+            files_to_analyze =[31,38,42,51,61,64,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77];
+            cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
+            load NBES_Files_v2
+            legend_string={'NB+', 'NB-'};    y_ax_label={'Im'}; y_ax_units={'pA'};    
+            path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis_VC\Evoked';   
+            a = exist(path_output,'dir'); %a will be 7 if a folder "name" exists and 0 otherwise
+            if a==0;
+                mkdir(path_output);
+            end        
 end
         
     for fileind=1:length(files_to_analyze) ;
@@ -52,16 +60,27 @@ end
     load(fname) 
      %%
    Ch2_data= raw_data{3}./20; %dividing by the LFP gain           
-    current_data=data_no_spikes{channel};    
-    galvano_nstim = Param.facade(6);
-    galvano_freq = Param.facade(7);
-
+    if isempty(data_no_spikes)
+            current_data=raw_data{channel};
+            if clamp_flag==1
+                current_data=(-1).*raw_data{channel};
+            end
+            data_used='raw_data';
+        else
+        current_data=data_no_spikes{channel}; %raw_data{channel}; 
+        if clamp_flag==1
+            current_data=(-1).*data_no_spikes{channel}; %raw_data{channel};
+        end
+        data_used='data_no_spikes';
+        end
 data_preprocessing 
 
  if ~isempty(current_data_filt)
      current_data=current_data_filt;
  end
  
+current_data_smooth=sgolayfilt(current_data, 1,81); 
+
 clear color_table    
     whisker_stim_color(1,:)=[255 153 153]/256; %[239 188 86]/256;
     switch exp_type
@@ -69,14 +88,20 @@ clear color_table
                 color_table=[0 0 0; [216 22 22]/256;  [136 137 138]/256; [255 153 153]/256; [30,75,14]/256; [112,172,90]/256];  
             case 2
                 color_table=[0 0 0; [0 0 204]/256;  [136 137 138]/256; [255 153 153]/256; [30,75,14]/256; [112,172,90]/256];  
+           case 3 
+                color_table=[0 0 0; [216 22 22]/256;  [136 137 138]/256; [255 153 153]/256; [30,75,14]/256; [112,172,90]/256];        
         end
  %%    
    for trace_type=trace_type_input %1 for spont., 2 for evoked
-         interval=[];       
+         interval=[];  interval_temp=[];     
     intervals_to_analyze 
             epoch_length=0.5; %[sec]
                  epochs=round(duration/epoch_length);    
-                  finalAmp_Thres = 2 ;
+                  finalAmp_Thres = 2;
+                  if exp_type==3
+                       finalAmp_Thres = 4;
+                  end
+                      
                             
         for t=1:2;
             event_start_vec{t}=[];  event_onVal_vec{t} = [];  event_amplitude_vec{t} =  [];    event_ampPos_vec{t} =  []; 
@@ -91,7 +116,9 @@ clear color_table
                   starting=[]; amplitude=[]; ampPos=[]; halfWidth=[]; halfWidthS=[]; halfWidthE=[];
                   peak_start_int = interval(1+sf{1}*epoch_length*(epoch-1),t);
                   peak_end_int = interval(sf{1}*epoch_length*epoch,t);
-        voltages_input = current_data(peak_start_int:peak_end_int,trace,x_value(t));
+%         voltages_input = current_data(peak_start_int:peak_end_int,trace,x_value(t));
+        voltages_input = current_data_smooth(peak_start_int:peak_end_int,trace,x_value(t));
+
         doPlot = 0;
         I_temp=0;
         [voltages, tmp_starting,tmp_amplitude, tmp_ampPos, halfWidth,tmp_halfWidthS, tmp_halfWidthE] = fn_EventDetector_v2(voltages_input, dt, finalAmp_Thres, doPlot,I_temp);
@@ -126,7 +153,7 @@ clear color_table
         if print_flag==1
             figure(1); clf
             hold on
-                     h1=plot([1:size(current_data,1)].*dt, current_data(:,trace,x_value(t)),'k');
+                     h1=plot([1:size(current_data,1)].*dt, current_data_smooth(:,trace,x_value(t)),'k');
                      h2=scatter(event_start{t,trace}*dt,current_data(event_start{t,trace},trace,x_value(t)),'r','fill'); %mark event onset
                      h3=scatter(event_ampPos{t,trace}*dt,current_data(event_ampPos{t,trace},trace,x_value(t)),'b','fill'); %mark event peak
                      h4=scatter(event_halfWidthS{t,trace}*dt,current_data(event_halfWidthS{t,trace},trace,x_value(t)),'c','fill'); %mark event half-width start
@@ -165,6 +192,9 @@ clear color_table
             event_ongoing(fileind).cells=files_to_analyze;
             event_ongoing(fileind).analysis_mfile='Analyze_by_single_trials_ongoing_v2.m';
             event_ongoing(fileind).fname = fname;
+            event_ongoing(fileind).x_value=x_value;
+            event_ongoing(fileind).used_data=data_used;
+            event_ongoing(fileind).clamp_flag=clamp_flag;
             event_ongoing(fileind).trace_type_input = trace_type_input;
             event_ongoing(fileind).BP50HzLFP=BP50HzLFP_flag; %removing 50Hz noise from LFP signal
             event_ongoing(fileind).BP50HzVm=BP50HzVm_flag; %removing 50Hz noise from Vm signal

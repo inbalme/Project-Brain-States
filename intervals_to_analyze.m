@@ -12,7 +12,7 @@
                 x_value=(clamp_flag+3).*[1,1];
             end
         case 3
-            x_value=[2,1]; %for apont. activity takes the "before" from x-value 2 and the "after" from x-value 1. enables taking longer interval           
+            x_value=[2,1]; %for spont. activity takes the "before" from x-value 2 and the "after" from x-value 1. enables taking longer interval           
  end
 clear  duration start_time start_sample end_sample interval interval_mat interval_plot x y patch_xdata patch_ydata yex ylim_data sem_xdata sem_ydata sem_cdata
 coeffs=[]; 
