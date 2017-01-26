@@ -1147,7 +1147,7 @@ files(31).electrode_resist = 7.1;
 files(31).depth = 352;
 files(31).pr_whisker = 'D3';
 files(31).adj_whisker = [];                                            
-files(31).headers = 18:34;
+files(31).headers = [19:21,23,25:34];
 files(31).stim_type = 8;                        % 1=spont , 2=light alone, 3=puff alone, 4=puff+light, 5=galvano alone, 6=galvano+light, 7=protocol ES only, 8=protocol galvano
 files(31).EEG_flag = 1;
 files(31).dual_rec_flag = 0;
@@ -1570,7 +1570,7 @@ files(42).electrode_resist = [6.7,7.6];
 files(42).depth = [495,426];
 files(42).pr_whisker = 'D3';
 files(42).adj_whisker = [];                                            
-files(42).headers = [10:13,17:22,27:31];
+files(42).headers = [11:13,17:22,27:31];
 files(42).stim_type = 8;                        % 1=spont , 2=light alone, 3=puff alone, 4=puff+light, 5=galvano alone, 6=galvano+light, 7=protocol ES only, 8=protocol galvano
 files(42).EEG_flag = 0;
 files(42).dual_rec_flag = 1;

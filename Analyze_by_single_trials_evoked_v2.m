@@ -20,7 +20,7 @@ bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from
 %%
 switch exp_type
     case 1
-        files_to_analyze =46; %[8,10,12,14,15,16,22,37,40,1,46,48,52,58,72,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
+        files_to_analyze =46; %[8,10,12,14,15,16,22,36,37,40,1,44,46,48,52,56,58,62,72,75,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};  y_ax_label={'Vm'}; y_ax_units={'mV'};   
@@ -41,7 +41,7 @@ switch exp_type
             mkdir(path_output);
         end   
     case 3 
-        files_to_analyze =[42,51,61,64,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77];
+        files_to_analyze =[31,38,42,51,67,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77];
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};    y_ax_label={'Im'}; y_ax_units={'pA'};    

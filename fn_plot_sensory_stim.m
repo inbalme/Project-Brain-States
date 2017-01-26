@@ -1,6 +1,6 @@
 function []=fn_plot_sensory_stim(dt, stim2_X,whisker_stim_color)
             figure(gcf)
-            patch_xdata=[stim2_X{2}; flipud(stim2_X{2})];
+            patch_xdata=[stim2_X; flipud(stim2_X)];
             xlim_data=get(gca,'xlim');
             ylim_data=get(gca,'ylim');
             yex=wextend('1D','sym',ylim_data,1)';

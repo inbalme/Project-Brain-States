@@ -15,7 +15,7 @@ clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
  channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
-exp_type=3; %1-NBES, 2-ChAT
+exp_type=2; %1-NBES, 2-ChAT
 trace_type_input=[2]; %for exp_type=2||3 use [1,2], for exp_type=1 use [3,2]
 trace_type=trace_type_input;
 analyze_time_before_train=0.1;
@@ -23,7 +23,7 @@ analyze_train_only_flag=0;
 save_flag= 0;
 print_flag=1;
 norm_flag=0;
-clamp_flag=3; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
+clamp_flag=[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 BPLFP_flag=0; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
@@ -51,7 +51,7 @@ end
 
 switch exp_type
     case 1
-        files_to_analyze =[16,22,46,48,52]; %[8,10,12,14,15,16,22,37,40,1,46,48,52,58,72,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
+        files_to_analyze =[8,10,12,14,15,16,22,36,37,40,1,44,46,48,52,56,58,62,72,75,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};  y_ax_label={'Vm'}; y_ax_units={'mV'};    
@@ -72,7 +72,7 @@ switch exp_type
             end
         
      case 3
-        files_to_analyze =[42,51,61,64,67,69,71,74];
+        files_to_analyze =[31,38,42,51,67,69,71,74];
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};    y_ax_label={'Im'}; y_ax_units={'pA'};  
@@ -1404,7 +1404,7 @@ end
         plot(s_amp-0.15,p_amp,'k*')
         hold off
         xlabel('Stim. serial number' ,'FontSize', 16);
-        ylabel(['Amplitude [',y_ax_units,']'],'FontSize', 16);    
+        ylabel(['Amplitude [',y_ax_units{1},']'],'FontSize', 16);    
         title(['Mean Response Amplitude - local baseline,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);    
 %%        
          h3=figure;  
@@ -1452,7 +1452,7 @@ end
 %         line([0;12],[0;0],'linestyle','--','linewidth',2,'color','b') %change line to zero
         hold off
         xlabel('Stim. serial number' ,'FontSize', 16);
-        ylabel(['Mean ',y_ax_label,' STD [',y_ax_units,']'],'FontSize', 16);    
+        ylabel(['Mean ',y_ax_label{1},' STD [',y_ax_units{1},']'],'FontSize', 16);    
         title(['Mean membrane STD, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);    
     %%  Paired plots for global mean trace parameters
 stim_num=1;
@@ -1470,7 +1470,7 @@ hold off
         x1limits = [0.75 2.25]; x1ticks = [1,2];        
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string,'box', 'off'); %'fontweight', 'bold', 
-        ylabel(['Trace Baseline [', y_ax_units,']'], 'FontSize', 28,'fontname', 'arial');
+        ylabel(['Trace Baseline [', y_ax_units{1},']'], 'FontSize', 28,'fontname', 'arial');
         title(['Global Baseline, n=' num2str(length(files_to_analyze)) ', p=' num2str(peaks_stat(stim_num).wilcoxon_p_change_baseline_global)] ,'FontSize', 20,'fontname', 'arial'); 
 
                  % Plot adaptation amplitude ratio (amp8-10/amp1)
@@ -1522,7 +1522,7 @@ hold off
         x1limits = [0.75 2.25];        x1ticks = [1,2];
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
-        ylabel(['std [', y_ax_units,']'], 'FontSize', 28,'fontname', 'arial');
+        ylabel(['std [', y_ax_units{1},']'], 'FontSize', 28,'fontname', 'arial');
         title(['pre-train STD, n=' num2str(length(files_to_analyze)) ', p=' num2str(peaks_stat(stim_num).wilcoxon_p_change_pre_response_STD)] ,'FontSize', 20,'fontname', 'arial');   
 
         % Plot evoked train STD
@@ -1539,7 +1539,7 @@ hold off
         x1limits = [0.75 2.25];         x1ticks = [1,2];
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
-        ylabel(['std [',y_ax_units,']'], 'FontSize', 28,'fontname', 'arial');
+        ylabel(['std [',y_ax_units{1},']'], 'FontSize', 28,'fontname', 'arial');
         title(['evoked train STD, n=' num2str(length(files_to_analyze)) ', p=' num2str(peaks_stat(stim_num).wilcoxon_p_change_Vm_res_train_STD)] ,'FontSize', 20,'fontname', 'arial');   
         
                 % Plot post-train STD
@@ -1556,7 +1556,7 @@ hold off
         x1limits = [0.75 2.25];   x1ticks = [1,2];    
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
-        ylabel(['std [',y_ax_units,']'], 'FontSize', 28,'fontname', 'arial');
+        ylabel(['std [',y_ax_units{1},']'], 'FontSize', 28,'fontname', 'arial');
         title(['post-train STD, n=' num2str(length(files_to_analyze)) ', p=' num2str(peaks_stat(stim_num).wilcoxon_p_change_post_train_STD)] ,'FontSize', 20,'fontname', 'arial');   
 
     %% Scatter plots for first peak parameters
@@ -1663,8 +1663,10 @@ print(gb1,['Mean Response Amplitude_stim ',num2str(stim_num)],'-dpng','-r600','-
 % end
  
 %% rmANOVA with built-in matlab function - Vm STD 
-pre_response_STD_noNB(:,1)= peaks_stat(1).pre_response_STD(:,1);
-pre_response_STD_NB(:,1)= peaks_stat(1).pre_response_STD(:,2);
+% pre_response_STD_noNB(:,1)= peaks_stat(1).pre_response_STD(:,1);
+% pre_response_STD_NB(:,1)= peaks_stat(1).pre_response_STD(:,2);
+pre_response_STD_noNB(:,1)= peaks_stat(1).baseline_global_std(:,1);
+pre_response_STD_NB(:,1)= peaks_stat(1).baseline_global_std(:,2);
 Vm_res_STD_meanstim_noNB(:,1)=peaks_stat(1).Vm_res_STD_meanstim(:,1);
 Vm_res_STD_meanstim_NB(:,1)=peaks_stat(1).Vm_res_STD_meanstim(:,2);
 post_train_STD_noNB(:,1)=peaks_stat(1).post_train_STD(:,1);
@@ -1723,8 +1725,10 @@ VmSTD_stat.p_before=VmSTD_p_before;
 VmSTD_stat.p_during=VmSTD_p_during;
 VmSTD_stat.p_after=VmSTD_p_after;
 %% rmANOVA with matlab function - Vm M 
-pre_response_M_noNB(:,1)= peaks_stat(1).pre_response_M(:,1);
-pre_response_M_NB(:,1)= peaks_stat(1).pre_response_M(:,2);
+% pre_response_M_noNB(:,1)= peaks_stat(1).pre_response_M(:,1); 
+% pre_response_M_NB(:,1)= peaks_stat(1).pre_response_M(:,2);
+pre_response_M_noNB(:,1)= peaks_stat(1).baseline_global(:,1); 
+pre_response_M_NB(:,1)= peaks_stat(1).baseline_global(:,2);
 Vm_res_M_meanstim_noNB(:,1)=peaks_stat(1).Vm_res_M_meanstim(:,1);
 Vm_res_M_meanstim_NB(:,1)=peaks_stat(1).Vm_res_M_meanstim(:,2);
 post_train_M_noNB(:,1)=peaks_stat(1).post_train_M(:,1);
@@ -1904,7 +1908,7 @@ text(3,my,asterisk_after,'HorizontalAlignment', 'center','verticalAlignment','bo
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','FontSize', 16,'xticklabel',{'Before','During','After'} ,'box', 'off'); %'fontweight', 'bold', 'ylim',ylim_data,
         xlabel('Sensory Stimulation' ,'FontSize', 16);
-        ylabel([y_ax_label,' STD [',y_ax_units,']'] ,'FontSize', 16);    
+        ylabel([y_ax_label{1},' STD [',y_ax_units{1},']'] ,'FontSize', 16);    
         title(['membrane trial-to-trial variability, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
         %% bar plot of mean Vm NB- and NB+ before, during and after sensory stimulation
     stim_num=1;
@@ -1926,7 +1930,7 @@ hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'Lege
 % [legh,objh,outh,outm] = legend('NB Off','NB On','Location','northeast');
 l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
 ylim_data=[get(gca,'ylim')]';
-if ylim_data(2)<0
+if ylim_data(2)<=0
     my=min(ylim_data)+2;
     ylim_data=[-70 -45]; %get(gca,'ylim'); %[0 8.5];
 else
@@ -1986,7 +1990,7 @@ text(3,my,asterisk_after,'HorizontalAlignment', 'center','verticalAlignment','bo
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'ylim',ylim_data,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','FontSize', 16,'xticklabel',{'Before','During','After'} ,'box', 'off'); %'fontweight', 'bold', 
         xlabel('Sensory Stimulation' ,'FontSize', 16);
-        ylabel([y_ax_label,' Mean [',y_ax_units,']'] ,'FontSize', 16);   
+        ylabel([y_ax_label{1},' Mean [',y_ax_units{1},']'] ,'FontSize', 16);   
         title(['Membrane Mean, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
         %% Plot parameters along the train stim - version 3:bars+error bars of the mean values  
         %under construction, and not used because I am using the single
@@ -2101,7 +2105,7 @@ hold off
 %         y1ticks = [0,3,6];
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold','ylim', y1limits,'ytick', y1ticks, 
-        ylabel(['Signal Amplitude [',y_ax_units,']'], 'FontSize', 28,'fontname', 'arial');
+        ylabel(['Signal Amplitude [',y_ax_units{1},']'], 'FontSize', 28,'fontname', 'arial');
         title(['Amplitude signal, n=' num2str(length(files_to_analyze)) ', p=' num2str(peaks_stat(stim_num).wilcoxon_p_Amplitude_signal)] ,'FontSize', 20,'fontname', 'arial');   
 
         % Plot Amplitude noise1 (noise is from the Vm during the train)
@@ -2139,7 +2143,7 @@ hold off
 %         y1ticks = [0,3,6];
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 'ylim', y1limits,'ytick', y1ticks,
-        ylabel(['Noise Amplitude [',y_ax_units,']'], 'FontSize', 28,'fontname', 'arial');
+        ylabel(['Noise Amplitude [',y_ax_units{1},']'], 'FontSize', 28,'fontname', 'arial');
         title(['Amplitude noise1, n=' num2str(length(files_to_analyze)) ', p=' num2str(peaks_stat(stim_num).wilcoxon_p_Amplitude_noise1)] ,'FontSize', 20,'fontname', 'arial');   
 
                 % Plot Amplitude noise2 (noise is from the Vm before the train)
@@ -2159,7 +2163,7 @@ hold off
 %         y1ticks = [0,0.5,1];
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
-        ylabel(['Noise Amplitude [',y_ax_units,']'], 'FontSize', 28,'fontname', 'arial');
+        ylabel(['Noise Amplitude [',y_ax_units{1},']'], 'FontSize', 28,'fontname', 'arial');
         title(['Amplitude noise2, n=' num2str(length(files_to_analyze)) ', p=' num2str(peaks_stat(stim_num).wilcoxon_p_Amplitude_noise2)] ,'FontSize', 20,'fontname', 'arial');   
         %% save figures
 if save_flag==1

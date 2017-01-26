@@ -18,18 +18,17 @@ cc_stat=[]; cc_spont=[]; cc_evoked=[]; cc=[]; cc_shuffled_it=[]; cc_shuff_sub=[]
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X
  
  global exp_type
-exp_type=1; %1-NBES, 2-ChAT
-trace_type_input=[3,2]; %[3,2]; %for exp_type=2 use [1,2]
+exp_type=3; %1-NBES, 2-ChAT
+trace_type_input=[1,2]; %[3,2]; %for exp_type=2 or 3 use [1,2]
 analyze_time_before_train=0.1;
 analyze_train_only_flag=0;
-save_flag=1;
+save_flag=0;
 print_flag=1;
 norm_flag=0;
-% LPF_flag=1;
-% lp=300; %set the frequency for LPF of Vm
+clamp_flag=3; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
-BPLFP_flag=0; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
+BPLFP_flag=1; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
 bp_manual_LFP=[0.1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 BPVm_flag=0; %filtering LFP and Vm same as LFP was filtered in the multiclamp
 bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
@@ -39,24 +38,31 @@ switch exp_type
         files_to_analyze =[44,46,48,50,52,56,58,62,72,75,82,84]; %[8,10,11,12,14,15,16,22,36,37,40]; %[1,44,46,48,50,52,56,58,62,72,75]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
-        legend_string={'NB+', 'NB-'};
+        legend_string={'NB+', 'NB-'}; y_ax_label={'Vm'}; y_ax_units={'mV'};   
         legend_string_shuff={'NB+ shuffled', 'NB- shuffled'};       
 
     case 2
         files_to_analyze =[76,77,80,82,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
-        legend_string={'Light On', 'Light Off'};
+        legend_string={'Light On', 'Light Off'}; y_ax_label={'Vm'}; y_ax_units={'mV'};   
         legend_string_shuff={'Light On shuffled', 'Light Off shuffled'};
+        
+    case 3 
+        files_to_analyze =31; %[31,38,42,51,67,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77];
+        cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
+        load NBES_Files_v2
+        legend_string={'NB+', 'NB-'};    y_ax_label={'Im'}; y_ax_units={'pA'};     
+        legend_string_shuff={'NB+ shuffled', 'NB- shuffled'};      
 end
     
     for fileind=1:length(files_to_analyze) ;    
-%         close all
+        close all
     clearvars -except cc_stat cc_spont cc_evoked  files_to_analyze fileind files cc_spont_for_xls_mean...
         cc_evoked_for_xls_mean cc lags cc_shuffled_mean cc_shuffled_it cc_mean cc_shuff_sub_mean save_flag print_flag...
         cc_lag0_mat cc_lag0_shuff_mat cc_max_mat cc_max_time_mat cc_maxdiff_mat  cc_max_shuff_mat...
         norm_flag  BP50HzLFP_flag BP50HzVm_flag BPLFP_flag bp_manual_LFP BPVm_flag bp_manual_Vm exp_type trace_type_input...
-        legend_string legend_string_shuff analyze_time_before_train analyze_train_only_flag
+        legend_string legend_string_shuff analyze_time_before_train analyze_train_only_flag clamp_flag y_ax_label y_ax_units
    
     channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
     
@@ -66,9 +72,19 @@ end
     load(fname) 
     %%
      Ch2_data= raw_data{3}./20; %dividing by the LFP gain           
-    current_data=data_no_spikes{channel};
-    galvano_nstim = Param.facade(6);
-    galvano_freq = Param.facade(7);
+    if isempty(data_no_spikes)
+            current_data=raw_data{channel};
+             if clamp_flag==1
+                current_data=(-1).*raw_data{channel};
+            end
+            data_used='raw_data';
+        else
+        current_data=data_no_spikes{channel}; %raw_data{channel}; 
+         if clamp_flag==1
+            current_data=(-1).*data_no_spikes{channel}; %raw_data{channel};
+        end
+        data_used='data_no_spikes';
+        end
     data_preprocessing
    if ~isempty(current_data_filt)
      current_data=current_data_filt;
@@ -113,96 +129,23 @@ switch exp_type
             mkdir(path_output);
         end
         cd(path_output)
+    case 3 
+        color_table=[0 0 0; [216 22 22]/256;  [136 137 138]/256; [255 153 153]/256; [30,75,14]/256; [112,172,90]/256];  
+        path_output=['D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations_VC\',path_output]; 
+%         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations_VC'
+        a = exist(path_output,'dir'); %a will be 7 if a folder "name" exists and 0 otherwise
+        if a==0;
+            mkdir(path_output);
+        end
+        cd(path_output)       
 end
  
 %%
 for trace_type=trace_type_input; %1:2; 
         norm_LFP=[]; norm_Vm=[]; 
         %%
+           interval=[];   interval_temp=[];     
         intervals_to_analyze
-        %%
-%     switch trace_type
-%         case 1
-%             x_value=[1,1];
-%         case 2
-%             x_value=[2:3]; %2:3; %[1,1];
-%         case 3
-%             x_value=[2,1]; %for apont. activity takes the "before" from x-value 2 and the "after" from x-value 1. enables taking longer interval
-% end
-% clear  duration start_time start_sample end_sample interval interval_mat interval_plot x y patch_xdata patch_ydata yex ylim_data sem_xdata sem_ydata sem_cdata
-% coeffs=[]; 
-% switch exp_type
-%     case 1
-%         switch trace_type
-%             case 1
-%                  start_time = [0.4,5.6]; %[sec] %[0,5]
-%                  duration = 2.5; %[sec] 
-%                     for t=1:length(start_time);
-%                      start_sample(:,t) = ceil(start_time(t).*sf{1});
-%                         if start_time(t)==0
-%                             start_sample(:,t) = 1;
-%                         end
-%                       end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1})-1;
-%                       interval(:,t) = start_sample(:,t):end_sample(:,t);
-%                     end 
-%             case 2
-%                  start_sample =stim2_X{x_value(1)}(1,1)-0.1.*sf{1};  %start 100ms before sensory stim
-%         %          duration = 1; %[sec]
-%                 galvano_nstim = Param.facade(6);
-%                 galvano_freq = Param.facade(7);
-%                 duration = galvano_nstim./galvano_freq+0.05;
-%                 end_sample = start_sample+duration.*sf{1}-1;
-%                 interval(:,1) = round(start_sample:end_sample);
-%                 interval(:,2) = interval(:,1);
-%             case 3
-%                  start_time = [0.4,5.6]; %[sec] %[0,5]
-%                  duration = 4; %[sec] 
-%                     for t=1:length(start_time);
-%                      start_sample(:,t) = ceil(start_time(t).*sf{1});
-%                         if start_time(t)==0
-%                             start_sample(:,t) = 1;
-%                         end
-%                         end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1})-1;
-%                         interval(:,t) = start_sample(:,t):end_sample(:,t);
-%                     end
-%             end
-%     case 2
-%         switch trace_type
-%             case 1
-%         %          start_time = [0.4,5.6]; %[sec] %[0,5]
-%                  start_time=[0.4, stim1_X{x_value(1)}(1,1).*dt+0.4];
-%                  duration =2.5;
-%                     for t=1:length(start_time);
-%                      start_sample(:,t) = ceil(start_time(t).*sf{1});
-%                         if start_time(t)==0
-%                             start_sample(:,t) = 1;
-%                         end
-%                       end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1})-1;
-%                       interval(:,t) = start_sample(:,t):end_sample(:,t);
-%                     end 
-%             case 2
-%                  start_sample =stim2_X{x_value(1)}(1,1)-0.1.*sf{1};  %start 100ms before sensory stim
-%         %          duration = 1; %[sec]
-%                 galvano_nstim = Param.facade(6);
-%                 galvano_freq = Param.facade(7);
-%                 duration = galvano_nstim./galvano_freq+0.05;
-%                 end_sample = start_sample+duration.*sf{1}-1;
-%                 interval(:,1) = round(start_sample:end_sample);
-%                 interval(:,2) = interval(:,1);
-%                 
-%            case 3
-%                  start_time = [0.4,stim1_X{x_value(1)}(1,1).*dt+0.4]; %[sec] %[0,5]
-%                  duration = 4; %[sec] 
-%                     for t=1:length(start_time);
-%                      start_sample(:,t) = ceil(start_time(t).*sf{1});
-%                         if start_time(t)==0
-%                             start_sample(:,t) = 1;
-%                         end
-%                         end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1})-1;
-%                         interval(:,t) = start_sample(:,t):end_sample(:,t);
-%                     end
-%         end
-% end
 %%
 for t=1:2
 %% Subtract mean from the interval (fragment of trace)
@@ -210,7 +153,7 @@ data_LFP{t}=Ch2_data_filt(interval(:,t),:,x_value(t));
 data_LFP_noDC{t} = fn_Subtract_Mean(data_LFP{t});
 data_Vm{t}=current_data(interval(:,t),:,x_value(t));   
 data_Vm_noDC{t} = fn_Subtract_Mean(data_Vm{t});
-data_Vm_filt{t}=current_data_filt(interval(:,t),:,x_value(t));
+data_Vm_filt{t}=current_data(interval(:,t),:,x_value(t));
 data_Vm_filt_noDC{t} = fn_Subtract_Mean(data_Vm_filt{t});
 
 %normalize data (so that a general decrease in the power of the trace will not affect the correlations:
@@ -278,15 +221,15 @@ subplot(2*length(trace),1,2*tr_ind)
         axis tight
                            
         if trace_type==2;
-            fn_plot_sensory_stim(dt, stim2_X,whisker_stim_color)
-            xlm=get(gca,'xlim'); xlm(2)=end_sample.*dt*1000; set(gca,'xlim',xlm); %showing only the part of trace that was used for CC analysis
+            fn_plot_sensory_stim(dt, stim2{1},whisker_stim_color)
+            xlm=get(gca,'xlim'); xlm(2)=end_sample(1).*dt*1000; set(gca,'xlim',xlm); %showing only the part of trace that was used for CC analysis
         end
         
         %plotting scale bar
-horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
     hold off
     ylim_data=[get(gca,'ylim')]';
     xlim_data=[get(gca,'xlim')]';
@@ -300,13 +243,13 @@ horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0
         axis tight            
 
         if trace_type==2;
-            fn_plot_sensory_stim(dt,stim2_X,whisker_stim_color)
-            xlm=get(gca,'xlim'); xlm(2)=end_sample.*dt*1000; set(gca,'xlim',xlm); %showing only the part of trace that was used for CC analysis
+            fn_plot_sensory_stim(dt,stim2{1},whisker_stim_color)
+            xlm=get(gca,'xlim'); xlm(2)=end_sample(1).*dt*1000; set(gca,'xlim',xlm); %showing only the part of trace that was used for CC analysis
         end
         
         %plotting scale bar
- horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh./20), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+ horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh./20), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
     hold off  
     set(gca,'xlim',xlim_data)
     set(gca, 'visible', 'off') ;
@@ -335,15 +278,15 @@ subplot(2*length(trace),1,2*tr_ind)
         axis tight
                            
         if trace_type==2;
-            fn_plot_sensory_stim(dt, stim2_X,whisker_stim_color)
-            xlm=get(gca,'xlim'); xlm(2)=end_sample.*dt*1000; set(gca,'xlim',xlm); %showing only the part of trace that was used for CC analysis
+            fn_plot_sensory_stim(dt, stim2{2},whisker_stim_color)
+            xlm=get(gca,'xlim'); xlm(2)=end_sample(2).*dt*1000; set(gca,'xlim',xlm); %showing only the part of trace that was used for CC analysis
         end
         
         %plotting scale bar
-horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
- horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
     hold off
     ylim_data=[get(gca,'ylim')]';
     xlim_data=[get(gca,'xlim')]';
@@ -357,13 +300,13 @@ horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0
         axis tight            
 
         if trace_type==2;
-            fn_plot_sensory_stim(dt,stim2_X,whisker_stim_color)
-            xlm=get(gca,'xlim'); xlm(2)=end_sample.*dt*1000; set(gca,'xlim',xlm); %showing only the part of trace that was used for CC analysis
+            fn_plot_sensory_stim(dt,stim2{1},whisker_stim_color)
+            xlm=get(gca,'xlim'); xlm(2)=end_sample(1).*dt*1000; set(gca,'xlim',xlm); %showing only the part of trace that was used for CC analysis
         end
         
         %plotting scale bar
- horiz_vert=0;        lengthh=0.5;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize;
-        [b1,b2] = fn_makeCalibBar(horiz_vert,lengthh,textit,c,fonsizes);
+ horiz_vert=0;        lengthh=0.5;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
     hold off  
     set(gca,'xlim',xlim_data)
     set(gca, 'visible', 'off') ;
@@ -936,8 +879,8 @@ mv_shuff_stat.ANOVA=ranovatbl_mv_shuff;
 mv_shuff_stat.multcomp_NBbySS=NBbySS_mv_shuff;
 mv_shuff_stat.multcomp_SSbyNB=SSbyNB_mv;
 mv_shuff_stat.rmANOVA_p=max_val_rmANOVA_p;
-mv_shuff_stat.evoked_p=max_val_p_evoked;
-mv_shuff_stat.spont_p=max_val_p_spont;
+mv_shuff_stat.evoked_p=max_val_shuff_p_evoked;
+mv_shuff_stat.spont_p=max_val_shuff_p_spont;
          %% Paired plot of spont+evoked non-normalized max peak absolute values
 CC_Y_max_val_sp=cc_stat.spont.max_val';
 CC_X_sp(1,:)=ones(1,size(CC_Y_max_val_sp,2));
