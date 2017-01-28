@@ -19,9 +19,10 @@ cc_stat=[]; cc_spont=[]; cc_evoked=[]; cc=[]; cc_shuffled_it=[]; cc_shuff_sub=[]
  
  global exp_type
 exp_type=3; %1-NBES, 2-ChAT
-trace_type_input=[1,2]; %[3,2]; %for exp_type=2 or 3 use [1,2]
-analyze_time_before_train=0.1;
-analyze_train_only_flag=0;
+trace_type_input=[1,2]; %[3,2] for exp_type=1; %for exp_type=2 or 3 use [1,2]
+analyze_time_before_train=0;
+analyze_train_only_flag=1;
+add_to_plot=0.15; %seconds from each side of the trace
 save_flag=0;
 print_flag=0;
 norm_flag=0;
@@ -49,8 +50,8 @@ switch exp_type
         legend_string_shuff={'Light On shuffled', 'Light Off shuffled'};
         
     case 3 
-        files_to_analyze =[51,67]; %[31,38,42,51,67,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77];
-        clamp_flag=1;
+        files_to_analyze =[31,38,42,51,67,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77]; [51,67];
+        clamp_flag=3;
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};    y_ax_label={'Im'}; y_ax_units={'pA'};     
@@ -63,7 +64,7 @@ end
         cc_evoked_for_xls_mean cc lags cc_shuffled_mean cc_shuffled_it cc_mean cc_shuff_sub_mean save_flag print_flag...
         cc_lag0_mat cc_lag0_shuff_mat cc_max_mat cc_max_time_mat cc_maxdiff_mat  cc_max_shuff_mat...
         norm_flag  BP50HzLFP_flag BP50HzVm_flag BPLFP_flag bp_manual_LFP BPVm_flag bp_manual_Vm exp_type trace_type_input...
-        legend_string legend_string_shuff analyze_time_before_train analyze_train_only_flag clamp_flag y_ax_label y_ax_units
+        legend_string legend_string_shuff analyze_time_before_train analyze_train_only_flag clamp_flag y_ax_label y_ax_units add_to_plot
    
     channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
     
@@ -156,6 +157,10 @@ data_Vm{t}=current_data(interval(:,t),:,x_value(t));
 data_Vm_noDC{t} = fn_Subtract_Mean(data_Vm{t});
 data_Vm_filt{t}=current_data(interval(:,t),:,x_value(t));
 data_Vm_filt_noDC{t} = fn_Subtract_Mean(data_Vm_filt{t});
+% for plots:
+     interval_plot(:,t)=[interval(1,t)-add_to_plot*sf{1}:interval(end,t)+add_to_plot*sf{1}]; 
+    data_Vm_plot{t}=current_data(interval_plot(:,t),:,x_value(t));
+    data_LFP_plot{t}=Ch2_data_filt(interval_plot(:,t),:,x_value(t)).*20;
 
 %normalize data (so that a general decrease in the power of the trace will not affect the correlations:
  if norm_flag==1;
@@ -166,7 +171,8 @@ data_Vm_filt_noDC{t} = fn_Subtract_Mean(data_Vm_filt{t});
         end
        data_LFP_noDC{t}=norm_LFP{t};
        data_Vm_filt_noDC{t}=norm_Vm{t};
- end
+ end 
+       
 %% bootstrap
  % bootstrap to calculate shuffeled cc
     trials=size(current_data,2);
@@ -209,16 +215,16 @@ scalebar_fontsize=12;
     if print_flag==1;
 % plotting one trace of data and LFP against each other -
  trace=[2,3,4];%1:size(current_data,2); %5;
- 
-        interval_plot(:,1)=interval(:,1);        
-        data_Vm_plot=data_Vm_filt{1}(:,trace);
-        data_LFP_plot=data_LFP{1}(:,trace).*20;
+
+%          interval_plot(:,1)=[interval(1,1)-add_to_plot*sf{1}:interval(end,1)+add_to_plot*sf{1}];  
+%          data_Vm_plot=data_Vm_filt{1}(:,trace);
+%          data_LFP_plot=data_LFP{1}(:,trace).*20;
 
 Fig{fileind}(trace_type)=figure;
 for tr_ind=1:length(trace)
 subplot(2*length(trace),1,2*tr_ind)
     hold on
-        p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot(:,tr_ind), 'color',color_table(1,:),'LineWidth',1.2);
+        p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot{1}(:,tr_ind), 'color',color_table(1,:),'LineWidth',1.2);
         axis tight
                            
         if trace_type==2;
@@ -238,8 +244,8 @@ horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0
     
   subplot(2*length(trace),1,2*tr_ind-1)     
  	hold on
-        p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot(:,tr_ind),'color',color_table(2,:),'LineWidth',1.2);
-%         text(interval_plot(1,1).*dt*1000,data_Vm_plot(1),[num2str(floor(data_Vm_plot(1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')  
+        p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot{1}(:,tr_ind),'color',color_table(2,:),'LineWidth',1.2);
+%         text(interval_plot(1,1).*dt*1000,data_Vm_plot{1}(1),[num2str(floor(data_Vm_plot{1}(1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')  
 
         axis tight            
 
@@ -267,15 +273,15 @@ end
 
 % after ES
        
-        interval_plot(:,2)=interval(:,2);        
-        data_Vm_plot=data_Vm_filt{2}(:,trace);
-        data_LFP_plot=data_LFP{2}(:,trace);  
+%         interval_plot(:,2)=[interval(1,2)-add_to_plot*sf{1}:interval(end,2)+add_to_plot*sf{1}]; 
+%         data_Vm_plot=data_Vm_filt{2}(:,trace);
+%         data_LFP_plot=data_LFP{2}(:,trace);  
           
 Fig{fileind}(trace_type+3)=figure;
 for tr_ind=1:length(trace)
 subplot(2*length(trace),1,2*tr_ind)
     hold on
-        p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot(:,tr_ind),'color',color_table(5,:),'LineWidth',1.2);
+        p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot{2}(:,tr_ind),'color',color_table(5,:),'LineWidth',1.2);
         axis tight
                            
         if trace_type==2;
@@ -295,8 +301,8 @@ horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0
     
   subplot(2*length(trace),1,2*tr_ind-1)
  	hold on
-       p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot(:,tr_ind),'color',color_table(4,:),'LineWidth',1.2);
-%         text(interval_plot(1,1).*dt*1000,data_Vm_plot(1),[num2str(floor(data_Vm_plot(1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')  
+       p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot{2}(:,tr_ind),'color',color_table(4,:),'LineWidth',1.2);
+%         text(interval_plot(1,1).*dt*1000,data_Vm_plot{2}(1),[num2str(floor(data_Vm_plot{2}(1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')  
 
         axis tight            
 

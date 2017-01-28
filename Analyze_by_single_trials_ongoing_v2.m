@@ -4,8 +4,8 @@ global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data curr
  global exp_type
 exp_type=3; %1-NBES, 2-ChAT
 trace_type_input=1; %
-analyze_time_before_train=0.1;
-analyze_train_only_flag=0;
+analyze_time_before_train=0;
+analyze_train_only_flag=1;
 save_flag= 0;
 print_flag=0;
 norm_flag=0;

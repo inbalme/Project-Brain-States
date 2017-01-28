@@ -36,8 +36,9 @@ switch exp_type
                 start_sample =stim2_X{x_value(1)}(1,1)-analyze_time_before_train.*sf{1};  %start 100ms before sensory stim
                 galvano_nstim = Param.facade(6);
                 galvano_freq = Param.facade(7);
-                duration = galvano_nstim./galvano_freq+0.1;
-                if analyze_train_only_flag==0
+%                 duration = galvano_nstim./galvano_freq+0.1;
+                duration = galvano_nstim./galvano_freq;
+                if analyze_train_only_flag==1
                     end_sample = start_sample+duration.*sf{1}-1;
                 else
                    end_sample = stim2_X{x_value(1)}(1,end)+0.1.*sf{1}-1;  
@@ -75,8 +76,9 @@ switch exp_type
                 start_sample =stim2_X{x_value(1)}(1,1)-analyze_time_before_train.*sf{1};  %start 100ms before sensory stim
                 galvano_nstim = Param.facade(6);
                 galvano_freq = Param.facade(7);
-                duration = galvano_nstim./galvano_freq+0.1;
-                if analyze_train_only_flag==0
+%                 duration = galvano_nstim./galvano_freq+0.1;
+                duration = galvano_nstim./galvano_freq;
+                if analyze_train_only_flag==1
                     end_sample = start_sample+duration.*sf{1}-1;
                 else
                    end_sample = stim2_X{x_value(1)}(1,end)+0.1.*sf{1}-1;  
@@ -131,8 +133,9 @@ switch exp_type
                     start_sample(:,t) =stim2{t}(1,1)-analyze_time_before_train.*sf{1};  %start 100ms before sensory stim
                     galvano_nstim = Param.facade(15);
                     galvano_freq = Param.facade(16);
-                    duration = galvano_nstim./galvano_freq+0.1;
-                        if analyze_train_only_flag==0
+%                     duration = galvano_nstim./galvano_freq+0.1;
+                    duration = galvano_nstim./galvano_freq;
+                        if analyze_train_only_flag==1
                             end_sample(:,t) = start_sample(:,t)+duration.*sf{1}-1;
                         else
                            end_sample(:,t) = stim2{t}(1,end)+0.1.*sf{1}-1;  

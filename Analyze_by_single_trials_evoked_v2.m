@@ -2,11 +2,11 @@
 clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
-exp_type=3; %1-NBES, 2-ChAT
+exp_type=1; %1-NBES, 2-ChAT, 3-NBES VC
 trace_type_input=2; %
 analyze_time_before_train=0.1;
 analyze_train_only_flag=0;
-save_flag= 0;
+save_flag= 1;
 print_flag=0;
 norm_flag=0;
 clamp_flag=3; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
@@ -14,13 +14,13 @@ BP50HzLFP_flag=0; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 BPLFP_flag=0; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
 bp_manual_LFP=[1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
-BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
+BPVm_flag=0; %filtering LFP and Vm same as LFP was filtered in the multiclamp
 bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 
 %%
 switch exp_type
     case 1
-        files_to_analyze =46; %[8,10,12,14,15,16,22,36,37,40,1,44,46,48,52,56,58,62,72,75,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
+        files_to_analyze =[8,10,12,14,15,16,22,36,37,40,1,44,46,48,52,56,58,62,72,75,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};  y_ax_label={'Vm'}; y_ax_units={'mV'};   
@@ -292,7 +292,7 @@ data_preprocessing
             event_evoked(fileind).win_duration = duration;
             event_evoked(fileind).trace_type_input = trace_type_input;
             event_evoked(fileind).analyze_time_before_train = analyze_time_before_train;
-            event_evoked(fileind).V = analyze_train_only_flag;
+            event_evoked(fileind).analyze_train_only_flag = analyze_train_only_flag;
             event_evoked(fileind).BP50HzLFP=BP50HzLFP_flag; %removing 50Hz noise from LFP signal
             event_evoked(fileind).BP50HzVm=BP50HzVm_flag; %removing 50Hz noise from Vm signal
             event_evoked(fileind).BPLFP_flag=BPLFP_flag; %filtering LFP 
@@ -947,7 +947,6 @@ end
      s_halfWidth_std=find(h_halfWidth_std==1);
      s_adapt_amp=find(h_adapt_amp==1);
      s_nonspecific_count_m=find(h_nonspecific_count_m==1);
-
  %% Plot parameters along the train stim - version 3:bars+error bars of the mean values
  close all
      
@@ -978,138 +977,166 @@ end
      halfWidth_std_mat{1}(:,stim_num)= event_evoked_stat.stim_num(stim_num).halfWidth_std(:,1);
      halfWidth_std_mat{2}(:,stim_num)= event_evoked_stat.stim_num(stim_num).halfWidth_std(:,2);
     end     
-    
-    h1=figure;        
-        hold on
+%% repeated measures ANOVA for amplitude over the train stim.
+[stat_failures]=fn_sensory_train_response_2_way_rmANOVA(failures_m_mat{1}(:,:), failures_m_mat{2}(:,:));
+[stat_nonspecific_count]=fn_sensory_train_response_2_way_rmANOVA(nonspecific_count_m_mat{1}(:,:), nonspecific_count_m_mat{2}(:,:));
+[stat_onset]=fn_sensory_train_response_2_way_rmANOVA(onset_m_mat{1}(:,:), onset_m_mat{2}(:,:));
+[stat_onset_std]=fn_sensory_train_response_2_way_rmANOVA(onset_std_mat{1}(:,:), onset_std_mat{2}(:,:));
+[stat_amp]=fn_sensory_train_response_2_way_rmANOVA(amplitude_m_mat{1}(:,:), amplitude_m_mat{2}(:,:));
+[stat_amp_std]=fn_sensory_train_response_2_way_rmANOVA(amplitude_std_mat{1}(:,:), amplitude_std_mat{2}(:,:));
+[stat_ampVal]=fn_sensory_train_response_2_way_rmANOVA(ampVal_m_mat{1}(:,:), ampVal_m_mat{2}(:,:));
+[stat_onVal]=fn_sensory_train_response_2_way_rmANOVA(onVal_m_mat{1}(:,:), onVal_m_mat{2}(:,:));
+[stat_ampDel]=fn_sensory_train_response_2_way_rmANOVA(ampDel_m_mat{1}(:,:), ampDel_m_mat{2}(:,:));
+[stat_ampDel_std]=fn_sensory_train_response_2_way_rmANOVA(ampDel_std_mat{1}(:,:), ampDel_std_mat{2}(:,:));
+[stat_halfWidth]=fn_sensory_train_response_2_way_rmANOVA(halfWidth_m_mat{1}(:,:), halfWidth_m_mat{2}(:,:));
+[stat_halfWidth_std]=fn_sensory_train_response_2_way_rmANOVA(halfWidth_std_mat{1}(:,:), halfWidth_std_mat{2}(:,:));
+%% Plots with p-values from repeated-measures ANOVA
+%% failures
+      h1=figure; 
+for stim=1:size(failures_m_mat{2}(:,:),2);
+        if stat_failures.p_stim{stim,1}>0.05 
+            asterisk_failures{stim,1}='n.s.';
+        else if stat_failures.p_stim{stim,1}<0.05 && stat_failures.p_stim{stim,1}>0.01
+            asterisk_failures{stim,1}='*';
+            else if stat_failures.p_stim{stim,1}<0.01 && stat_failures.p_stim{stim,1}>0.001
+                    asterisk_failures{stim,1}='**';
+            else if stat_failures.p_stim{stim,1}<0.001
+                     asterisk_failures{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
         errbar_h=errorbar([1:size(failures_m_mat{1}(:,:),2)]-0.3,nanmean(failures_m_mat{1}(:,:),1),zeros(1,size(failures_m_mat{1}(:,:),2)), nanstd(failures_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         errbar_h=errorbar([1:size(failures_m_mat{2}(:,:),2)],nanmean(failures_m_mat{2}(:,:),1),zeros(1,size(failures_m_mat{2}(:,:),2)), nanstd(failures_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         bar([1:size(failures_m_mat{1}(:,:),2)]-0.3, nanmean(failures_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
         bar([1:size(failures_m_mat{2}(:,:),2)], nanmean(failures_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
         ylim_data=[get(gca,'ylim')]';
-        p_failures_m=max(ylim_data).*ones(size(s_failures_m));
-        plot(s_failures_m-0.15,p_failures_m,'k*')
+        my=max(ylim_data)-1;
+        for stim=1:size(failures_m_mat{2}(:,:),2);
+            if strcmp('n.s.',asterisk_failures{stim,1})==0          
+             text(stim,my,asterisk_failures{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
         hold off
+        set(gca,'xlim',[0,size(failures_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
         xlabel('Stim. serial number' ,'FontSize', 16);
         ylabel('Failures rate' ,'FontSize', 16);    
-        title(['Mean Rate of Failures,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
-        
-        h2=figure;        
-        hold on
+        title(['Mean Rate of Failures,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);      
+    %% nonspecific_count
+      h2=figure; 
+for stim=1:size(nonspecific_count_m_mat{2}(:,:),2);
+        if stat_nonspecific_count.p_stim{stim,1}>0.05 
+            asterisk_nonspecific_count{stim,1}='n.s.';
+        else if stat_nonspecific_count.p_stim{stim,1}<0.05 && stat_nonspecific_count.p_stim{stim,1}>0.01
+            asterisk_nonspecific_count{stim,1}='*';
+            else if stat_nonspecific_count.p_stim{stim,1}<0.01 && stat_nonspecific_count.p_stim{stim,1}>0.001
+                    asterisk_nonspecific_count{stim,1}='**';
+            else if stat_nonspecific_count.p_stim{stim,1}<0.001
+                     asterisk_nonspecific_count{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
         errbar_h=errorbar([1:size(nonspecific_count_m_mat{1}(:,:),2)]-0.3,nanmean(nonspecific_count_m_mat{1}(:,:),1),zeros(1,size(nonspecific_count_m_mat{1}(:,:),2)), nanstd(nonspecific_count_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         errbar_h=errorbar([1:size(nonspecific_count_m_mat{2}(:,:),2)],nanmean(nonspecific_count_m_mat{2}(:,:),1),zeros(1,size(nonspecific_count_m_mat{2}(:,:),2)), nanstd(nonspecific_count_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         bar([1:size(nonspecific_count_m_mat{1}(:,:),2)]-0.3, nanmean(nonspecific_count_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
-        bar([1:size(nonspecific_count_m_mat{2}(:,:),2)], nanmean(nonspecific_count_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+        bar([1:size(nonspecific_count_m_mat{2}(:,:),2)], nanmean(nonspecific_count_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
         ylim_data=[get(gca,'ylim')]';
-        p_nonspecific_count_m=max(ylim_data).*ones(size(s_nonspecific_count_m));
-        plot(s_nonspecific_count_m-0.15,p_nonspecific_count_m,'k*')
+        my=max(ylim_data)-1;
+        for stim=1:size(nonspecific_count_m_mat{2}(:,:),2);
+            if strcmp('n.s.',asterisk_nonspecific_count{stim,1})==0          
+             text(stim,my,asterisk_nonspecific_count{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end 
         hold off
+        set(gca,'xlim',[0,size(nonspecific_count_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
         xlabel('Stim. serial number' ,'FontSize', 16);
         ylabel('Non-specific response rate' ,'FontSize', 16);    
         title(['Mean Rate of Non-specific responses,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
-
-        h3=figure;        
-        hold on
+         %% onset_m
+      h3=figure; 
+for stim=1:size(onset_m_mat{2}(:,:),2);
+        if stat_onset.p_stim{stim,1}>0.05 
+            asterisk_onset{stim,1}='n.s.';
+        else if stat_onset.p_stim{stim,1}<0.05 && stat_onset.p_stim{stim,1}>0.01
+            asterisk_onset{stim,1}='*';
+            else if stat_onset.p_stim{stim,1}<0.01 && stat_onset.p_stim{stim,1}>0.001
+                    asterisk_onset{stim,1}='**';
+            else if stat_onset.p_stim{stim,1}<0.001
+                     asterisk_onset{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
         errbar_h=errorbar([1:size(onset_m_mat{1}(:,:),2)]-0.3,nanmean(onset_m_mat{1}(:,:),1),zeros(1,size(onset_m_mat{1}(:,:),2)), nanstd(onset_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         errbar_h=errorbar([1:size(onset_m_mat{2}(:,:),2)],nanmean(onset_m_mat{2}(:,:),1),zeros(1,size(onset_m_mat{2}(:,:),2)), nanstd(onset_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         bar([1:size(onset_m_mat{1}(:,:),2)]-0.3, nanmean(onset_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
-        bar([1:size(onset_m_mat{2}(:,:),2)], nanmean(onset_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+        bar([1:size(onset_m_mat{2}(:,:),2)], nanmean(onset_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
         ylim_data=[get(gca,'ylim')]';
-        p_onset_m=max(ylim_data).*ones(size(s_onset_m));
-        plot(s_onset_m-0.15,p_onset_m,'k*')
+        my=max(ylim_data)-1;
+        for stim=1:size(onset_m_mat{2}(:,:),2);
+            if strcmp('n.s.',asterisk_onset{stim,1})==0          
+             text(stim,my,asterisk_onset{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
         hold off
+        set(gca,'xlim',[0,size(onset_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
         xlabel('Stim. serial number' ,'FontSize', 16);
         ylabel('Onset Latency [mS]' ,'FontSize', 16);    
         title(['Mean Onset Latency,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
-
-        h4=figure;        
-        hold on
+        %% onset std
+      h4=figure; 
+for stim=1:size(onset_std_mat{2}(:,:),2);
+        if stat_onset_std.p_stim{stim,1}>0.05 
+            asterisk_onset_std{stim,1}='n.s.';
+        else if stat_onset_std.p_stim{stim,1}<0.05 && stat_onset_std.p_stim{stim,1}>0.01
+            asterisk_onset_std{stim,1}='*';
+            else if stat_onset_std.p_stim{stim,1}<0.01 && stat_onset_std.p_stim{stim,1}>0.001
+                    asterisk_onset_std{stim,1}='**';
+            else if stat_onset_std.p_stim{stim,1}<0.001
+                     asterisk_onset_std{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
         errbar_h=errorbar([1:size(onset_std_mat{1}(:,:),2)]-0.3,nanmean(onset_std_mat{1}(:,:),1),zeros(1,size(onset_std_mat{1}(:,:),2)), nanstd(onset_std_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         errbar_h=errorbar([1:size(onset_std_mat{2}(:,:),2)],nanmean(onset_std_mat{2}(:,:),1),zeros(1,size(onset_std_mat{2}(:,:),2)), nanstd(onset_std_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         bar([1:size(onset_std_mat{1}(:,:),2)]-0.3, nanmean(onset_std_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
-        bar([1:size(onset_std_mat{2}(:,:),2)], nanmean(onset_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+        bar([1:size(onset_std_mat{2}(:,:),2)], nanmean(onset_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
         ylim_data=[get(gca,'ylim')]';
-        p_onset_std=max(ylim_data).*ones(size(s_onset_std));
-        plot(s_onset_std-0.15,p_onset_std,'k*')
+        my=max(ylim_data)-1;
+        for stim=1:size(onset_std_mat{2}(:,:),2);
+            if strcmp('n.s.',asterisk_onset_std{stim,1})==0          
+             text(stim,my,asterisk_onset_std{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
         hold off
+        set(gca,'xlim',[0,size(onset_std_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
         xlabel('Stim. serial number' ,'FontSize', 16);
         ylabel('Onset Latency STD [mS]' ,'FontSize', 16);    
-        title(['Mean response jitter,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
-%% repeated measures ANOVA for amplitude over the train stim.
-%% rmANOVA with matlab function -amplitude. 
-peak_amp_noNB(:,:)= amplitude_m_mat{1}(:,:);
-peak_amp_NB(:,:)= amplitude_m_mat{2}(:,:);
-
-peak_amp_all(:,:)=[peak_amp_noNB;peak_amp_NB];
- S_1(:,1)=1:length(files_to_analyze); 
- 
-% clear ta within rm_amp mauchly_amp ranovatbl_amp eps_amp eps NBbyTime_amp TimebyNB_amp
-
-ta_vector_names={'peak_amp_noNB(:,1:10)','peak_amp_NB(:,1:10)'};
-ta=table(S_1,peak_amp_noNB(:,1),peak_amp_noNB(:,2),peak_amp_noNB(:,3),peak_amp_noNB(:,4),peak_amp_noNB(:,5),peak_amp_noNB(:,6),...
-    peak_amp_noNB(:,7),peak_amp_noNB(:,8),peak_amp_noNB(:,9),peak_amp_noNB(:,10),peak_amp_noNB(:,11),...
-    peak_amp_NB(:,1),peak_amp_NB(:,2),peak_amp_NB(:,3),peak_amp_NB(:,4),peak_amp_NB(:,5),peak_amp_NB(:,6),...
-    peak_amp_NB(:,7),peak_amp_NB(:,8),peak_amp_NB(:,9),peak_amp_NB(:,10),peak_amp_NB(:,11),...
-    'variablenames', {'cells','Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8','Y9','Y10','Y11','Y12','Y13','Y14','Y15','Y16','Y17','Y18','Y19','Y20','Y21','Y22'}); %,,'Y21','Y22'
-factorNames = {'NB','Time'};
-within = table({'N';'N';'N';'N';'N';'N';'N';'N';'N';'N';'N';'Y';'Y';'Y';'Y';'Y';'Y';'Y';'Y';'Y';'Y';'Y'},{'1';'2';'3';'4';'5';'6';'7';'8';'9';'10';'11';'1';'2';'3';'4';'5';'6';'7';'8';'9';'10';'11'},'VariableNames',factorNames); %the levels of each factor in each measurment witgin subject
-% fit the repeated measures model
-rm_amp = fitrm(ta,'Y1-Y22~1','WithinDesign',within);
-%test for sphericity
-mauchly_amp=mauchly(rm_amp);
-% run my repeated measures anova here
-[ranovatbl_amp] = ranova(rm_amp,'withinmodel','NB*Time');
-%multiple comparisons:
-NBbyTime_amp = multcompare(rm_amp,'NB','By','Time');
-TimebyNB_amp = multcompare(rm_amp,'Time','By','NB');
-eps_amp = epsilon(rm_amp);
-eps=table2cell(eps_amp(1,2));
-if eps{1}<0.75
-    amp_rmANOVA_NB_effect_p= table2cell(ranovatbl_amp(3,6));
-    amp_rmANOVA_Time_effect_p= table2cell(ranovatbl_amp(5,6));
-    amp_rmANOVA_interaction_effect_p= table2cell(ranovatbl_amp(7,6));
-else
-     amp_rmANOVA_NB_effect_p= table2cell(ranovatbl_amp(3,7));
-     amp_rmANOVA_Time_effect_p= table2cell(ranovatbl_amp(5,7));
-     amp_rmANOVA_interaction_effect_p= table2cell(ranovatbl_amp(7,7));
-end
-table_column1=table2cell(NBbyTime_amp(:,1));
-
-for stim=1:size(peak_amp_noNB,2) 
-    row= find(strcmp(num2str(stim),table_column1),1);
-    amp_p_stim{1}(stim,:)=table2cell(NBbyTime_amp(row,6));
-end
-    
-amp_stat.table=ta;
-amp_stat.table_data_vecs=ta_vector_names;
-amp_stat.within_design=within;
-amp_stat.rm=rm_amp;
-amp_stat.mauchly=mauchly_amp;
-amp_stat.eps=eps_amp;
-amp_stat.ANOVA=ranovatbl_amp;
-amp_stat.multcomp_NBbyTime=NBbyTime_amp;
-amp_stat.multcomp_TimebyNB=TimebyNB_amp;
-amp_stat.rmANOVA_NB_effect_p= amp_rmANOVA_NB_effect_p;
-amp_stat.rmANOVA_Time_effect_p= amp_rmANOVA_Time_effect_p;
-amp_stat.rmANOVA_interaction_effect_p= amp_rmANOVA_interaction_effect_p;
-amp_stat.p_stim=amp_p_stim{1};
-
-
-%%
+        title(['Mean Response Jitter ,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+        %%  amplitude 
       h5=figure; 
 for stim=1:size(amplitude_m_mat{2}(:,:),2);
-        if amp_stat.p_stim{stim,1}>0.05 
+        if stat_amp.p_stim{stim,1}>0.05 
             asterisk_amp{stim,1}='n.s.';
-        else if amp_stat.p_stim{stim,1}<0.05 && amp_stat.p_stim{stim,1}>0.01
+        else if stat_amp.p_stim{stim,1}<0.05 && stat_amp.p_stim{stim,1}>0.01
             asterisk_amp{stim,1}='*';
-            else if amp_stat.p_stim{stim,1}<0.01 && amp_stat.p_stim{stim,1}>0.001
+            else if stat_amp.p_stim{stim,1}<0.01 && stat_amp.p_stim{stim,1}>0.001
                     asterisk_amp{stim,1}='**';
-            else if amp_stat.p_stim{stim,1}<0.001
+            else if stat_amp.p_stim{stim,1}<0.001
                      asterisk_amp{stim,1}='***';
                 end
                 end
@@ -1119,9 +1146,7 @@ end
    
 hold on      
         errbar_h=errorbar([1:size(amplitude_m_mat{1}(:,:),2)]-0.3,nanmean(amplitude_m_mat{1}(:,:),1),zeros(1,size(amplitude_m_mat{1}(:,:),2)), nanstd(amplitude_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         errbar_h=errorbar([1:size(amplitude_m_mat{2}(:,:),2)],nanmean(amplitude_m_mat{2}(:,:),1),zeros(1,size(amplitude_m_mat{2}(:,:),2)), nanstd(amplitude_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         bar([1:size(amplitude_m_mat{1}(:,:),2)]-0.3, nanmean(amplitude_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
         bar([1:size(amplitude_m_mat{2}(:,:),2)], nanmean(amplitude_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
         ylim_data=[get(gca,'ylim')]';
@@ -1131,128 +1156,520 @@ hold on
              text(stim,my,asterisk_amp{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
             end
         end
-%         p_amplitude_m=max(ylim_data).*ones(size(s_amplitude_m));
-%         plot(s_amplitude_m-0.15,p_amplitude_m,'k*')
-%         line([0;12],[0;0],'linestyle','--','linewidth',2,'color','b') %change line to zero
         hold off
         set(gca,'xlim',[0,size(amplitude_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
         xlabel('Stim. serial number' ,'FontSize', 16);
-        ylabel('Mean Response Amplitude [mV]' ,'FontSize', 16);    
-        title(['Mean Response Amplitude - local baseline,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
-        
-         h6=figure;        
-        hold on
+       ylabel('Mean Response [mV]' ,'FontSize', 16);    
+        title(['Mean Response Amplitude - local baseline,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);     
+      %%  amplitude std
+      h6=figure; 
+for stim=1:size(amplitude_std_mat{2}(:,:),2);
+        if stat_amp_std.p_stim{stim,1}>0.05 
+            asterisk_amp_std{stim,1}='n.s.';
+        else if stat_amp_std.p_stim{stim,1}<0.05 && stat_amp_std.p_stim{stim,1}>0.01
+            asterisk_amp_std{stim,1}='*';
+            else if stat_amp_std.p_stim{stim,1}<0.01 && stat_amp_std.p_stim{stim,1}>0.001
+                    asterisk_amp_std{stim,1}='**';
+            else if stat_amp_std.p_stim{stim,1}<0.001
+                     asterisk_amp_std{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
         errbar_h=errorbar([1:size(amplitude_std_mat{1}(:,:),2)]-0.3,nanmean(amplitude_std_mat{1}(:,:),1),zeros(1,size(amplitude_std_mat{1}(:,:),2)), nanstd(amplitude_std_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         errbar_h=errorbar([1:size(amplitude_std_mat{2}(:,:),2)],nanmean(amplitude_std_mat{2}(:,:),1),zeros(1,size(amplitude_std_mat{2}(:,:),2)), nanstd(amplitude_std_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         bar([1:size(amplitude_std_mat{1}(:,:),2)]-0.3, nanmean(amplitude_std_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
-        bar([1:size(amplitude_std_mat{2}(:,:),2)], nanmean(amplitude_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+        bar([1:size(amplitude_std_mat{2}(:,:),2)], nanmean(amplitude_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
         ylim_data=[get(gca,'ylim')]';
-        p_amplitude_std=max(ylim_data).*ones(size(s_amplitude_std));
-        plot(s_amplitude_std-0.15,p_amplitude_std,'k*')
+        my=max(ylim_data)-1;
+        for stim=1:size(amplitude_std_mat{2}(:,:),2);
+            if strcmp('n.s.',asterisk_amp_std{stim,1})==0          
+             text(stim,my,asterisk_amp_std{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
         hold off
+        set(gca,'xlim',[0,size(amplitude_std_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
         xlabel('Stim. serial number' ,'FontSize', 16);
-        ylabel('Amplitude STD [mV]' ,'FontSize', 16);    
-        title(['Mean Amplitude STD (trial-to-trial variability) ,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
- 
-        h7=figure;        
-        hold on
-%         set(gca,'Ydir','reverse'); %added because the membrane pot. values are negative. more changes: error bars are symmetric and caps not removed, and asterisks yvalue is min instead of max
-        errbar_h=errorbar([1:size(ampVal_m_mat{1}(:,:),2)]-0.3,nanmean(ampVal_m_mat{1}(:,:),1), nanstd(ampVal_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-        errbar_h=errorbar([1:size(ampVal_m_mat{2}(:,:),2)],nanmean(ampVal_m_mat{2}(:,:),1), nanstd(ampVal_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        ylabel('Mean Response Amplitude STD [mV]' ,'FontSize', 16);    
+        title(['Mean Response Amplitude Jitter,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+         %%  amplitude peak value
+      h7=figure; 
+for stim=1:size(ampVal_m_mat{2}(:,:),2);
+        if stat_ampVal.p_stim{stim,1}>0.05 
+            asterisk_ampVal{stim,1}='n.s.';
+        else if stat_ampVal.p_stim{stim,1}<0.05 && stat_ampVal.p_stim{stim,1}>0.01
+            asterisk_ampVal{stim,1}='*';
+            else if stat_ampVal.p_stim{stim,1}<0.01 && stat_ampVal.p_stim{stim,1}>0.001
+                    asterisk_ampVal{stim,1}='**';
+            else if stat_ampVal.p_stim{stim,1}<0.001
+                     asterisk_ampVal{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
+        errbar_h=errorbar([1:size(ampVal_m_mat{1}(:,:),2)]-0.3,nanmean(ampVal_m_mat{1}(:,:),1),zeros(1,size(ampVal_m_mat{1}(:,:),2)), nanstd(ampVal_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        errbar_h=errorbar([1:size(ampVal_m_mat{2}(:,:),2)],nanmean(ampVal_m_mat{2}(:,:),1),zeros(1,size(ampVal_m_mat{2}(:,:),2)), nanstd(ampVal_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         bar([1:size(ampVal_m_mat{1}(:,:),2)]-0.3, nanmean(ampVal_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
-        bar([1:size(ampVal_m_mat{2}(:,:),2)], nanmean(ampVal_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+        bar([1:size(ampVal_m_mat{2}(:,:),2)], nanmean(ampVal_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
         ylim_data=[get(gca,'ylim')]';
-         set(gca,'ylim',[min(ylim_data),min(ylim_data)+30])
-        p_ampVal_m=min(ylim_data).*ones(size(s_ampVal_m))+5;
-        plot(s_ampVal_m-0.15,p_ampVal_m,'k*')  
+        my=max(ylim_data)-1;
+        for stim=1:size(ampVal_m_mat{2}(:,:),2);
+            if strcmp('n.s.',asterisk_ampVal{stim,1})==0          
+             text(stim,my,asterisk_ampVal{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
         hold off
+        set(gca,'xlim',[0,size(ampVal_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
         xlabel('Stim. serial number' ,'FontSize', 16);
-        ylabel('Response Peak Value [mV]' ,'FontSize', 16);    
-        title(['Mean Response Peak Value ,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
-               
-        h8=figure;        
-        hold on
-%         set(gca,'Ydir','reverse');
-        errbar_h=errorbar([1:size(onVal_m_mat{1}(:,:),2)]-0.3,nanmean(onVal_m_mat{1}(:,:),1), nanstd(onVal_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-        errbar_h=errorbar([1:size(onVal_m_mat{2}(:,:),2)],nanmean(onVal_m_mat{2}(:,:),1), nanstd(onVal_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+       ylabel('Mean Peak Value [mV]' ,'FontSize', 16);    
+        title(['Mean Response Peak Value,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);      
+                %%  Response Onset Value
+      h8=figure; 
+for stim=1:size(onVal_m_mat{2}(:,:),2);
+        if stat_onVal.p_stim{stim,1}>0.05 
+            asterisk_onVal{stim,1}='n.s.';
+        else if stat_onVal.p_stim{stim,1}<0.05 && stat_onVal.p_stim{stim,1}>0.01
+            asterisk_onVal{stim,1}='*';
+            else if stat_onVal.p_stim{stim,1}<0.01 && stat_onVal.p_stim{stim,1}>0.001
+                    asterisk_onVal{stim,1}='**';
+            else if stat_onVal.p_stim{stim,1}<0.001
+                     asterisk_onVal{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
+        errbar_h=errorbar([1:size(onVal_m_mat{1}(:,:),2)]-0.3,nanmean(onVal_m_mat{1}(:,:),1),zeros(1,size(onVal_m_mat{1}(:,:),2)), nanstd(onVal_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        errbar_h=errorbar([1:size(onVal_m_mat{2}(:,:),2)],nanmean(onVal_m_mat{2}(:,:),1),zeros(1,size(onVal_m_mat{2}(:,:),2)), nanstd(onVal_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         bar([1:size(onVal_m_mat{1}(:,:),2)]-0.3, nanmean(onVal_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
-        bar([1:size(onVal_m_mat{2}(:,:),2)], nanmean(onVal_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+        bar([1:size(onVal_m_mat{2}(:,:),2)], nanmean(onVal_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
         ylim_data=[get(gca,'ylim')]';
-     set(gca,'ylim',[min(ylim_data),min(ylim_data)+30])
-        p_onVal_m=min(ylim_data).*ones(size(s_onVal_m))+5; 
-        plot(s_onVal_m-0.15,p_onVal_m,'k*')
+        my=max(ylim_data)-1;
+        for stim=1:size(onVal_m_mat{2}(:,:),2);
+            if strcmp('n.s.',asterisk_amp{stim,1})==0          
+             text(stim,my,asterisk_amp{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
         hold off
+        set(gca,'xlim',[0,size(onVal_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
         xlabel('Stim. serial number' ,'FontSize', 16);
-        ylabel('Onset Vm [mV]' ,'FontSize', 16);    
-        title(['Mean Onset Vm value,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
-        
-        h9=figure;        
-        hold on
+       ylabel('Mean Onset value [mV]' ,'FontSize', 16);    
+        title(['Mean Response Onset Value,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+                %%  Response Peak Latency
+      h9=figure; 
+for stim=1:size(ampDel_m_mat{2}(:,:),2);
+        if stat_ampDel.p_stim{stim,1}>0.05 
+            asterisk_ampDel{stim,1}='n.s.';
+        else if stat_ampDel.p_stim{stim,1}<0.05 && stat_ampDel.p_stim{stim,1}>0.01
+            asterisk_ampDel{stim,1}='*';
+            else if stat_ampDel.p_stim{stim,1}<0.01 && stat_ampDel.p_stim{stim,1}>0.001
+                    asterisk_ampDel{stim,1}='**';
+            else if stat_ampDel.p_stim{stim,1}<0.001
+                     asterisk_ampDel{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
         errbar_h=errorbar([1:size(ampDel_m_mat{1}(:,:),2)]-0.3,nanmean(ampDel_m_mat{1}(:,:),1),zeros(1,size(ampDel_m_mat{1}(:,:),2)), nanstd(ampDel_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         errbar_h=errorbar([1:size(ampDel_m_mat{2}(:,:),2)],nanmean(ampDel_m_mat{2}(:,:),1),zeros(1,size(ampDel_m_mat{2}(:,:),2)), nanstd(ampDel_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         bar([1:size(ampDel_m_mat{1}(:,:),2)]-0.3, nanmean(ampDel_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
-        bar([1:size(ampDel_m_mat{2}(:,:),2)], nanmean(ampDel_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+        bar([1:size(ampDel_m_mat{2}(:,:),2)], nanmean(ampDel_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
         ylim_data=[get(gca,'ylim')]';
-        p_ampDel_m=max(ylim_data).*ones(size(s_ampDel_m));
-        plot(s_ampDel_m-0.15,p_ampDel_m,'k*')
+        my=max(ylim_data)-1;
+        for stim=1:size(ampDel_m_mat{2}(:,:),2);
+            if strcmp('n.s.',asterisk_ampDel{stim,1})==0          
+             text(stim,my,asterisk_ampDel{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
         hold off
+        set(gca,'xlim',[0,size(ampDel_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
         xlabel('Stim. serial number' ,'FontSize', 16);
-        ylabel('Peak Latency [mS]' ,'FontSize', 16);    
-        title(['Mean Peak Latency,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
-        
-    
-         h10=figure;        
-        hold on
+       ylabel('Mean Peak Latency [mS]' ,'FontSize', 16);    
+        title(['Mean Response Peak Latency, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);     
+                %%  Response Peak Latency STD
+      h10=figure; 
+for stim=1:size(ampDel_std_mat{2}(:,:),2);
+        if stat_ampDel_std.p_stim{stim,1}>0.05 
+            asterisk_ampDel_std{stim,1}='n.s.';
+        else if stat_ampDel_std.p_stim{stim,1}<0.05 && stat_ampDel_std.p_stim{stim,1}>0.01
+            asterisk_ampDel_std{stim,1}='*';
+            else if stat_ampDel_std.p_stim{stim,1}<0.01 && stat_ampDel_std.p_stim{stim,1}>0.001
+                    asterisk_ampDel_std{stim,1}='**';
+            else if stat_ampDel_std.p_stim{stim,1}<0.001
+                     asterisk_ampDel_std{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
         errbar_h=errorbar([1:size(ampDel_std_mat{1}(:,:),2)]-0.3,nanmean(ampDel_std_mat{1}(:,:),1),zeros(1,size(ampDel_std_mat{1}(:,:),2)), nanstd(ampDel_std_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         errbar_h=errorbar([1:size(ampDel_std_mat{2}(:,:),2)],nanmean(ampDel_std_mat{2}(:,:),1),zeros(1,size(ampDel_std_mat{2}(:,:),2)), nanstd(ampDel_std_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         bar([1:size(ampDel_std_mat{1}(:,:),2)]-0.3, nanmean(ampDel_std_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
-        bar([1:size(ampDel_std_mat{2}(:,:),2)], nanmean(ampDel_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+        bar([1:size(ampDel_std_mat{2}(:,:),2)], nanmean(ampDel_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
         ylim_data=[get(gca,'ylim')]';
-        p_ampDel_std=max(ylim_data).*ones(size(s_ampDel_std));
-        plot(s_ampDel_std-0.15,p_ampDel_std,'k*')
+        my=max(ylim_data)-1;
+        for stim=1:size(ampDel_std_mat{2}(:,:),2);
+            if strcmp('n.s.',asterisk_ampDel_std{stim,1})==0          
+             text(stim,my,asterisk_ampDel_std{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
         hold off
+        set(gca,'xlim',[0,size(ampDel_std_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
         xlabel('Stim. serial number' ,'FontSize', 16);
-        ylabel('Peak Latency STD [mS]' ,'FontSize', 16);    
-        title(['Mean Peak Latency Jitter,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
-        
-         h11=figure;        
-        hold on
+       ylabel('Mean Peak Latency STD [mS]' ,'FontSize', 16);    
+        title(['Mean Response Peak Latency Jitter, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);     
+                        %%  Response Half-Width
+      h11=figure; 
+for stim=1:size(halfWidth_m_mat{2}(:,:),2);
+        if stat_halfWidth.p_stim{stim,1}>0.05 
+            asterisk_halfWidth{stim,1}='n.s.';
+        else if stat_halfWidth.p_stim{stim,1}<0.05 && stat_halfWidth.p_stim{stim,1}>0.01
+            asterisk_halfWidth{stim,1}='*';
+            else if stat_halfWidth.p_stim{stim,1}<0.01 && stat_halfWidth.p_stim{stim,1}>0.001
+                    asterisk_halfWidth{stim,1}='**';
+            else if stat_halfWidth.p_stim{stim,1}<0.001
+                     asterisk_halfWidth{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
         errbar_h=errorbar([1:size(halfWidth_m_mat{1}(:,:),2)]-0.3,nanmean(halfWidth_m_mat{1}(:,:),1),zeros(1,size(halfWidth_m_mat{1}(:,:),2)), nanstd(halfWidth_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         errbar_h=errorbar([1:size(halfWidth_m_mat{2}(:,:),2)],nanmean(halfWidth_m_mat{2}(:,:),1),zeros(1,size(halfWidth_m_mat{2}(:,:),2)), nanstd(halfWidth_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         bar([1:size(halfWidth_m_mat{1}(:,:),2)]-0.3, nanmean(halfWidth_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
-        bar([1:size(halfWidth_m_mat{2}(:,:),2)], nanmean(halfWidth_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+        bar([1:size(halfWidth_m_mat{2}(:,:),2)], nanmean(halfWidth_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
         ylim_data=[get(gca,'ylim')]';
-        p_halfWidth_m=max(ylim_data).*ones(size(s_halfWidth_m));
-        plot(s_halfWidth_m-0.15,p_halfWidth_m,'k*')
+        my=max(ylim_data)-1;
+        for stim=1:size(halfWidth_m_mat{2}(:,:),2);
+            if strcmp('n.s.',asterisk_halfWidth{stim,1})==0          
+             text(stim,my,asterisk_halfWidth{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
         hold off
+        set(gca,'xlim',[0,size(halfWidth_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
         xlabel('Stim. serial number' ,'FontSize', 16);
-        ylabel('Half-Width [mS]' ,'FontSize', 16);    
-        title(['Mean Half-Width,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
-        
-         h12=figure;        
-        hold on
+       ylabel('Half-Width [mS]' ,'FontSize', 16);    
+        title(['Mean ResponseHalf-Width, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
+                                %%  Response Half-Width STD
+      h12=figure; 
+for stim=1:size(halfWidth_std_mat{2}(:,:),2);
+        if stat_halfWidth_std.p_stim{stim,1}>0.05 
+            asterisk_halfWidth_std{stim,1}='n.s.';
+        else if stat_halfWidth_std.p_stim{stim,1}<0.05 && stat_halfWidth_std.p_stim{stim,1}>0.01
+            asterisk_halfWidth_std{stim,1}='*';
+            else if stat_halfWidth_std.p_stim{stim,1}<0.01 && stat_halfWidth_std.p_stim{stim,1}>0.001
+                    asterisk_halfWidth_std{stim,1}='**';
+            else if stat_halfWidth_std.p_stim{stim,1}<0.001
+                     asterisk_halfWidth_std{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
         errbar_h=errorbar([1:size(halfWidth_std_mat{1}(:,:),2)]-0.3,nanmean(halfWidth_std_mat{1}(:,:),1),zeros(1,size(halfWidth_std_mat{1}(:,:),2)), nanstd(halfWidth_std_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         errbar_h=errorbar([1:size(halfWidth_std_mat{2}(:,:),2)],nanmean(halfWidth_std_mat{2}(:,:),1),zeros(1,size(halfWidth_std_mat{2}(:,:),2)), nanstd(halfWidth_std_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-%         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
         bar([1:size(halfWidth_std_mat{1}(:,:),2)]-0.3, nanmean(halfWidth_std_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
-        bar([1:size(halfWidth_std_mat{2}(:,:),2)], nanmean(halfWidth_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+        bar([1:size(halfWidth_std_mat{2}(:,:),2)], nanmean(halfWidth_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
         ylim_data=[get(gca,'ylim')]';
-        p_halfWidth_std=max(ylim_data).*ones(size(s_halfWidth_std));
-        plot(s_halfWidth_std-0.15,p_halfWidth_std,'k*')
+        my=max(ylim_data)-1;
+        for stim=1:size(halfWidth_std_mat{2}(:,:),2);
+            if strcmp('n.s.',asterisk_halfWidth_std{stim,1})==0          
+             text(stim,my,asterisk_halfWidth_std{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
         hold off
+        set(gca,'xlim',[0,size(halfWidth_std_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
         xlabel('Stim. serial number' ,'FontSize', 16);
-        ylabel('Half-Width STD [mS]' ,'FontSize', 16);    
-        title(['Mean Half-Width STD,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
-        
+       ylabel('Half-Width STD [mS]' ,'FontSize', 16);    
+        title(['Mean Response Half-Width STD, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
+%% rmANOVA with matlab function -amplitude. 
+% peak_amp_noNB(:,:)= amplitude_m_mat{1}(:,:);
+% peak_amp_NB(:,:)= amplitude_m_mat{2}(:,:);
+% peak_amp_all(:,:)=[peak_amp_noNB;peak_amp_NB];
+%  S_1(:,1)=1:length(files_to_analyze); 
+%  
+% % clear ta within rm_amp mauchly_amp ranovatbl_amp eps_amp eps NBbyTime_amp TimebyNB_amp
+% 
+% ta_vector_names={'peak_amp_noNB(:,1:10)','peak_amp_NB(:,1:10)'};
+% ta=table(S_1,peak_amp_noNB(:,1),peak_amp_noNB(:,2),peak_amp_noNB(:,3),peak_amp_noNB(:,4),peak_amp_noNB(:,5),peak_amp_noNB(:,6),...
+%     peak_amp_noNB(:,7),peak_amp_noNB(:,8),peak_amp_noNB(:,9),peak_amp_noNB(:,10),peak_amp_noNB(:,11),...
+%     peak_amp_NB(:,1),peak_amp_NB(:,2),peak_amp_NB(:,3),peak_amp_NB(:,4),peak_amp_NB(:,5),peak_amp_NB(:,6),...
+%     peak_amp_NB(:,7),peak_amp_NB(:,8),peak_amp_NB(:,9),peak_amp_NB(:,10),peak_amp_NB(:,11),...
+%     'variablenames', {'cells','Y1','Y2','Y3','Y4','Y5','Y6','Y7','Y8','Y9','Y10','Y11','Y12','Y13','Y14','Y15','Y16','Y17','Y18','Y19','Y20','Y21','Y22'}); %,,'Y21','Y22'
+% factorNames = {'NB','Time'};
+% within = table({'N';'N';'N';'N';'N';'N';'N';'N';'N';'N';'N';'Y';'Y';'Y';'Y';'Y';'Y';'Y';'Y';'Y';'Y';'Y'},{'1';'2';'3';'4';'5';'6';'7';'8';'9';'10';'11';'1';'2';'3';'4';'5';'6';'7';'8';'9';'10';'11'},'VariableNames',factorNames); %the levels of each factor in each measurment witgin subject
+% % fit the repeated measures model
+% rm_amp = fitrm(ta,'Y1-Y22~1','WithinDesign',within);
+% %test for sphericity
+% mauchly_amp=mauchly(rm_amp);
+% % run my repeated measures anova here
+% [ranovatbl_amp] = ranova(rm_amp,'withinmodel','NB*Time');
+% %multiple comparisons:
+% NBbyTime_amp = multcompare(rm_amp,'NB','By','Time');
+% TimebyNB_amp = multcompare(rm_amp,'Time','By','NB');
+% eps_amp = epsilon(rm_amp);
+% eps=table2cell(eps_amp(1,2));
+% if eps{1}<0.75
+%     amp_rmANOVA_NB_effect_p= table2cell(ranovatbl_amp(3,6));
+%     amp_rmANOVA_Time_effect_p= table2cell(ranovatbl_amp(5,6));
+%     amp_rmANOVA_interaction_effect_p= table2cell(ranovatbl_amp(7,6));
+% else
+%      amp_rmANOVA_NB_effect_p= table2cell(ranovatbl_amp(3,7));
+%      amp_rmANOVA_Time_effect_p= table2cell(ranovatbl_amp(5,7));
+%      amp_rmANOVA_interaction_effect_p= table2cell(ranovatbl_amp(7,7));
+% end
+% table_column1=table2cell(NBbyTime_amp(:,1));
+% 
+% for stim=1:size(peak_amp_noNB,2) 
+%     row= find(strcmp(num2str(stim),table_column1),1);
+%     amp_p_stim{1}(stim,:)=table2cell(NBbyTime_amp(row,6));
+% end
+%     
+% stat_amp.table=ta;
+% stat_amp.table_data_vecs=ta_vector_names;
+% stat_amp.within_design=within;
+% stat_amp.rm=rm_amp;
+% stat_amp.mauchly=mauchly_amp;
+% stat_amp.eps=eps_amp;
+% stat_amp.ANOVA=ranovatbl_amp;
+% stat_amp.multcomp_NBbyTime=NBbyTime_amp;
+% stat_amp.multcomp_TimebyNB=TimebyNB_amp;
+% stat_amp.rmANOVA_NB_effect_p= amp_rmANOVA_NB_effect_p;
+% stat_amp.rmANOVA_Time_effect_p= amp_rmANOVA_Time_effect_p;
+% stat_amp.rmANOVA_interaction_effect_p= amp_rmANOVA_interaction_effect_p;
+% stat_amp.p_stim=amp_p_stim{1};
+%% Plots with p-values from t-tests
+% h1=figure;        
+%         hold on
+%         errbar_h=errorbar([1:size(failures_m_mat{1}(:,:),2)]-0.3,nanmean(failures_m_mat{1}(:,:),1),zeros(1,size(failures_m_mat{1}(:,:),2)), nanstd(failures_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         errbar_h=errorbar([1:size(failures_m_mat{2}(:,:),2)],nanmean(failures_m_mat{2}(:,:),1),zeros(1,size(failures_m_mat{2}(:,:),2)), nanstd(failures_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         bar([1:size(failures_m_mat{1}(:,:),2)]-0.3, nanmean(failures_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+%         bar([1:size(failures_m_mat{2}(:,:),2)], nanmean(failures_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+%         ylim_data=[get(gca,'ylim')]';
+%         p_failures_m=max(ylim_data).*ones(size(s_failures_m));
+%         plot(s_failures_m-0.15,p_failures_m,'k*')
+%         hold off
+%         xlabel('Stim. serial number' ,'FontSize', 16);
+%         ylabel('Failures rate' ,'FontSize', 16);    
+%         title(['Mean Rate of Failures,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+%         
+%         h2=figure;        
+%         hold on
+%         errbar_h=errorbar([1:size(nonspecific_count_m_mat{1}(:,:),2)]-0.3,nanmean(nonspecific_count_m_mat{1}(:,:),1),zeros(1,size(nonspecific_count_m_mat{1}(:,:),2)), nanstd(nonspecific_count_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         errbar_h=errorbar([1:size(nonspecific_count_m_mat{2}(:,:),2)],nanmean(nonspecific_count_m_mat{2}(:,:),1),zeros(1,size(nonspecific_count_m_mat{2}(:,:),2)), nanstd(nonspecific_count_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         bar([1:size(nonspecific_count_m_mat{1}(:,:),2)]-0.3, nanmean(nonspecific_count_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+%         bar([1:size(nonspecific_count_m_mat{2}(:,:),2)], nanmean(nonspecific_count_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+%         ylim_data=[get(gca,'ylim')]';
+%         p_nonspecific_count_m=max(ylim_data).*ones(size(s_nonspecific_count_m));
+%         plot(s_nonspecific_count_m-0.15,p_nonspecific_count_m,'k*')
+%         hold off
+%         xlabel('Stim. serial number' ,'FontSize', 16);
+%         ylabel('Non-specific response rate' ,'FontSize', 16);    
+%         title(['Mean Rate of Non-specific responses,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+% 
+%         h3=figure;        
+%         hold on
+%         errbar_h=errorbar([1:size(onset_m_mat{1}(:,:),2)]-0.3,nanmean(onset_m_mat{1}(:,:),1),zeros(1,size(onset_m_mat{1}(:,:),2)), nanstd(onset_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         errbar_h=errorbar([1:size(onset_m_mat{2}(:,:),2)],nanmean(onset_m_mat{2}(:,:),1),zeros(1,size(onset_m_mat{2}(:,:),2)), nanstd(onset_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         bar([1:size(onset_m_mat{1}(:,:),2)]-0.3, nanmean(onset_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+%         bar([1:size(onset_m_mat{2}(:,:),2)], nanmean(onset_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+%         ylim_data=[get(gca,'ylim')]';
+%         p_onset_m=max(ylim_data).*ones(size(s_onset_m));
+%         plot(s_onset_m-0.15,p_onset_m,'k*')
+%         hold off
+%         xlabel('Stim. serial number' ,'FontSize', 16);
+%         ylabel('Onset Latency [mS]' ,'FontSize', 16);    
+%         title(['Mean Onset Latency,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+% 
+%         h4=figure;   
+%         hold on
+%         errbar_h=errorbar([1:size(onset_std_mat{1}(:,:),2)]-0.3,nanmean(onset_std_mat{1}(:,:),1),zeros(1,size(onset_std_mat{1}(:,:),2)), nanstd(onset_std_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         errbar_h=errorbar([1:size(onset_std_mat{2}(:,:),2)],nanmean(onset_std_mat{2}(:,:),1),zeros(1,size(onset_std_mat{2}(:,:),2)), nanstd(onset_std_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         bar([1:size(onset_std_mat{1}(:,:),2)]-0.3, nanmean(onset_std_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+%         bar([1:size(onset_std_mat{2}(:,:),2)], nanmean(onset_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+%         ylim_data=[get(gca,'ylim')]';
+%         p_onset_std=max(ylim_data).*ones(size(s_onset_std));
+%         plot(s_onset_std-0.15,p_onset_std,'k*')
+%         hold off
+%         xlabel('Stim. serial number' ,'FontSize', 16);
+%         ylabel('Onset Latency STD [mS]' ,'FontSize', 16);    
+%         title(['Mean response jitter,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+
+% 
+%       h5=figure; 
+% for stim=1:size(amplitude_m_mat{2}(:,:),2);
+%         if stat_amp.p_stim{stim,1}>0.05 
+%             asterisk_amp{stim,1}='n.s.';
+%         else if stat_amp.p_stim{stim,1}<0.05 && stat_amp.p_stim{stim,1}>0.01
+%             asterisk_amp{stim,1}='*';
+%             else if stat_amp.p_stim{stim,1}<0.01 && stat_amp.p_stim{stim,1}>0.001
+%                     asterisk_amp{stim,1}='**';
+%             else if stat_amp.p_stim{stim,1}<0.001
+%                      asterisk_amp{stim,1}='***';
+%                 end
+%                 end
+%             end
+%         end
+% end
+%    
+% hold on      
+%         errbar_h=errorbar([1:size(amplitude_m_mat{1}(:,:),2)]-0.3,nanmean(amplitude_m_mat{1}(:,:),1),zeros(1,size(amplitude_m_mat{1}(:,:),2)), nanstd(amplitude_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         errbar_h=errorbar([1:size(amplitude_m_mat{2}(:,:),2)],nanmean(amplitude_m_mat{2}(:,:),1),zeros(1,size(amplitude_m_mat{2}(:,:),2)), nanstd(amplitude_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         bar([1:size(amplitude_m_mat{1}(:,:),2)]-0.3, nanmean(amplitude_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+%         bar([1:size(amplitude_m_mat{2}(:,:),2)], nanmean(amplitude_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+%         ylim_data=[get(gca,'ylim')]';
+%         my=max(ylim_data)-1;
+%         for stim=1:size(amplitude_m_mat{2}(:,:),2);
+%             if strcmp('n.s.',asterisk_amp{stim,1})==0          
+%              text(stim,my,asterisk_amp{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+%             end
+%         end
+% %         p_amplitude_m=max(ylim_data).*ones(size(s_amplitude_m));
+% %         plot(s_amplitude_m-0.15,p_amplitude_m,'k*')
+% %         line([0;12],[0;0],'linestyle','--','linewidth',2,'color','b') %change line to zero
+%         hold off
+%         set(gca,'xlim',[0,size(amplitude_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
+%         xlabel('Stim. serial number' ,'FontSize', 16);
+%         ylabel('Mean Response Amplitude [mV]' ,'FontSize', 16);    
+%         title(['Mean Response Amplitude - local baseline,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+%         
+%          h6=figure;        
+%         hold on
+%         errbar_h=errorbar([1:size(amplitude_std_mat{1}(:,:),2)]-0.3,nanmean(amplitude_std_mat{1}(:,:),1),zeros(1,size(amplitude_std_mat{1}(:,:),2)), nanstd(amplitude_std_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         errbar_h=errorbar([1:size(amplitude_std_mat{2}(:,:),2)],nanmean(amplitude_std_mat{2}(:,:),1),zeros(1,size(amplitude_std_mat{2}(:,:),2)), nanstd(amplitude_std_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         bar([1:size(amplitude_std_mat{1}(:,:),2)]-0.3, nanmean(amplitude_std_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+%         bar([1:size(amplitude_std_mat{2}(:,:),2)], nanmean(amplitude_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+%         ylim_data=[get(gca,'ylim')]';
+%         p_amplitude_std=max(ylim_data).*ones(size(s_amplitude_std));
+%         plot(s_amplitude_std-0.15,p_amplitude_std,'k*')
+%         hold off
+%         xlabel('Stim. serial number' ,'FontSize', 16);
+%         ylabel('Amplitude STD [mV]' ,'FontSize', 16);    
+%         title(['Mean Amplitude STD (trial-to-trial variability) ,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+%  
+%         h7=figure;        
+%         hold on
+% %         set(gca,'Ydir','reverse'); %added because the membrane pot. values are negative. more changes: error bars are symmetric and caps not removed, and asterisks yvalue is min instead of max
+%         errbar_h=errorbar([1:size(ampVal_m_mat{1}(:,:),2)]-0.3,nanmean(ampVal_m_mat{1}(:,:),1), nanstd(ampVal_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         errbar_h=errorbar([1:size(ampVal_m_mat{2}(:,:),2)],nanmean(ampVal_m_mat{2}(:,:),1), nanstd(ampVal_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         bar([1:size(ampVal_m_mat{1}(:,:),2)]-0.3, nanmean(ampVal_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+%         bar([1:size(ampVal_m_mat{2}(:,:),2)], nanmean(ampVal_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+%         ylim_data=[get(gca,'ylim')]';
+%          set(gca,'ylim',[min(ylim_data),min(ylim_data)+30])
+%         p_ampVal_m=min(ylim_data).*ones(size(s_ampVal_m))+5;
+%         plot(s_ampVal_m-0.15,p_ampVal_m,'k*')  
+%         hold off
+%         xlabel('Stim. serial number' ,'FontSize', 16);
+%         ylabel('Response Peak Value [mV]' ,'FontSize', 16);    
+%         title(['Mean Response Peak Value ,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+%                
+%         h8=figure;        
+%         hold on
+% %         set(gca,'Ydir','reverse');
+%         errbar_h=errorbar([1:size(onVal_m_mat{1}(:,:),2)]-0.3,nanmean(onVal_m_mat{1}(:,:),1), nanstd(onVal_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         errbar_h=errorbar([1:size(onVal_m_mat{2}(:,:),2)],nanmean(onVal_m_mat{2}(:,:),1), nanstd(onVal_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         bar([1:size(onVal_m_mat{1}(:,:),2)]-0.3, nanmean(onVal_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+%         bar([1:size(onVal_m_mat{2}(:,:),2)], nanmean(onVal_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+%         ylim_data=[get(gca,'ylim')]';
+%      set(gca,'ylim',[min(ylim_data),min(ylim_data)+30])
+%         p_onVal_m=min(ylim_data).*ones(size(s_onVal_m))+5; 
+%         plot(s_onVal_m-0.15,p_onVal_m,'k*')
+%         hold off
+%         xlabel('Stim. serial number' ,'FontSize', 16);
+%         ylabel('Onset Vm [mV]' ,'FontSize', 16);    
+%         title(['Mean Onset Vm value,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+%         
+%         h9=figure;        
+%         hold on
+%         errbar_h=errorbar([1:size(ampDel_m_mat{1}(:,:),2)]-0.3,nanmean(ampDel_m_mat{1}(:,:),1),zeros(1,size(ampDel_m_mat{1}(:,:),2)), nanstd(ampDel_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         errbar_h=errorbar([1:size(ampDel_m_mat{2}(:,:),2)],nanmean(ampDel_m_mat{2}(:,:),1),zeros(1,size(ampDel_m_mat{2}(:,:),2)), nanstd(ampDel_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         bar([1:size(ampDel_m_mat{1}(:,:),2)]-0.3, nanmean(ampDel_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+%         bar([1:size(ampDel_m_mat{2}(:,:),2)], nanmean(ampDel_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+%         ylim_data=[get(gca,'ylim')]';
+%         p_ampDel_m=max(ylim_data).*ones(size(s_ampDel_m));
+%         plot(s_ampDel_m-0.15,p_ampDel_m,'k*')
+%         hold off
+%         xlabel('Stim. serial number' ,'FontSize', 16);
+%         ylabel('Peak Latency [mS]' ,'FontSize', 16);    
+%         title(['Mean Peak Latency,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+%         
+%     
+%          h10=figure;        
+%         hold on
+%         errbar_h=errorbar([1:size(ampDel_std_mat{1}(:,:),2)]-0.3,nanmean(ampDel_std_mat{1}(:,:),1),zeros(1,size(ampDel_std_mat{1}(:,:),2)), nanstd(ampDel_std_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         errbar_h=errorbar([1:size(ampDel_std_mat{2}(:,:),2)],nanmean(ampDel_std_mat{2}(:,:),1),zeros(1,size(ampDel_std_mat{2}(:,:),2)), nanstd(ampDel_std_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         bar([1:size(ampDel_std_mat{1}(:,:),2)]-0.3, nanmean(ampDel_std_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+%         bar([1:size(ampDel_std_mat{2}(:,:),2)], nanmean(ampDel_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+%         ylim_data=[get(gca,'ylim')]';
+%         p_ampDel_std=max(ylim_data).*ones(size(s_ampDel_std));
+%         plot(s_ampDel_std-0.15,p_ampDel_std,'k*')
+%         hold off
+%         xlabel('Stim. serial number' ,'FontSize', 16);
+%         ylabel('Peak Latency STD [mS]' ,'FontSize', 16);    
+%         title(['Mean Peak Latency Jitter,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+%         
+%          h11=figure;        
+%         hold on
+%         errbar_h=errorbar([1:size(halfWidth_m_mat{1}(:,:),2)]-0.3,nanmean(halfWidth_m_mat{1}(:,:),1),zeros(1,size(halfWidth_m_mat{1}(:,:),2)), nanstd(halfWidth_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         errbar_h=errorbar([1:size(halfWidth_m_mat{2}(:,:),2)],nanmean(halfWidth_m_mat{2}(:,:),1),zeros(1,size(halfWidth_m_mat{2}(:,:),2)), nanstd(halfWidth_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         bar([1:size(halfWidth_m_mat{1}(:,:),2)]-0.3, nanmean(halfWidth_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+%         bar([1:size(halfWidth_m_mat{2}(:,:),2)], nanmean(halfWidth_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+%         ylim_data=[get(gca,'ylim')]';
+%         p_halfWidth_m=max(ylim_data).*ones(size(s_halfWidth_m));
+%         plot(s_halfWidth_m-0.15,p_halfWidth_m,'k*')
+%         hold off
+%         xlabel('Stim. serial number' ,'FontSize', 16);
+%         ylabel('Half-Width [mS]' ,'FontSize', 16);    
+%         title(['Mean Half-Width,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+%         
+%          h12=figure;        
+%         hold on
+%         errbar_h=errorbar([1:size(halfWidth_std_mat{1}(:,:),2)]-0.3,nanmean(halfWidth_std_mat{1}(:,:),1),zeros(1,size(halfWidth_std_mat{1}(:,:),2)), nanstd(halfWidth_std_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         errbar_h=errorbar([1:size(halfWidth_std_mat{2}(:,:),2)],nanmean(halfWidth_std_mat{2}(:,:),1),zeros(1,size(halfWidth_std_mat{2}(:,:),2)), nanstd(halfWidth_std_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+% %         fn_errorbar_capsize(errbar_h,capincrease,asymmetric)
+%         bar([1:size(halfWidth_std_mat{1}(:,:),2)]-0.3, nanmean(halfWidth_std_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+%         bar([1:size(halfWidth_std_mat{2}(:,:),2)], nanmean(halfWidth_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+%         ylim_data=[get(gca,'ylim')]';
+%         p_halfWidth_std=max(ylim_data).*ones(size(s_halfWidth_std));
+%         plot(s_halfWidth_std-0.15,p_halfWidth_std,'k*')
+%         hold off
+%         xlabel('Stim. serial number' ,'FontSize', 16);
+%         ylabel('Half-Width STD [mS]' ,'FontSize', 16);    
+%         title(['Mean Half-Width STD,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);        
 %% Plot parameters along the train stim - version 1: line+error bars of percent change - preparations
 % for stim_num=1:11;
 %        if event_evoked_stat.stim_num(stim_num).lillietest_h_change_failures_m==0      
@@ -1541,5 +1958,6 @@ print(g1,'Evoked Adaptation Amplitude Ratio_paired plot','-dpng','-r600','-openg
 saveas(g1,'Evoked Adaptation Amplitude Ratio_paired_plot','fig') 
 
 filename='Evoked activity event detection'; 
-save(filename, 'files_to_analyze', 'event_evoked', 'event_evoked_stat','amp_stat')
+save(filename, 'files_to_analyze', 'event_evoked', 'event_evoked_stat','stat_failures','stat_nonspecific_count','stat_onset',...
+    'stat_onset_std','stat_amp','stat_amp_std','stat_ampVal','stat_onVal','stat_ampDel','stat_ampDel_std','stat_halfWidth','stat_halfWidth_std')
 end
