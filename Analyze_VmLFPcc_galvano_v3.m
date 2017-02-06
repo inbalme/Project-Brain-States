@@ -18,15 +18,15 @@ cc_stat=[]; cc_spont=[]; cc_evoked=[]; cc=[]; cc_shuffled_it=[]; cc_shuff_sub=[]
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X
  
  global exp_type
-exp_type=3; %1-NBES, 2-ChAT
-trace_type_input=[1,2]; %[3,2] for exp_type=1; %for exp_type=2 or 3 use [1,2]
+exp_type=1; %1-NBES, 2-ChAT
+trace_type_input=[3,2]; %[3,2] for exp_type=1; %for exp_type=2 or 3 use [1,2]
 analyze_time_before_train=0;
 analyze_train_only_flag=1;
 add_to_plot=0.15; %seconds from each side of the trace
-save_flag=0;
+save_flag=1;
 print_flag=0;
 norm_flag=0;
-clamp_flag=3; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
+clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 BPLFP_flag=1; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
@@ -50,7 +50,7 @@ switch exp_type
         legend_string_shuff={'Light On shuffled', 'Light Off shuffled'};
         
     case 3 
-        files_to_analyze =[31,38,42,51,67,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77]; [51,67];
+        files_to_analyze =[31,38,42,51,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77]; [51,67];
         clamp_flag=3;
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2

@@ -2,12 +2,13 @@
 clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
-exp_type=1; %1-NBES, 2-ChAT, 3-NBES VC
+exp_type=3; %1-NBES, 2-ChAT, 3-NBES VC
 trace_type_input=2; %
 analyze_time_before_train=0.1;
 analyze_train_only_flag=0;
-save_flag= 1;
+save_flag= 0;
 print_flag=0;
+paired_plot_flag=1; 
 norm_flag=0;
 clamp_flag=3; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 BP50HzLFP_flag=0; %removing 50Hz noise from LFP signal
@@ -20,11 +21,14 @@ bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from
 %%
 switch exp_type
     case 1
-        files_to_analyze =46; %[8,10,12,14,15,16,22,36,37,40,1,44,46,48,52,56,58,62,72,75,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
+        files_to_analyze =[8,10,12,14,15,16,22,36,37,40,1,44,46,48,52,56,58,62,72,75,82,84];  %[16,22,36,37,40,44,46,48,52,56,58,62,72,75,82,84]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};  y_ax_label={'Vm'}; y_ax_units={'mV'};   
         path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Evoked';
+        if paired_plot_flag==1; 
+            path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Evoked paired plots';
+        end
         a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
         if a==0;
             mkdir(path_output);
@@ -36,16 +40,22 @@ switch exp_type
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};  y_ax_label={'Vm'}; y_ax_units={'mV'};   
         path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Evoked';
-        a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
+         if paired_plot_flag==1; 
+             path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Evoked paired plots';
+         end
+        a = exist(path_output,'dir'); %a will be 7 if a folder "name" exists and 0 otherwise
         if a==0;
             mkdir(path_output);
         end   
     case 3 
-        files_to_analyze =[31,38,42,51,67,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77];
+        files_to_analyze =[31,38,42,51,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77];
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};    y_ax_label={'Im'}; y_ax_units={'pA'};    
         path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis_VC\Evoked';   
+        if paired_plot_flag==1; 
+            path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis_VC\Evoked paired plots';   
+        end
         a = exist(path_output,'dir'); %a will be 7 if a folder "name" exists and 0 otherwise
         if a==0;
             mkdir(path_output);
@@ -77,8 +87,8 @@ end
 
 data_preprocessing   
 
- if ~isempty(current_data_filt)
-     current_data=current_data_filt;
+ if isempty(current_data_filt)
+     current_data_filt=current_data;
  end
  
  clear color_table
@@ -129,7 +139,7 @@ data_preprocessing
 %                   peak_end_int = interval(stim_ISI*(stim_num+1),t);
 %                   peak_start_int = interval(1,t);
 %                   peak_end_int = interval(end,t);
-        voltages_input = current_data(peak_start_int:peak_end_int,trace,x_value(t));
+        voltages_input = current_data_filt(peak_start_int:peak_end_int,trace,x_value(t));
 %         finalAmp_Thres = 1 ;
         doPlot = 0;
         I_temp=0;
@@ -244,19 +254,26 @@ data_preprocessing
             event_halfWidthS_nonspecific{t,stim_num,trace} =  halfWidthS(1); 
             event_halfWidthE_nonspecific{t,stim_num,trace} =  halfWidthE(1); 
             count = count+1;
-
+%need to take as response amplitude the values at ampPos minus at starting,
+%in the Raw Data and not in the filtered data. and then test it.
         else %in this case it is a real response
             failures{t,stim_num,trace}=0;
             event_start{t,stim_num,trace} =  starting(1);
             event_on{t,stim_num,trace} =  (starting(1)-stim2{t}(1,stim_num))*dt*1000; %in msec
             event_onVal{t,stim_num,trace} = current_data(starting(1),trace,x_value(t));
-            event_amplitude{t,stim_num,trace} =  amplitude(1); 
             event_ampPos{t,stim_num,trace} =  ampPos(1); 
             event_ampDel{t,stim_num,trace} =  (ampPos(1)-stim2{t}(1,stim_num))*dt*1000;  %in msec
             event_ampVal{t,stim_num,trace} = current_data(ampPos(1),trace,x_value(t));
             event_halfWidth{t,stim_num,trace} =  halfWidth(1); 
             event_halfWidthS{t,stim_num,trace} =  halfWidthS(1); 
             event_halfWidthE{t,stim_num,trace} =  halfWidthE(1); 
+            event_amplitude{t,stim_num,trace} = current_data(ampPos(1),trace,x_value(t))-current_data(starting(1),trace,x_value(t)); 
+            if event_amplitude{t,stim_num,trace}<=0
+                event_amplitude{t,stim_num,trace}=nan;
+            end
+%             event_amplitude{t,stim_num,trace} =  amplitude(1); 
+           
+           
         end
         if length(starting)>1
             event_start_nonspecific{t,stim_num,trace}=[event_start_nonspecific{t,stim_num,trace}, starting(2:end)];
@@ -991,9 +1008,11 @@ end
 [stat_halfWidth]=fn_sensory_train_response_2_way_rmANOVA(halfWidth_m_mat{1}(:,:), halfWidth_m_mat{2}(:,:));
 [stat_halfWidth_std]=fn_sensory_train_response_2_way_rmANOVA(halfWidth_std_mat{1}(:,:), halfWidth_std_mat{2}(:,:));
 %% Plots with p-values from repeated-measures ANOVA
+color_table_lines = rand(length(files_to_analyze),3);
 %% failures
       h1=figure; 
-for stim=1:size(failures_m_mat{2}(:,:),2);
+      stimz=size(failures_m_mat{2}(:,:),2);
+for stim=1:stimz;
         if stat_failures.p_stim{stim,1}>0.05 
             asterisk_failures{stim,1}='n.s.';
         else if stat_failures.p_stim{stim,1}<0.05 && stat_failures.p_stim{stim,1}>0.01
@@ -1007,14 +1026,15 @@ for stim=1:size(failures_m_mat{2}(:,:),2);
             end
         end
 end
-   
+
 hold on      
         errbar_h=errorbar([1:size(failures_m_mat{1}(:,:),2)]-0.3,nanmean(failures_m_mat{1}(:,:),1),zeros(1,size(failures_m_mat{1}(:,:),2)), nanstd(failures_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         errbar_h=errorbar([1:size(failures_m_mat{2}(:,:),2)],nanmean(failures_m_mat{2}(:,:),1),zeros(1,size(failures_m_mat{2}(:,:),2)), nanstd(failures_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         bar([1:size(failures_m_mat{1}(:,:),2)]-0.3, nanmean(failures_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
         bar([1:size(failures_m_mat{2}(:,:),2)], nanmean(failures_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))
+
         ylim_data=[get(gca,'ylim')]';
-        my=max(ylim_data)-1;
+        my=max(ylim_data)-0.05;
         for stim=1:size(failures_m_mat{2}(:,:),2);
             if strcmp('n.s.',asterisk_failures{stim,1})==0          
              text(stim,my,asterisk_failures{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
@@ -1048,7 +1068,7 @@ hold on
         bar([1:size(nonspecific_count_m_mat{1}(:,:),2)]-0.3, nanmean(nonspecific_count_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
         bar([1:size(nonspecific_count_m_mat{2}(:,:),2)], nanmean(nonspecific_count_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
         ylim_data=[get(gca,'ylim')]';
-        my=max(ylim_data)-1;
+        my=max(ylim_data)-0.05;
         for stim=1:size(nonspecific_count_m_mat{2}(:,:),2);
             if strcmp('n.s.',asterisk_nonspecific_count{stim,1})==0          
              text(stim,my,asterisk_nonspecific_count{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
@@ -1061,7 +1081,8 @@ hold on
         title(['Mean Rate of Non-specific responses,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
          %% onset_m
       h3=figure; 
-for stim=1:size(onset_m_mat{2}(:,:),2);
+      stimz=size(onset_m_mat{2}(:,:),2);
+for stim=1:stimz
         if stat_onset.p_stim{stim,1}>0.05 
             asterisk_onset{stim,1}='n.s.';
         else if stat_onset.p_stim{stim,1}<0.05 && stat_onset.p_stim{stim,1}>0.01
@@ -1081,9 +1102,26 @@ hold on
         errbar_h=errorbar([1:size(onset_m_mat{2}(:,:),2)],nanmean(onset_m_mat{2}(:,:),1),zeros(1,size(onset_m_mat{2}(:,:),2)), nanstd(onset_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         bar([1:size(onset_m_mat{1}(:,:),2)]-0.3, nanmean(onset_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
         bar([1:size(onset_m_mat{2}(:,:),2)], nanmean(onset_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+%for line pair-plots:
+if paired_plot_flag==1; 
+          for stim=1:stimz
+                F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).onset_m;
+                F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+                F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+           end
+                for cell=1:length(files_to_analyze)
+                    for stim=1:stimz
+                        if isnan(F1_Y{stim}(cell,:))
+                        else
+                             plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',10,'markerfacecolor','k')
+%                           pause
+                        end
+                    end
+                end
+end
         ylim_data=[get(gca,'ylim')]';
         my=max(ylim_data)-1;
-        for stim=1:size(onset_m_mat{2}(:,:),2);
+        for stim=1:stimz
             if strcmp('n.s.',asterisk_onset{stim,1})==0          
              text(stim,my,asterisk_onset{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
             end
@@ -1094,8 +1132,10 @@ hold on
         ylabel('Onset Latency [mS]' ,'FontSize', 16);    
         title(['Mean Onset Latency,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
         %% onset std
+        F1_Y=[]; F1_X=[];
       h4=figure; 
-for stim=1:size(onset_std_mat{2}(:,:),2);
+      stimz=size(onset_std_mat{2}(:,:),2);
+for stim=1:stimz;
         if stat_onset_std.p_stim{stim,1}>0.05 
             asterisk_onset_std{stim,1}='n.s.';
         else if stat_onset_std.p_stim{stim,1}<0.05 && stat_onset_std.p_stim{stim,1}>0.01
@@ -1115,9 +1155,26 @@ hold on
         errbar_h=errorbar([1:size(onset_std_mat{2}(:,:),2)],nanmean(onset_std_mat{2}(:,:),1),zeros(1,size(onset_std_mat{2}(:,:),2)), nanstd(onset_std_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         bar([1:size(onset_std_mat{1}(:,:),2)]-0.3, nanmean(onset_std_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
         bar([1:size(onset_std_mat{2}(:,:),2)], nanmean(onset_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+   %for line pair-plots:
+if paired_plot_flag==1; 
+   for stim=1:stimz
+        F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).onset_std;
+        F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+        F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+   end
+        for cell=1:length(files_to_analyze)
+            for stim=1:stimz
+                 if isnan(F1_Y{stim}(cell,:))
+                 else
+                   plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',10,'markerfacecolor','k')
+%                   pause
+                 end
+            end
+        end
+end
         ylim_data=[get(gca,'ylim')]';
         my=max(ylim_data)-1;
-        for stim=1:size(onset_std_mat{2}(:,:),2);
+        for stim=1:stimz;
             if strcmp('n.s.',asterisk_onset_std{stim,1})==0          
              text(stim,my,asterisk_onset_std{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
             end
@@ -1129,7 +1186,8 @@ hold on
         title(['Mean Response Jitter ,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
         %%  amplitude 
       h5=figure; 
-for stim=1:size(amplitude_m_mat{2}(:,:),2);
+      stimz=size(amplitude_m_mat{2}(:,:),2);
+for stim=1:stimz
         if stat_amp.p_stim{stim,1}>0.05 
             asterisk_amp{stim,1}='n.s.';
         else if stat_amp.p_stim{stim,1}<0.05 && stat_amp.p_stim{stim,1}>0.01
@@ -1149,9 +1207,26 @@ hold on
         errbar_h=errorbar([1:size(amplitude_m_mat{2}(:,:),2)],nanmean(amplitude_m_mat{2}(:,:),1),zeros(1,size(amplitude_m_mat{2}(:,:),2)), nanstd(amplitude_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         bar([1:size(amplitude_m_mat{1}(:,:),2)]-0.3, nanmean(amplitude_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
         bar([1:size(amplitude_m_mat{2}(:,:),2)], nanmean(amplitude_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+%for line pair-plots:
+if paired_plot_flag==1; 
+   for stim=1:stimz
+        F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).amplitude_m;
+        F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+        F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+   end
+        for cell=1:length(files_to_analyze)
+            for stim=1:stimz
+                 if isnan(F1_Y{stim}(cell,:))
+                    else
+                        plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',10,'markerfacecolor','k')
+%                         pause
+                 end
+            end
+        end
+end
         ylim_data=[get(gca,'ylim')]';
         my=max(ylim_data)-1;
-        for stim=1:size(amplitude_m_mat{2}(:,:),2);
+        for stim=1:stimz
             if strcmp('n.s.',asterisk_amp{stim,1})==0          
              text(stim,my,asterisk_amp{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
             end
@@ -1159,11 +1234,29 @@ hold on
         hold off
         set(gca,'xlim',[0,size(amplitude_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
         xlabel('Stim. serial number' ,'FontSize', 16);
-       ylabel('Mean Response [mV]' ,'FontSize', 16);    
-        title(['Mean Response Amplitude - local baseline,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);     
+       ylabel(['Amplitude [', y_ax_units{1},']'],'FontSize', 16);    
+        title(['Mean Response Amplitude, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);     
+        %%
+        data_vec=[];
+        nbin=20;
+        for stim=1:stimz
+           data_vec=[data_vec,event_evoked_stat.stim_num(stim).change_amplitude_m'];
+        end
+         Fig1=figure;
+            hold on
+            [ncounts,nbins]=hist(data_vec,nbin);
+%             ncounts(2,:)=ncounts(2,:)./length(data_vec(:,2));
+            h1=bar(nbins,ncounts);
+            
+%             obj = gmdistribution.fit(data_vec(:,1),2);
+%             set(h2,'FaceColor',[0 0 1],'EdgeColor','w')
+%             set(h1,'FaceColor',[0 0 0],'EdgeColor','w','faceAlpha', 0.3)
+            ylim1=get(gca,'ylim');
+       hold off
       %%  amplitude std
       h6=figure; 
-for stim=1:size(amplitude_std_mat{2}(:,:),2);
+      stimz=size(amplitude_std_mat{2}(:,:),2);
+for stim=1:stimz
         if stat_amp_std.p_stim{stim,1}>0.05 
             asterisk_amp_std{stim,1}='n.s.';
         else if stat_amp_std.p_stim{stim,1}<0.05 && stat_amp_std.p_stim{stim,1}>0.01
@@ -1183,6 +1276,23 @@ hold on
         errbar_h=errorbar([1:size(amplitude_std_mat{2}(:,:),2)],nanmean(amplitude_std_mat{2}(:,:),1),zeros(1,size(amplitude_std_mat{2}(:,:),2)), nanstd(amplitude_std_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         bar([1:size(amplitude_std_mat{1}(:,:),2)]-0.3, nanmean(amplitude_std_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
         bar([1:size(amplitude_std_mat{2}(:,:),2)], nanmean(amplitude_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+    %for line pair-plots:
+if paired_plot_flag==1; 
+   for stim=1:stimz
+        F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).amplitude_std;
+        F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+        F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+   end
+        for cell=1:length(files_to_analyze)
+            for stim=1:stimz
+                 if isnan(F1_Y{stim}(cell,:))
+                    else
+                        plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',10,'markerfacecolor','k')
+%                         pause
+                 end
+            end
+        end
+end
         ylim_data=[get(gca,'ylim')]';
         my=max(ylim_data)-1;
         for stim=1:size(amplitude_std_mat{2}(:,:),2);
@@ -1193,11 +1303,12 @@ hold on
         hold off
         set(gca,'xlim',[0,size(amplitude_std_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
         xlabel('Stim. serial number' ,'FontSize', 16);
-        ylabel('Mean Response Amplitude STD [mV]' ,'FontSize', 16);    
+        ylabel(['Amplitude STD [', y_ax_units{1},']'] ,'FontSize', 16);    
         title(['Mean Response Amplitude Jitter,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
          %%  amplitude peak value
+         stimz=size(ampVal_m_mat{2}(:,:),2);
       h7=figure; 
-for stim=1:size(ampVal_m_mat{2}(:,:),2);
+for stim=1:stimz
         if stat_ampVal.p_stim{stim,1}>0.05 
             asterisk_ampVal{stim,1}='n.s.';
         else if stat_ampVal.p_stim{stim,1}<0.05 && stat_ampVal.p_stim{stim,1}>0.01
@@ -1213,25 +1324,50 @@ for stim=1:size(ampVal_m_mat{2}(:,:),2);
 end
    
 hold on      
-        errbar_h=errorbar([1:size(ampVal_m_mat{1}(:,:),2)]-0.3,nanmean(ampVal_m_mat{1}(:,:),1),zeros(1,size(ampVal_m_mat{1}(:,:),2)), nanstd(ampVal_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-        errbar_h=errorbar([1:size(ampVal_m_mat{2}(:,:),2)],nanmean(ampVal_m_mat{2}(:,:),1),zeros(1,size(ampVal_m_mat{2}(:,:),2)), nanstd(ampVal_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        errbar_h=errorbar([1:size(ampVal_m_mat{1}(:,:),2)]-0.3,nanmean(ampVal_m_mat{1}(:,:),1),nanstd(ampVal_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k',zeros(1,size(ampVal_m_mat{1}(:,:),2)), 
+        errbar_h=errorbar([1:size(ampVal_m_mat{2}(:,:),2)],nanmean(ampVal_m_mat{2}(:,:),1),nanstd(ampVal_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k',zeros(1,size(ampVal_m_mat{2}(:,:),2)), 
         bar([1:size(ampVal_m_mat{1}(:,:),2)]-0.3, nanmean(ampVal_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
         bar([1:size(ampVal_m_mat{2}(:,:),2)], nanmean(ampVal_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+    %for line pair-plots:
+if paired_plot_flag==1; 
+    for stim=1:stimz
+        F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).ampVal_m;
+        F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+        F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+   end
+        for cell=1:length(files_to_analyze)
+            for stim=1:stimz
+                 if isnan(F1_Y{stim}(cell,:))
+                    else
+                        plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',10,'markerfacecolor','k')
+%                         pause
+                 end
+            end
+        end
+end
+        axis tight
         ylim_data=[get(gca,'ylim')]';
-        my=max(ylim_data)-1;
+ if ylim_data(2)<=0
+    ylim_data=[ylim_data(1)-5 ylim_data(1)+30]; %get(gca,'ylim'); %[0 8.5];
+    my=min(ylim_data)+2;
+else
+    my=max(ylim_data)-1;
+    ylim_data(1)=0;
+end
         for stim=1:size(ampVal_m_mat{2}(:,:),2);
             if strcmp('n.s.',asterisk_ampVal{stim,1})==0          
              text(stim,my,asterisk_ampVal{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
             end
         end
         hold off
-        set(gca,'xlim',[0,size(ampVal_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
+        set(gca,'xlim',[0,size(ampVal_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11],'ylim',ylim_data)
         xlabel('Stim. serial number' ,'FontSize', 16);
-       ylabel('Mean Peak Value [mV]' ,'FontSize', 16);    
+       ylabel(['Peak Value [', y_ax_units{1},']'] ,'FontSize', 16);    
         title(['Mean Response Peak Value,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);      
                 %%  Response Onset Value
+                stimz=size(onVal_m_mat{2}(:,:),2);
       h8=figure; 
-for stim=1:size(onVal_m_mat{2}(:,:),2);
+for stim=1:stimz
         if stat_onVal.p_stim{stim,1}>0.05 
             asterisk_onVal{stim,1}='n.s.';
         else if stat_onVal.p_stim{stim,1}<0.05 && stat_onVal.p_stim{stim,1}>0.01
@@ -1247,25 +1383,51 @@ for stim=1:size(onVal_m_mat{2}(:,:),2);
 end
    
 hold on      
-        errbar_h=errorbar([1:size(onVal_m_mat{1}(:,:),2)]-0.3,nanmean(onVal_m_mat{1}(:,:),1),zeros(1,size(onVal_m_mat{1}(:,:),2)), nanstd(onVal_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-        errbar_h=errorbar([1:size(onVal_m_mat{2}(:,:),2)],nanmean(onVal_m_mat{2}(:,:),1),zeros(1,size(onVal_m_mat{2}(:,:),2)), nanstd(onVal_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        errbar_h=errorbar([1:size(onVal_m_mat{1}(:,:),2)]-0.3,nanmean(onVal_m_mat{1}(:,:),1),nanstd(onVal_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k',zeros(1,size(onVal_m_mat{1}(:,:),2)), 
+        errbar_h=errorbar([1:size(onVal_m_mat{2}(:,:),2)],nanmean(onVal_m_mat{2}(:,:),1),nanstd(onVal_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k',zeros(1,size(onVal_m_mat{2}(:,:),2)), 
         bar([1:size(onVal_m_mat{1}(:,:),2)]-0.3, nanmean(onVal_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
         bar([1:size(onVal_m_mat{2}(:,:),2)], nanmean(onVal_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+       
+    %for line pair-plots:
+if paired_plot_flag==1;     
+   for stim=1:stimz
+        F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).onVal_m;
+        F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+        F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+   end
+        for cell=1:length(files_to_analyze)
+            for stim=1:stimz
+                 if isnan(F1_Y{stim}(cell,:))
+                    else
+                        plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',10,'markerfacecolor','k')
+%                         pause
+                 end
+            end
+        end
+end
+        axis tight
         ylim_data=[get(gca,'ylim')]';
-        my=max(ylim_data)-1;
+ if ylim_data(2)<=0
+    ylim_data=[ylim_data(1)-5 ylim_data(1)+25]; %get(gca,'ylim'); %[0 8.5];
+    my=min(ylim_data)+2;
+else
+    my=max(ylim_data)-1;
+    ylim_data(1)=0;
+end
         for stim=1:size(onVal_m_mat{2}(:,:),2);
             if strcmp('n.s.',asterisk_amp{stim,1})==0          
              text(stim,my,asterisk_amp{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
             end
         end
         hold off
-        set(gca,'xlim',[0,size(onVal_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
+        set(gca,'xlim',[0,size(onVal_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11],'ylim',ylim_data)
         xlabel('Stim. serial number' ,'FontSize', 16);
-       ylabel('Mean Onset value [mV]' ,'FontSize', 16);    
+       ylabel(['Onset Value [', y_ax_units{1},']'],'FontSize', 16);    
         title(['Mean Response Onset Value,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
                 %%  Response Peak Latency
+                stimz=size(ampDel_m_mat{2}(:,:),2);
       h9=figure; 
-for stim=1:size(ampDel_m_mat{2}(:,:),2);
+for stim=1:stimz
         if stat_ampDel.p_stim{stim,1}>0.05 
             asterisk_ampDel{stim,1}='n.s.';
         else if stat_ampDel.p_stim{stim,1}<0.05 && stat_ampDel.p_stim{stim,1}>0.01
@@ -1285,8 +1447,25 @@ hold on
         errbar_h=errorbar([1:size(ampDel_m_mat{2}(:,:),2)],nanmean(ampDel_m_mat{2}(:,:),1),zeros(1,size(ampDel_m_mat{2}(:,:),2)), nanstd(ampDel_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         bar([1:size(ampDel_m_mat{1}(:,:),2)]-0.3, nanmean(ampDel_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
         bar([1:size(ampDel_m_mat{2}(:,:),2)], nanmean(ampDel_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+    %for line pair-plots:
+if paired_plot_flag==1;        
+   for stim=1:stimz
+        F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).ampDel_m;
+        F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+        F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+   end
+        for cell=1:length(files_to_analyze)
+            for stim=1:stimz
+                 if isnan(F1_Y{stim}(cell,:))
+                    else
+                        plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',10,'markerfacecolor','k')
+%                         pause
+                 end
+            end
+        end
+end
         ylim_data=[get(gca,'ylim')]';
-        my=max(ylim_data)-1;
+        my=max(ylim_data)-5;
         for stim=1:size(ampDel_m_mat{2}(:,:),2);
             if strcmp('n.s.',asterisk_ampDel{stim,1})==0          
              text(stim,my,asterisk_ampDel{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
@@ -1298,8 +1477,9 @@ hold on
        ylabel('Mean Peak Latency [mS]' ,'FontSize', 16);    
         title(['Mean Response Peak Latency, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);     
                 %%  Response Peak Latency STD
+                stimz=size(ampDel_std_mat{2}(:,:),2);
       h10=figure; 
-for stim=1:size(ampDel_std_mat{2}(:,:),2);
+for stim=1:stimz
         if stat_ampDel_std.p_stim{stim,1}>0.05 
             asterisk_ampDel_std{stim,1}='n.s.';
         else if stat_ampDel_std.p_stim{stim,1}<0.05 && stat_ampDel_std.p_stim{stim,1}>0.01
@@ -1319,8 +1499,25 @@ hold on
         errbar_h=errorbar([1:size(ampDel_std_mat{2}(:,:),2)],nanmean(ampDel_std_mat{2}(:,:),1),zeros(1,size(ampDel_std_mat{2}(:,:),2)), nanstd(ampDel_std_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         bar([1:size(ampDel_std_mat{1}(:,:),2)]-0.3, nanmean(ampDel_std_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
         bar([1:size(ampDel_std_mat{2}(:,:),2)], nanmean(ampDel_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+    %for line pair-plots:
+if paired_plot_flag==1;       
+   for stim=1:stimz
+        F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).ampDel_std;
+        F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+        F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+   end
+        for cell=1:length(files_to_analyze)
+            for stim=1:stimz
+                 if isnan(F1_Y{stim}(cell,:))
+                    else
+                        plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',10,'markerfacecolor','k')
+%                         pause
+                 end
+            end
+        end
+end
         ylim_data=[get(gca,'ylim')]';
-        my=max(ylim_data)-1;
+        my=max(ylim_data)-5;
         for stim=1:size(ampDel_std_mat{2}(:,:),2);
             if strcmp('n.s.',asterisk_ampDel_std{stim,1})==0          
              text(stim,my,asterisk_ampDel_std{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
@@ -1329,11 +1526,12 @@ hold on
         hold off
         set(gca,'xlim',[0,size(ampDel_std_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
         xlabel('Stim. serial number' ,'FontSize', 16);
-       ylabel('Mean Peak Latency STD [mS]' ,'FontSize', 16);    
+       ylabel('Peak Latency STD [mS]' ,'FontSize', 16);    
         title(['Mean Response Peak Latency Jitter, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);     
                         %%  Response Half-Width
+                        stimz=size(halfWidth_m_mat{2}(:,:),2);
       h11=figure; 
-for stim=1:size(halfWidth_m_mat{2}(:,:),2);
+for stim=1:stimz
         if stat_halfWidth.p_stim{stim,1}>0.05 
             asterisk_halfWidth{stim,1}='n.s.';
         else if stat_halfWidth.p_stim{stim,1}<0.05 && stat_halfWidth.p_stim{stim,1}>0.01
@@ -1353,8 +1551,25 @@ hold on
         errbar_h=errorbar([1:size(halfWidth_m_mat{2}(:,:),2)],nanmean(halfWidth_m_mat{2}(:,:),1),zeros(1,size(halfWidth_m_mat{2}(:,:),2)), nanstd(halfWidth_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         bar([1:size(halfWidth_m_mat{1}(:,:),2)]-0.3, nanmean(halfWidth_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
         bar([1:size(halfWidth_m_mat{2}(:,:),2)], nanmean(halfWidth_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+    %for line pair-plots:
+if paired_plot_flag==1;
+   for stim=1:stimz
+        F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).halfWidth_m;
+        F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+        F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+   end
+        for cell=1:length(files_to_analyze)
+            for stim=1:stimz
+                 if isnan(F1_Y{stim}(cell,:))
+                    else
+                        plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',10,'markerfacecolor','k')
+%                         pause
+                 end
+            end
+        end
+end
         ylim_data=[get(gca,'ylim')]';
-        my=max(ylim_data)-1;
+        my=max(ylim_data)-5;
         for stim=1:size(halfWidth_m_mat{2}(:,:),2);
             if strcmp('n.s.',asterisk_halfWidth{stim,1})==0          
              text(stim,my,asterisk_halfWidth{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
@@ -1364,10 +1579,11 @@ hold on
         set(gca,'xlim',[0,size(halfWidth_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
         xlabel('Stim. serial number' ,'FontSize', 16);
        ylabel('Half-Width [mS]' ,'FontSize', 16);    
-        title(['Mean ResponseHalf-Width, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
+        title(['Mean Response Half-Width, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
                                 %%  Response Half-Width STD
+    stimz=size(halfWidth_std_mat{2}(:,:),2);
       h12=figure; 
-for stim=1:size(halfWidth_std_mat{2}(:,:),2);
+for stim=1:stimz
         if stat_halfWidth_std.p_stim{stim,1}>0.05 
             asterisk_halfWidth_std{stim,1}='n.s.';
         else if stat_halfWidth_std.p_stim{stim,1}<0.05 && stat_halfWidth_std.p_stim{stim,1}>0.01
@@ -1387,8 +1603,25 @@ hold on
         errbar_h=errorbar([1:size(halfWidth_std_mat{2}(:,:),2)],nanmean(halfWidth_std_mat{2}(:,:),1),zeros(1,size(halfWidth_std_mat{2}(:,:),2)), nanstd(halfWidth_std_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
         bar([1:size(halfWidth_std_mat{1}(:,:),2)]-0.3, nanmean(halfWidth_std_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
         bar([1:size(halfWidth_std_mat{2}(:,:),2)], nanmean(halfWidth_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+    %for line pair-plots:
+if paired_plot_flag==1;
+   for stim=1:stimz
+        F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).halfWidth_std;
+        F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+        F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+   end
+        for cell=1:length(files_to_analyze)
+            for stim=1:stimz
+                 if isnan(F1_Y{stim}(cell,:))
+                    else
+                        plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',10,'markerfacecolor','k')
+%                         pause
+                 end
+            end
+        end
+end
         ylim_data=[get(gca,'ylim')]';
-        my=max(ylim_data)-1;
+        my=max(ylim_data)-5;
         for stim=1:size(halfWidth_std_mat{2}(:,:),2);
             if strcmp('n.s.',asterisk_halfWidth_std{stim,1})==0          
              text(stim,my,asterisk_halfWidth_std{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
@@ -1908,10 +2141,24 @@ nancount=sum(nanmat(1,:));
 tmp_X(1,:)=ones(1,size(tmp_Y,2));
 tmp_X(2,:)=2*ones(1,size(tmp_Y,2));
 E =event_evoked_stat.stim_num(stim_num).adapt_amp_m_std;
+if event_evoked_stat.stim_num(stim_num).wilcoxon_p_adapt_amp >0.05 
+    asterisk_sp='n.s.';
+else if event_evoked_stat.stim_num(stim_num).wilcoxon_p_adapt_amp<0.05 && event_evoked_stat.stim_num(stim_num).wilcoxon_p_adapt_amp>0.01
+    asterisk_sp='*';
+    else if event_evoked_stat.stim_num(stim_num).wilcoxon_p_adapt_amp<0.01 && event_evoked_stat.stim_num(stim_num).wilcoxon_p_adapt_amp>0.001
+            asterisk_sp='**';
+    else if event_evoked_stat.stim_num(stim_num).wilcoxon_p_adapt_amp<0.001
+             asterisk_sp='***';
+        end
+        end
+    end
+end
+my=max(max(event_evoked_stat.stim_num(stim_num).adapt_amp_m))*1.1; 
 g1=figure;
 hold on
 line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(tmp_X(:,1), nanmean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
+text(1.5,my,asterisk_sp,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
 % boxplot(tmp_Y')
 hold off
         x1limits = [0.75 2.25];
@@ -1920,7 +2167,7 @@ hold off
 %         y1ticks = [0,0.5,1];
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
-        ylabel('Adaptation Amplitude Ratio]', 'FontSize', 28,'fontname', 'arial');
+        ylabel('Adaptation Amplitude Ratio', 'FontSize', 28,'fontname', 'arial');
         title(['Adaptation Amplitude Ratio, n=' num2str(nancount) ', p=' num2str(event_evoked_stat.stim_num(stim_num).ttest_p_adapt_amp)] ,'FontSize', 20,'fontname', 'arial');   
 
 %         pause 
@@ -1929,8 +2176,8 @@ end
         %% save figures
 if save_flag==1
 cd(path_output)
-print(h1,'Evoked Failures','-dpng','-r600','-opengl')
 saveas(h1,'Evoked Failures','fig') 
+print(h1,'Evoked Failures','-dpng','-r600','-opengl')
 print(h2,'Evoked Nonspecific Responses','-dpng','-r600','-opengl')
 saveas(h2,'Evoked Nonspecific Responses','fig') 
 print(h3,'Evoked Onset Latency','-dpng','-r600','-opengl')

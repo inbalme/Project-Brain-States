@@ -4,10 +4,10 @@ clear all
 
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data
  global exp_type
-exp_type=2; %1-NBES, 2-ChAT
-save_flag= 0;
+exp_type=3; %1-NBES, 2-ChAT
+save_flag= 1;
 print_flag=0;
-clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
+clamp_flag=3; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 % short_flag=0; %1- short trace, 0- long trace
 baseline_flag=0; %adding dashed line under traces
 bl=-70; %baseline value;
@@ -86,7 +86,7 @@ switch exp_type
             mkdir(path_output2);
       end 
    case 3 
-        files_to_analyze =77; %[31,38,42,51,61,64,67,69,71,74,77];
+        files_to_analyze =31; %[31,38,42,51,61,64,67,69,71,74,77];
         clamp_flag=3; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
@@ -128,8 +128,8 @@ end
         
    data_preprocessing 
    
-    if ~isempty(current_data_filt)
-     current_data=current_data_filt;
+    if isempty(current_data_filt)
+     current_data_filt=current_data;
     end
     
         clear color_table    
@@ -145,19 +145,15 @@ end
         
 % remove outlyers:
 if exp_type==1 && files_to_analyze(fileind)==16;
-    current_data(:,4,:)=[];
+    current_data_filt(:,4,:)=[];
 end
-% if files_to_analyze(fileind)==31;
-%     current_data(:,[1,5,7],:)=[];
-% end
-% if files_to_analyze(fileind)==42;
-%     current_data(:,1,:)=[];
-% end
-                % Subtract mean trace from data with or without spikes
+if exp_type==3 && files_to_analyze(fileind)==31;
+    current_data_filt(:,2,:)=[];
+end
+                %% Subtract mean trace from data with or without spikes
                 meansubtract_start_time = 0; %[sec]
                 meansubtract_duration = 3; %[sec]
 for x_value = 1:size(data.x_value,2) 
-     
                  meansubtract_start_sample = meansubtract_start_time.*sf{channel};
                 if meansubtract_start_time==0
                     meansubtract_start_sample = 1;
@@ -166,7 +162,7 @@ for x_value = 1:size(data.x_value,2)
                 meansubtract_interval = round(meansubtract_start_sample:meansubtract_end_sample);
                
 %                 data_no_spike_no_DC{channel}(:,:,x_value) = fn_Subtract_Mean(data_no_spikes{channel}(:,:,x_value),meansubtract_interval);
-                current_data_no_DC(:,:,x_value) = fn_Subtract_Mean(current_data(:,:,x_value),meansubtract_interval);    
+                current_data_no_DC(:,:,x_value) = fn_Subtract_Mean(current_data_filt(:,:,x_value),meansubtract_interval);    
 end
     end
 
@@ -250,7 +246,7 @@ switch exp_type
 end
  
 
-plot_data=current_data(:,:,x_value); %current_data %current_data_no_DC 
+plot_data=current_data_filt(:,:,x_value); %current_data_filt %current_data_no_DC 
 % if exp_type==2;
 %     plot_data(curr_inj_1*sf{1}:curr_inj_1_end*sf{1},:,:)=nan;
 %     plot_data(curr_inj_2*sf{1}:curr_inj_2_end*sf{1},:,:)=nan;
@@ -367,6 +363,7 @@ switch exp_type
      case 3
         rec3=rectangle('Position',[stim1_X{1}(1)*dt,ylim_data(1),(stim1_X{1}(2)-stim1_X{1}(1))*dt,ylim_data(2)-ylim_data(1)],'faceColor',color_table(3,:),'edgecolor','none');    
 end
+set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 % %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -374,7 +371,6 @@ horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
         
         ylabel('Vm SD [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
-set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
 %%
     %plot spont traces short - no ES:
@@ -391,6 +387,7 @@ axis tight
 ylim_data=[get(gca,'ylim')]';
 xlim_data=get(gca,'xlim');
 set(rec1,'Position',[x_axis_Sshort(1,1)*dt,ylim_data(1),(x_axis_Sshort(1,end)-x_axis_Sshort(1,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
+set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
@@ -399,7 +396,6 @@ horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
         
 ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
-set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
 
 %%
@@ -418,6 +414,7 @@ if exp_type==2;
         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
         line((stim1_X{1}).*dt,stim1_Y,'LineWidth',6,'Color','b') 
 end
+set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
@@ -425,7 +422,6 @@ horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,
  horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=0.05;
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
 ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
-set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
 
 %%
@@ -444,7 +440,7 @@ if exp_type==2;
         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
         line((stim1_X{1}-x_axis_Sshort(2,1)+x_axis_Sshort(1,1)).*dt,stim1_Y,'LineWidth',6,'Color','b') 
 end
-
+set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -452,14 +448,13 @@ horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
         
 ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
-set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
 
 %%
     %plot std trace short:   
         s7=figure;
         hold on
-         rec1=rectangle('Position',[x_axis_Sshort(2,1)*dt,plot_data_std(x_axis_Sshort(1,1),:,1),0.1,0.1]);
+         rec1=rectangle('Position',[x_axis_Sshort(1,1)*dt,plot_data_std(x_axis_Sshort(1,1),:,1),0.1,0.1]);
 htrace1=plot(x_axis_Sshort(1,:)*dt,plot_data_std(x_axis_Sshort(1,:),:,1), 'LineWidth',1.2,'color', color_table(1,:));
 htrace2=plot(x_axis_Sshort(1,:)*dt,plot_data_std(x_axis_Sshort(2,:),:,1), 'LineWidth',1.2,'color', color_table(2,:));
 % text(x_axis_Sshort(1,1)*dt,plot_data_std(x_axis_Sshort(1,1),1),[num2str(floor(plot_data_std(x_axis_Sshort(1,1),1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
@@ -471,6 +466,8 @@ if exp_type==2;
         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
         line((stim1_X{1}-x_axis_Sshort(2,1)+x_axis_Sshort(1,1)).*dt,stim1_Y,'LineWidth',6,'Color','b') 
 end
+set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
+
 %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -478,7 +475,6 @@ horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
 
 ylabel('Vm SD [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
-set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
 
 
@@ -544,6 +540,8 @@ patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
 patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
+set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
+
 %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -551,7 +549,6 @@ horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);        
 hold off
 ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
-set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
 
 %%
@@ -594,6 +591,8 @@ patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
 patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
+set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
+
 %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -602,7 +601,6 @@ horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,
         
 hold off
 ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
-set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
 
  %% plot evoked mean trace
@@ -636,6 +634,8 @@ patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
 patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
+set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
+
 %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -644,8 +644,6 @@ horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,
         
 hold off
 ylabel('Mean Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
-set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
-% l=legend({'NB-','NB+'},'box','off','location','northeast');
 set(gca, 'visible', 'off') ;
 
 %%
@@ -680,13 +678,14 @@ patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
 patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
+set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
+
 %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=1;     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);hold off
 ylabel('Vm SD [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
-set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
 
 %%
@@ -739,6 +738,8 @@ patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
 patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
+set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
+
 %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -746,7 +747,6 @@ horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);         
 hold off
 ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
-set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
 
 %%
@@ -789,6 +789,8 @@ patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
 patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
+set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
+
 %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -797,7 +799,6 @@ horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,
         
 hold off
 ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
-set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
 
  %% plot evoked mean trace
@@ -831,6 +832,8 @@ patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
 patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
+set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
+
 %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -839,8 +842,6 @@ horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,
         
 hold off
 ylabel('Mean Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
-set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
-% l=legend({'NB-','NB+'},'box','off','location','northeast');
 set(gca, 'visible', 'off') ;
 
 %%
@@ -875,13 +876,14 @@ patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
 patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
+set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
+
 %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=1;     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);hold off
 ylabel('Vm SD [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
-set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[])
 set(gca, 'visible', 'off') ;
 
 %%

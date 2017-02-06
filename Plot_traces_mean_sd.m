@@ -5,7 +5,7 @@ clear all
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data
  global exp_type
 exp_type=2; %1-NBES, 2-ChAT
-save_flag= 0;
+save_flag= 1;
 print_flag=0;
 clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 % short_flag=0; %1- short trace, 0- long trace
@@ -71,7 +71,7 @@ switch exp_type
       end 
 
     case 2
-        files_to_analyze =87; %[74,76,77,80,82,84,87];
+        files_to_analyze =84; %[74,76,77,80,82,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};    y_ax_label={'Vm'}; y_ax_units={'mV'}; 
@@ -86,7 +86,7 @@ switch exp_type
             mkdir(path_output2);
       end 
    case 3 
-        files_to_analyze =77; %[31,38,42,51,61,64,67,69,71,74,77];
+        files_to_analyze =74; %[31,38,42,51,61,64,67,69,71,74,77];
         clamp_flag=3; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
@@ -128,8 +128,8 @@ end
         
    data_preprocessing 
    
-    if ~isempty(current_data_filt)
-     current_data=current_data_filt;
+    if isempty(current_data_filt)
+     current_data_filt=current_data;
     end
     
         clear color_table    
@@ -145,19 +145,15 @@ end
         
 % remove outlyers:
 if exp_type==1 && files_to_analyze(fileind)==16;
-    current_data(:,4,:)=[];
+    current_data_filt(:,4,:)=[];
 end
-% if files_to_analyze(fileind)==31;
-%     current_data(:,[1,5,7],:)=[];
-% end
-% if files_to_analyze(fileind)==42;
-%     current_data(:,1,:)=[];
-% end
-                % Subtract mean trace from data with or without spikes
+if exp_type==3 && files_to_analyze(fileind)==31;
+    current_data_filt(:,2,:)=[];
+end
+                %% Subtract mean trace from data with or without spikes
                 meansubtract_start_time = 0; %[sec]
                 meansubtract_duration = 3; %[sec]
 for x_value = 1:size(data.x_value,2) 
-     
                  meansubtract_start_sample = meansubtract_start_time.*sf{channel};
                 if meansubtract_start_time==0
                     meansubtract_start_sample = 1;
@@ -166,7 +162,7 @@ for x_value = 1:size(data.x_value,2)
                 meansubtract_interval = round(meansubtract_start_sample:meansubtract_end_sample);
                
 %                 data_no_spike_no_DC{channel}(:,:,x_value) = fn_Subtract_Mean(data_no_spikes{channel}(:,:,x_value),meansubtract_interval);
-                current_data_no_DC(:,:,x_value) = fn_Subtract_Mean(current_data(:,:,x_value),meansubtract_interval);    
+                current_data_no_DC(:,:,x_value) = fn_Subtract_Mean(current_data_filt(:,:,x_value),meansubtract_interval);    
 end
     end
 
@@ -175,7 +171,7 @@ trace_fontsize=12;
 scalebar_fontsize=12;
 plot_stim_1=[1,0,1];
 plot_stim_2=[0,1,1];
-trace_ind =[1:size(current_data,2)]; % [1,2,3,4,5,6]; %1:size(plot_data,2);  %trace_ind is the numbers of traces to be plotted
+trace_ind =[1:size(current_data_filt,2)]; % [1,2,3,4,5,6]; %1:size(plot_data,2);  %trace_ind is the numbers of traces to be plotted
 switch exp_type
     case 1
         stim2{1}=stim2_X{2};
@@ -183,7 +179,7 @@ switch exp_type
         x_value=1:3;   
         galvano_nstim = Param.facade(6);
         galvano_freq = Param.facade(7);
-         if size(current_data,1)>12*sf{1}
+         if size(current_data_filt,1)>12*sf{1}
             x_axis_Slong=0.5*sf{1}:12*sf{1}-1;
             x_axis_Elong=round((stim1_X{1}(2,1)+10):10*sf{1}-1);
         else
@@ -232,7 +228,7 @@ switch exp_type
         curr_inj_depo = Param.facade(1);
         curr_inj_hyper = Param.facade(2);
         curr_inj_dur = Param.facade(7);
-        if size(current_data,1)>12*sf{1}
+        if size(current_data_filt,1)>12*sf{1}
             x_axis_Slong=0.5*sf{1}:12*sf{1}-1;
             x_axis_Elong=1:12*sf{1}-1;
         else
@@ -250,7 +246,7 @@ switch exp_type
 end
  
 
-plot_data=current_data(:,:,x_value); %current_data %current_data_no_DC 
+plot_data=current_data_filt(:,:,x_value); %current_data_filt %current_data_no_DC 
 % if exp_type==2;
 %     plot_data(curr_inj_1*sf{1}:curr_inj_1_end*sf{1},:,:)=nan;
 %     plot_data(curr_inj_2*sf{1}:curr_inj_2_end*sf{1},:,:)=nan;
@@ -281,7 +277,7 @@ plot_data_var=var(current_data_no_DC(:,:,x_value),0,2); % plot_data_var=var(plot
         rec2=rectangle('Position',[segment1(1,1)*dt,trace_to_plot(segment1(1,1)),0.1,0.1]);
 htrace1=plot(segment1*dt,trace_to_plot(segment1,:,:), 'LineWidth',1.2,'color', color_table(1,:));
 htrace2=plot(segment2*dt,trace_to_plot(segment2,:,:), 'LineWidth',1.2,'color', color_table(2,:));
-    text(x_axis_Slong(1)*dt,trace_to_plot(x_axis_Slong(1),1),[num2str(floor(plot_data(x_axis_Slong(1),1,1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
+%     text(x_axis_Slong(1)*dt,trace_to_plot(x_axis_Slong(1),1),[num2str(floor(plot_data(x_axis_Slong(1),1,1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
 % for i=1:length(trace_ind); %adding the voltage value of the first data point to the left of the trace
 %     text(x_axis_Slong(1)*dt,trace_to_plot(x_axis_Slong(1),i),[num2str(floor(plot_data(x_axis_Slong(1),i,1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
 % end
