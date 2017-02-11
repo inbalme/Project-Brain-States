@@ -71,7 +71,7 @@ switch exp_type
       end 
 
     case 2
-        files_to_analyze =84; %[74,76,77,80,82,84,87];
+        files_to_analyze =87; %[74,76,77,80,82,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};    y_ax_label={'Vm'}; y_ax_units={'mV'}; 

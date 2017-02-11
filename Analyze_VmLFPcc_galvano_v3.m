@@ -18,8 +18,8 @@ cc_stat=[]; cc_spont=[]; cc_evoked=[]; cc=[]; cc_shuffled_it=[]; cc_shuff_sub=[]
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X
  
  global exp_type
-exp_type=1; %1-NBES, 2-ChAT
-trace_type_input=[3,2]; %[3,2] for exp_type=1; %for exp_type=2 or 3 use [1,2]
+exp_type=2; %1-NBES, 2-ChAT
+trace_type_input=[1,2]; %[3,2] for exp_type=1; %for exp_type=2 or 3 use [1,2]
 analyze_time_before_train=0;
 analyze_train_only_flag=1;
 add_to_plot=0.15; %seconds from each side of the trace
@@ -30,9 +30,9 @@ clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 BPLFP_flag=1; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
-bp_manual_LFP=[0.1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
-BPVm_flag=0; %filtering LFP and Vm same as LFP was filtered in the multiclamp
-bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
+bp_manual_LFP=[30,50];%[0.1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
+BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
+bp_manual_Vm=[30,50];%[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
     
 switch exp_type
     case 1
