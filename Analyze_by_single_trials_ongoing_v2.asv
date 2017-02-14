@@ -6,7 +6,7 @@ exp_type=2; %1-NBES, 2-ChAT
 trace_type_input=1; %
 analyze_time_before_train=0;
 analyze_train_only_flag=1;
-save_flag= 1;
+save_flag= 0;
 print_flag=0;
 norm_flag=0;
 clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
@@ -19,7 +19,7 @@ bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from
 %%
 switch exp_type
     case 1
-        files_to_analyze =[8,10,12,14,15,16,22,37,40,1,44,46,48,52,58,72,75,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
+        files_to_analyze =[8,10,12,14,15,16,22,37,40,1,44,46,48,52,56,58,62,72,75,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};  y_ax_label={'Vm'}; y_ax_units={'mV'};  
@@ -40,7 +40,7 @@ switch exp_type
             mkdir(path_output);
         end   
     case 3 
-            files_to_analyze =[31,38,42,51,61,64,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77];
+            files_to_analyze =[31,38,42,51,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77];61,64,
             cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
             load NBES_Files_v2
             legend_string={'NB+', 'NB-'};    y_ax_label={'Im'}; y_ax_units={'pA'};    
@@ -105,51 +105,57 @@ clear color_table
                             
         for t=1:2;
             event_start_vec{t}=[];  event_onVal_vec{t} = [];  event_amplitude_vec{t} =  [];    event_ampPos_vec{t} =  []; 
-            event_ampVal_vec{t} = [];     event_halfWidth_vec{t} =  [];   event_halfWidthS_vec{t} =  []; 
+            event_ampVal_vec{t} = [];     event_halfWidth_vec{t} =  [];   event_halfWidthS_vec{t} =  []; event_peak90prcntTime_vec{t}=[];
             event_halfWidthE_vec{t} =  [];       
           for trace=1:size(current_data,2)    
               event_start{t,trace}=[];                      event_onVal{t,trace} = [];
             event_amplitude{t,trace} =  [];             event_ampPos{t,trace} =  [];             event_ampVal{t,trace} = [];
-            event_halfWidth{t,trace} =  [];            event_halfWidthS{t,trace} =  [];             event_halfWidthE{t,trace} =  []; 
+            event_halfWidth{t,trace} =  [];            event_halfWidthS{t,trace} =  [];             event_halfWidthE{t,trace} =  []; event_peak90prcntTime{t,trace}=[];
             
               for epoch=1:epochs
                   starting=[]; amplitude=[]; ampPos=[]; halfWidth=[]; halfWidthS=[]; halfWidthE=[];
                   peak_start_int = interval(1+sf{1}*epoch_length*(epoch-1),t);
                   peak_end_int = interval(sf{1}*epoch_length*epoch,t);
-%         voltages_input = current_data(peak_start_int:peak_end_int,trace,x_value(t));
-        voltages_input = current_data_smooth(peak_start_int:peak_end_int,trace,x_value(t));
+        %         voltages_input = current_data(peak_start_int:peak_end_int,trace,x_value(t));
+                   voltages_input = current_data_smooth(peak_start_int:peak_end_int,trace,x_value(t));
 
-        doPlot = 0;
-        I_temp=0;
-        [voltages, tmp_starting,tmp_amplitude, tmp_ampPos, halfWidth,tmp_halfWidthS, tmp_halfWidthE] = fn_EventDetector_v2(voltages_input, dt, finalAmp_Thres, doPlot,I_temp);
-%         title(['t=', num2str(t), ' trace ',num2str(trace)]); 
-%         set(gca,'ylim',[-60 -30])
-%          pause
-       
-    %correcting to the real locations in the trace
-         starting=(tmp_starting+peak_start_int-1)'; 
-         ampPos=(tmp_ampPos+peak_start_int-1)'; 
-         halfWidthS=(tmp_halfWidthS+peak_start_int-1)'; 
-         halfWidthE=(tmp_halfWidthE+peak_start_int-1)'; 
-         amplitude=tmp_amplitude';        
-                 
-         %if an event ends after a second event has started -> take halfWidthE to be the starting point of
-         %the next event:
-         tmp=find(starting(2:end)-halfWidthE(1:end-1)<0);
-         if ~isempty(tmp)
-              halfWidthE(tmp)=starting(tmp+1);
-         end         
-        halfWidth=(halfWidthE-halfWidthS).*dt.*1000; %in msec
-            event_start{t,trace} =  [event_start{t,trace};  starting];            
-            event_onVal{t,trace} = [event_onVal{t,trace}; current_data(starting,trace,x_value(t))];
-%             event_amplitude{t,trace} =  [event_amplitude{t,trace}; amplitude]; 
-            event_ampPos{t,trace} =  [event_ampPos{t,trace}; ampPos]; 
-            event_ampVal{t,trace} = [event_ampVal{t,trace}; current_data(ampPos,trace,x_value(t))];
-            event_halfWidth{t,trace} =  [event_halfWidth{t,trace}; halfWidth]; 
-            event_halfWidthS{t,trace} =  [event_halfWidthS{t,trace}; halfWidthS]; 
-            event_halfWidthE{t,trace} =  [event_halfWidthE{t,trace}; halfWidthE]; 
-            event_amplitude{t,trace} =  [event_amplitude{t,trace}; current_data(ampPos,trace,x_value(t))-current_data(starting,trace,x_value(t))]; 
-    end        
+                   doPlot = 0;
+                    I_temp=0;
+                    [voltages, tmp_starting,tmp_amplitude, tmp_ampPos, halfWidth,tmp_halfWidthS, tmp_halfWidthE] = fn_EventDetector_v2(voltages_input, dt, finalAmp_Thres, doPlot,I_temp);
+            %         title(['t=', num2str(t), ' trace ',num2str(trace)]); 
+            %         set(gca,'ylim',[-60 -30])
+            %          pause
+
+                %correcting to the real locations in the trace
+                     starting=(tmp_starting+peak_start_int-1)'; 
+                     ampPos=(tmp_ampPos+peak_start_int-1)'; 
+                     halfWidthS=(tmp_halfWidthS+peak_start_int-1)'; 
+                     halfWidthE=(tmp_halfWidthE+peak_start_int-1)'; 
+                     amplitude=tmp_amplitude'; 
+
+                     %if an event ends after a second event has started -> take halfWidthE to be the starting point of
+                     %the next event:
+                     tmp=find(starting(2:end)-halfWidthE(1:end-1)<0);
+                     if ~isempty(tmp)
+                          halfWidthE(tmp)=starting(tmp+1);
+                     end         
+                    halfWidth=(halfWidthE-halfWidthS).*dt.*1000; %in msec
+                    event_start{t,trace} =  [event_start{t,trace};  starting];            
+                    event_onVal{t,trace} = [event_onVal{t,trace}; current_data(starting,trace,x_value(t))];
+        %             event_amplitude{t,trace} =  [event_amplitude{t,trace}; amplitude]; 
+                    event_ampPos{t,trace} =  [event_ampPos{t,trace}; ampPos]; 
+                    event_ampVal{t,trace} = [event_ampVal{t,trace}; current_data(ampPos,trace,x_value(t))];
+                    event_halfWidth{t,trace} =  [event_halfWidth{t,trace}; halfWidth]; 
+                    event_halfWidthS{t,trace} =  [event_halfWidthS{t,trace}; halfWidthS]; 
+                    event_halfWidthE{t,trace} =  [event_halfWidthE{t,trace}; halfWidthE]; 
+                    event_amplitude{t,trace} =  [event_amplitude{t,trace}; current_data(ampPos,trace,x_value(t))-current_data(starting,trace,x_value(t))]; 
+              end        
+         for j=1:length(event_start{t,trace})
+             peak_int=event_start{t,trace}(j): event_ampPos{t,trace}(j);            
+             peak90prcntLoc(:,j)=find(current_data(peak_int,trace,x_value(t))-event_onVal{t,trace}(j)>=0.9.*event_amplitude{t,trace}(j),1);
+             peak90prcntTime(:,j)=peak90prcntLoc(:,j).*dt.*1000; %[time from event onset to 90% of peak, in mS]
+         end
+            event_peak90prcntTime{t,trace}=peak90prcntTime;
             %% visualize the detected events on the trace         
         if print_flag==1
             figure(1); clf
@@ -182,7 +188,8 @@ clear color_table
             event_ampVal_vec{t} = [event_ampVal_vec{t}(:); event_ampVal{t,trace}(:)];
             event_halfWidth_vec{t} =  [event_halfWidth_vec{t}(:); event_halfWidth{t,trace}(:)]; 
             event_halfWidthS_vec{t} =  [event_halfWidthS_vec{t}(:); event_halfWidthS{t,trace}(:)]; 
-            event_halfWidthE_vec{t} =  [event_halfWidthE_vec{t}(:); event_halfWidthE{t,trace}(:)];             
+            event_halfWidthE_vec{t} =  [event_halfWidthE_vec{t}(:); event_halfWidthE{t,trace}(:)];       
+            event_peak90prcntTime_vec{t}=[event_peak90prcntTime_vec{t}(:); event_peak90prcntTime{t,trace}(:)];
           end
            event_count(1,t)=length(event_start_vec{t}(:));
            event_freq(1,t) = event_count(1,t)/(duration*size(current_data,2));
@@ -218,8 +225,9 @@ clear color_table
             event_ongoing(fileind).amplitude = event_amplitude_vec; 
             event_ongoing(fileind).halfWidth = event_halfWidth_vec; 
             event_ongoing(fileind).halfWidthS = event_halfWidthS_vec; 
-            event_ongoing(fileind).halfWidthE = event_halfWidthE_vec;            
-            
+            event_ongoing(fileind).halfWidthE = event_halfWidthE_vec;          
+             event_ongoing(fileind).peak90prcntTime = event_peak90prcntTime_vec;
+             
             event_count_cells(fileind,:)=event_count;
             event_freq_cells(fileind,:)=event_freq;
             event_onVal_m(fileind,:)=cellfun(@mean,event_onVal_vec);
@@ -229,6 +237,7 @@ clear color_table
             event_amplitude_m(fileind,:)=cellfun(@mean,event_amplitude_vec);
             event_halfWidth_m(fileind,:)=cellfun(@mean,event_halfWidth_vec);
             event_halfWidth_std(fileind,:)=cellfun(@std,event_halfWidth_vec);
+            event_peak90prcntTime_m(fileind,:)=cellfun(@mean,event_peak90prcntTime_vec); 
 
             %% cell stats:
 %  onVal_vec_tmp= event_onVal_vec{1};   
@@ -384,6 +393,26 @@ clear color_table
          [event_ongoing_stat.wilcoxon_p_halfWidth_m, event_ongoing_stat.wilcoxon_h_halfWidth_m]= signrank(event_ongoing_stat.halfWidth_m(:,1),event_ongoing_stat.halfWidth_m(:,2));
 
         clear norm_event_halfWidth_m_noES norm_event_halfWidth_m_ES diff_event_halfWidth_m tmp
+        
+        event_peak90prcntTime_m
+        %half width of spontaneous events
+        tmp = event_peak90prcntTime_m;  
+        event_ongoing_stat.peak90prcntTime_m = event_peak90prcntTime_m;
+        norm_event_peak90prcntTime_m_noES(:,1)= tmp(:,1)./tmp(:,1);
+        norm_event_peak90prcntTime_m_ES(:,1)= tmp(:,2)./tmp(:,1);
+        event_ongoing_stat.norm_peak90prcntTime_m = [norm_event_peak90prcntTime_m_noES, norm_event_peak90prcntTime_m_ES];
+        event_ongoing_stat.peak90prcntTime_m_m= nanmean(tmp,1);
+        event_ongoing_stat.peak90prcntTime_m_std= nanstd(tmp,0,1);
+        %testing for normal distribution
+        diff_event_peak90prcntTime_m= tmp(:,2)- tmp(:,1);
+        [event_ongoing_stat.lillietest_h_peak90prcntTime_m, event_ongoing_stat.lillietest_p_peak90prcntTime_m] = lillietest(diff_event_peak90prcntTime_m);
+        %paired ttest 
+        [event_ongoing_stat.ttest_h_norm_peak90prcntTime_m, event_ongoing_stat.ttest_p_norm_peak90prcntTime_m]= ttest(event_ongoing_stat.norm_peak90prcntTime_m(:,1),event_ongoing_stat.norm_peak90prcntTime_m(:,2));
+        [event_ongoing_stat.ttest_h_peak90prcntTime_m, event_ongoing_stat.ttest_p_peak90prcntTime_m]= ttest(event_ongoing_stat.peak90prcntTime_m(:,1),event_ongoing_stat.peak90prcntTime_m(:,2));
+         [event_ongoing_stat.wilcoxon_p_peak90prcntTime_m, event_ongoing_stat.wilcoxon_h_peak90prcntTime_m]= signrank(event_ongoing_stat.peak90prcntTime_m(:,1),event_ongoing_stat.peak90prcntTime_m(:,2));
+
+        clear norm_event_peak90prcntTime_m_noES norm_event_peak90prcntTime_m_ES diff_event_peak90prcntTime_m tmp
+
  %% plots
 tmp_Y= event_ongoing_stat.freq';
 tmp_X(1,:)=ones(1,size(tmp_Y,2));
@@ -435,7 +464,7 @@ else if event_ongoing_stat.wilcoxon_p_amplitude_m<0.05 && event_ongoing_stat.wil
     end
 end
 linex=[1;2];
-my=max(max(event_ongoing_stat.amplitude_m))*1-2; 
+my=max(max(event_ongoing_stat.amplitude_m))*1.1-2; 
 liney=[my ;my ];
 
 g2=figure;
@@ -455,7 +484,7 @@ hold off
         ylabel(['Amplitude [', y_ax_units{1},']'], 'FontSize', 28,'fontname', 'arial');
         title(['Spontaneous event Amplitude,  p=' num2str(event_ongoing_stat.wilcoxon_p_amplitude_m)] ,'FontSize', 20,'fontname', 'arial');   
 %%
-        tmp_Y= event_ongoing_stat.halfWidth_m';
+tmp_Y= event_ongoing_stat.halfWidth_m';
 tmp_X(1,:)=ones(1,size(tmp_Y,2));
 tmp_X(2,:)=2*ones(1,size(tmp_Y,2));
 E = event_ongoing_stat.halfWidth_m_std;
@@ -472,7 +501,7 @@ else if event_ongoing_stat.wilcoxon_p_halfWidth_m<0.05 && event_ongoing_stat.wil
     end
 end
 linex=[1;2];
-my=max(max(event_ongoing_stat.halfWidth_m))*1.1; 
+my=max(max(event_ongoing_stat.halfWidth_m))+2; 
 liney=[my ;my ];
 g3=figure;
 hold on
@@ -507,7 +536,27 @@ hold off
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
         ylabel(['Event Onset value [', y_ax_units{1},']'], 'FontSize', 28,'fontname', 'arial');
-        title(['Spontaneous event onset value,  p=' num2str(event_ongoing_stat.wilcoxon_p_onVal_m)] ,'FontSize', 20,'fontname', 'arial');   
+        title(['Spontaneous event onset value,  p=' num2str(event_ongoing_stat.wilcoxon_p_onVal_m)] ,'FontSize', 20,'fontname', 'arial');
+        
+%% peak90prcntTime_m
+tmp_Y= event_ongoing_stat.peak90prcntTime_m';
+tmp_X(1,:)=ones(1,size(tmp_Y,2));
+tmp_X(2,:)=2*ones(1,size(tmp_Y,2));
+E = event_ongoing_stat.peak90prcntTime_m_std;
+g5=figure;
+hold on
+line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
+errorbar(tmp_X(:,1), nanmean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
+hold off
+        x1limits = [0.75 2.25];
+        x1ticks = [1,2];
+%         y1limits = [0 1.1];
+%         y1ticks = [0,0.5,1];
+        set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
+        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
+        ylabel('Event Rise-Time [mS]', 'FontSize', 28,'fontname', 'arial');
+        title(['Spontaneous event rise-time to 90% peak,  p=' num2str(event_ongoing_stat.wilcoxon_p_onVal_m)] ,'FontSize', 20,'fontname', 'arial');
+    
         %% save figures
 if save_flag==1
 cd(path_output)
@@ -519,6 +568,8 @@ print(g3,'Spontaneous event half-width','-dpng','-r600','-opengl')
 saveas(g3,'Spontaneous event half-width','fig') 
 print(g4,'Spontaneous event onset value','-dpng','-r600','-opengl')
 saveas(g4,'Spontaneous event onset value','fig') 
+print(g5,'Spontaneous event rise-time','-dpng','-r600','-opengl')
+saveas(g5,'Spontaneous event rise-time','fig') 
 filename='Spontaneous activity'; 
 save(filename, 'files_to_analyze', 'event_ongoing', 'event_ongoing_stat')
 end

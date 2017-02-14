@@ -1,8 +1,8 @@
 %% Analyze Vm histograms and powerspectrum
-% This file was created on 15/1/2017 based on
-% "Analyze_NBES_Vm_hist_and_powerspec_10_20Hz_v2'
-%This file is used for the analysis of files created with
-%extract_NBES_Data_v3 or Extract_ChAT_Data_v3
+% This file was created on 15/1/2017 based on "Analyze_NBES_Vm_hist_and_powerspec_10_20Hz_v2'
+%This file is used for the analysis of files created with extract_NBES_Data_v3 or Extract_ChAT_Data_v3
+%when running: pay attention to change the exp_type and files_to_analyze.
+%To analyze LFP, change current_data=Ch2_data. for powerspectrum this is in line 400.
 
 %       protocol 5 (NBES+galvnao (5 x-values))
 %       protocol 6 (ChAT intracellular current injections light+galvnao (15 x-values))

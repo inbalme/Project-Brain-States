@@ -142,6 +142,9 @@ cell_props.R_total_NoExpFit=Rin;
 [cell_props.R_cell_ttest_h,cell_props.R_cell_ttest_p]=ttest(cell_props.R_cell(:,1),cell_props.R_cell(:,2));
 [cell_props.R_cell_wilcoxon_p,cell_props.R_cell_wilcoxon_h]=signrank(cell_props.R_cell(:,1),cell_props.R_cell(:,2));
 
+[cell_props.C_cell_lillietest_h,cell_props.C_cell_lillietest_p]=lillietest(cell_props.C_cell(:,2)-cell_props.C_cell(:,1));
+[cell_props.C_cell_ttest_h,cell_props.C_cell_ttest_p]=ttest(cell_props.C_cell(:,1),cell_props.C_cell(:,2));
+[cell_props.C_cell_wilcoxon_p,cell_props.C_cell_wilcoxon_h]=signrank(cell_props.C_cell(:,1),cell_props.C_cell(:,2));
 %%
 tmp_Y= [cell_props.R_cell./1000000]';
 tmp_X(1,:)=ones(1,size(tmp_Y,2));

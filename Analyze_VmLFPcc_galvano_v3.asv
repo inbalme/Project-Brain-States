@@ -18,21 +18,21 @@ cc_stat=[]; cc_spont=[]; cc_evoked=[]; cc=[]; cc_shuffled_it=[]; cc_shuff_sub=[]
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X
  
  global exp_type
-exp_type=1; %1-NBES, 2-ChAT
-trace_type_input=[3,2]; %[3,2] for exp_type=1; %for exp_type=2 or 3 use [1,2]
+exp_type=2; %1-NBES, 2-ChAT
+trace_type_input=[1,2]; %[3,2] for exp_type=1; %for exp_type=2 or 3 use [1,2]
 analyze_time_before_train=0;
 analyze_train_only_flag=1;
 add_to_plot=0.15; %seconds from each side of the trace
-save_flag=1;
+save_flag=0;
 print_flag=0;
 norm_flag=0;
 clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 BPLFP_flag=1; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
-bp_manual_LFP=[0.1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
+bp_manual_LFP=[0.1,200];%[0.1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 BPVm_flag=0; %filtering LFP and Vm same as LFP was filtered in the multiclamp
-bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
+bp_manual_Vm=[0,300];%[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
     
 switch exp_type
     case 1
@@ -760,11 +760,41 @@ ta=table(S_1,lag0_spont_noNB,lag0_spont_NB,lag0_evoked_noNB,lag0_evoked_NB,...
 factorNames = {'Sensory_stim','NB'};
 within = table({'Sp';'Sp';'Ev';'Ev'},{'N';'Y';'N';'Y'},'VariableNames',factorNames); %the levels of each factor in each measurment witgin subject
 % fit the repeated measures model
-rm = fitrm(ta,'Y1-Y4~1','WithinDesign',within);
+rm_lag0 = fitrm(ta,'Y1-Y4~1','WithinDesign',within);
 %test for sphericity
-mauchly(rm)
+mauchly(rm_lag0)
 % run my repeated measures anova here
-[ranovatbl] = ranova(rm, 'WithinModel','Sensory_stim*NB');
+[ranovatbl_lag0] = ranova(rm_lag0, 'WithinModel','Sensory_stim*NB');
+%multiple comparisons:
+NBbySS_lag0 = multcompare(rm_lag0,'NB','By','Sensory_stim');
+SSbyNB_lag0 = multcompare(rm_lag0,'Sensory_stim','By','NB');
+lag0_rmANOVA_p= table2cell(ranovatbl_lag0(5,5));
+
+eps_lag0 = epsilon(rm_lag0);
+eps=table2cell(eps_lag0(1,2));
+%in case where the sphericity assumption is violated (mauchly test p<0.05):
+%if eps<0.75 - use the Greenhouse-Geisser correction.
+%if eps>0.75 - use the Huynh-Feldt correction
+if eps{1}<0.75
+    lag0_p_evoked=table2cell(NBbySS_lag0(1,6));
+    lag0_p_spont=table2cell(NBbySS_lag0(3,6));
+else
+     lag0_p_evoked=table2cell(NBbySS_lag0(1,7));
+     lag0_p_spont=table2cell(NBbySS_lag0(3,7));
+end
+
+lag0_stat.table=ta;
+lag0_stat.table_data_vecs=ta_vector_names;
+lag0_stat.within_design=within;
+lag0_stat.rm=rm_lag0;
+lag0_stat.mauchly=mauchly_lag0;
+lag0_stat.eps=eps_lag0;
+lag0_stat.ANOVA=ranovatbl_lag0;
+lag0_stat.multcomp_NBbySS=NBbySS_lag0;
+lag0_stat.multcomp_SSbyNB=SSbyNB_lag0;
+lag0_stat.rmANOVA_p=lag0_rmANOVA_p;
+lag0_stat.evoked_p=lag0_p_evoked;
+lag0_stat.spont_p=lag0_p_spont;
 %% rmANOVA with matlab function - lag0 shuffled
 lag0_shuff_spont_noNB(:,1)=cc_stat.spont.lag0_shuff(:,1);
 lag0_shuff_spont_NB(:,1)=cc_stat.spont.lag0_shuff(:,2);
@@ -775,18 +805,47 @@ lag0_shuff_evoked(:,1)=[lag0_shuff_evoked_noNB;lag0_shuff_evoked_NB];
  S_1(:,1)=1:length(files_to_analyze);
  
 clear rm ranovatbl ta
-
+ta_vector_names={'lag0_shuff_spont_noNB','lag0_shuff_spont_NB','lag0_shuff_evoked_noNB','lag0_shuff_evoked_NB'};
 ta=table(S_1,lag0_shuff_spont_noNB,lag0_shuff_spont_NB,lag0_shuff_evoked_noNB,lag0_shuff_evoked_NB,...
     'variablenames', {'cells','Y1','Y2','Y3','Y4'});
 factorNames = {'Sensory_stim','NB'};
 within = table({'Sp';'Sp';'Ev';'Ev'},{'N';'Y';'N';'Y'},'VariableNames',factorNames); %the levels of each factor in each measurment witgin subject
 % fit the repeated measures model
-rm = fitrm(ta,'Y1-Y4~1','WithinDesign',within);
+rm_lag0_shuff = fitrm(ta,'Y1-Y4~1','WithinDesign',within);
 %test for sphericity
-mauchly(rm)
+mauchly(rm_lag0_shuff)
 % run my repeated measures anova here
-[ranovatbl] = ranova(rm, 'WithinModel','Sensory_stim*NB');
-c_lag0_shuff = multcompare(rm,'NB','By','Sensory_stim');
+[ranovatbl_lag0_shuff] = ranova(rm_lag0_shuff, 'WithinModel','Sensory_stim*NB');
+%multiple comparisons:
+NBbySS_lag0_shuff = multcompare(rm_lag0_shuff,'NB','By','Sensory_stim');
+SSbyNB_lag0_shuff = multcompare(rm_lag0_shuff,'Sensory_stim','By','NB');
+lag0_shuff_rmANOVA_p= table2cell(ranovatbl_lag0_shuff(5,5));
+
+eps_lag0_shuff = epsilon(rm_lag0_shuff);
+eps=table2cell(eps_lag0_shuff(1,2));
+%in case where the sphericity assumption is violated (mauchly test p<0.05):
+%if eps<0.75 - use the Greenhouse-Geisser correction.
+%if eps>0.75 - use the Huynh-Feldt correction
+if eps{1}<0.75
+    lag0_shuff_p_evoked=table2cell(NBbySS_lag0_shuff(1,6));
+    lag0_shuff_p_spont=table2cell(NBbySS_lag0_shuff(3,6));
+else
+     lag0_shuff_p_evoked=table2cell(NBbySS_lag0_shuff(1,7));
+     lag0_shuff_p_spont=table2cell(NBbySS_lag0_shuff(3,7));
+end
+
+lag0_shuff_stat.table=ta;
+lag0_shuff_stat.table_data_vecs=ta_vector_names;
+lag0_shuff_stat.within_design=within;
+lag0_shuff_stat.rm=rm_lag0_shuff;
+lag0_shuff_stat.mauchly=mauchly_lag0_shuff;
+lag0_shuff_stat.eps=eps_lag0_shuff;
+lag0_shuff_stat.ANOVA=ranovatbl_lag0_shuff;
+lag0_shuff_stat.multcomp_NBbySS=NBbySS_lag0_shuff;
+lag0_shuff_stat.multcomp_SSbyNB=SSbyNB_lag0_shuff;
+lag0_shuff_stat.rmANOVA_p=lag0_shuff_rmANOVA_p;
+lag0_shuff_stat.evoked_p=lag0_shuff_p_evoked;
+lag0_shuff_stat.spont_p=lag0_shuff_p_spont;
 %% rmANOVA with matlab function - max val
 max_val_spont_noNB(:,1)=cc_stat.spont.max_val(:,1);
 max_val_spont_NB(:,1)=cc_stat.spont.max_val(:,2);
