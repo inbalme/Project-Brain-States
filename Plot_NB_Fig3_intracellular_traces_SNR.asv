@@ -2,7 +2,7 @@
 
 close all
 clear all
-save_flag=0;
+save_fla
 %opening saved figures:
 %Long traces:
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\Long Trace Presentation'
@@ -32,7 +32,7 @@ evoked_std_f16_ax = get(gcf, 'children');
 
 %%
 %Short traces:
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\Zoom-in Trace Presentation'
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\Zoom-in Trace'
 
 %evoked
 evoked_trace_Off_f16_zoom = open('f16_traces_x2_v2.fig');    

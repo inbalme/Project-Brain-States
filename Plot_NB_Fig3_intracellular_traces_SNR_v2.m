@@ -47,18 +47,15 @@ evoked_mean_f16_zoom_ax = get(gcf, 'children');
 evoked_std_f16_zoom = open('f16_std_x2+3_mean-subt_v2.fig');    
 evoked_std_f16_zoom_ax = get(gcf, 'children');
 
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\10_20Hz'
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\LFP_50Hz Vm_50Hz+BP'
 
-VmM = open('Vm M_Before During After Sensory stim_v2.fig');    
+VmM = open('Vm M_Before During After Sensory stim.fig');    
 VmM_ax = get(gcf, 'children');
 
-VmSTD = open('Vm STD_Before During After Sensory stim_v2.fig');    
+VmSTD = open('Vm STD_Before During After Sensory stim.fig');    
 VmSTD_ax = get(gcf, 'children');
 
-Peak_amp = open('Train Amplitude Local_v2.fig');    
-Peak_amp_ax = get(gcf, 'children');
-
-SNR = open('SNR1_v2.fig');    
+SNR = open('SNR1.fig');    
 SNR_ax = get(gcf, 'children');
 
 Amplitude_Signal = open('Amplitude_Signal_v2.fig');    
@@ -67,7 +64,10 @@ Amplitude_Signal_ax = get(gcf, 'children');
 Amplitude_Noise = open('Amplitude_Noise1_v2.fig');    
 Amplitude_Noise_ax = get(gcf, 'children');
 
-
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Evoked';
+% Peak_amp = open('Train Amplitude Local_v2.fig');    
+Peak_amp = open('Evoked Amplitude.fig');    
+Peak_amp_ax = get(gcf, 'children');
 
 
 %%

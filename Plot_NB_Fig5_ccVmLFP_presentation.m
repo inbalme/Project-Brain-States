@@ -2,8 +2,8 @@
 
 close all
 clear all
-
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz Presentation'
+save_flag=0;
+% cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz Presentation'
 
 %opening saved figures:
 
@@ -210,7 +210,9 @@ cc_paired_plot_shuff_ax_copy.FontSize=14;
 %  set(F, 'currentaxes', Response_modulation_ax_copy); t=title(''); yl=ylabel('Spikes/Stim. train','fontsize',13);
 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Presentation Figures'
-filename='Fig 5 ccVmLFP';
-saveas(F,'Fig 5 ccVmLFP.fig'); 
-print(F,filename,'-dpng','-r600','-opengl') 
-print(F, '-depsc2', filename);
+if save_flag==1
+    filename='Fig 5 ccVmLFP';
+    saveas(F,'Fig 5 ccVmLFP.fig'); 
+    print(F,filename,'-dpng','-r600','-opengl') 
+    print(F, '-depsc2', filename);
+end

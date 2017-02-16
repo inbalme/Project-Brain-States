@@ -4,10 +4,10 @@ close all
 clear all
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data
  global exp_type
-exp_type=2; %1-NBES, 2-ChAT
+exp_type=1; %1-NBES, 2-ChAT
 channel = 1;
 save_flag= 1;
-print_flag=1;
+print_flag=0;
 
 switch exp_type
     case 1
@@ -636,13 +636,13 @@ E = std(SNR_Y,0,2);
 linex=[1;2];
 my=max(max(SNR_Y))*1.1; 
 liney=[my;my];
-if spikes_stat.ttest_p_SNR>0.05 
+if spikes_stat.wilcoxon_p_SNR>0.05 
     asterisk='n.s.';
-else if spikes_stat.ttest_p_SNR<0.05 && spikes_stat.ttest_p_SNR>0.01
+else if spikes_stat.wilcoxon_p_SNR<0.05 && spikes_stat.wilcoxon_p_SNR>0.01
     asterisk='*';
-    else if spikes_stat.ttest_p_SNR<0.01 && spikes_stat.ttest_p_SNR>0.001
+    else if spikes_stat.wilcoxon_p_SNR<0.01 && spikes_stat.wilcoxon_p_SNR>0.001
             asterisk='**';
-    else if spikes_stat.ttest_p_SNR<0.001
+    else if spikes_stat.wilcoxon_p_SNR<0.001
              asterisk='***';
         end
         end
@@ -652,8 +652,8 @@ figure
 hold on
 line(SNR_X,SNR_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(SNR_X(:,1), mean(SNR_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
-text(1.5,my,asterisk,'HorizontalAlignment', 'center','fontsize',13) %'verticalAlignment','bottom',
+% line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
+text(1.5,my,asterisk,'HorizontalAlignment', 'center','fontsize',17) %'verticalAlignment','bottom',
 hold off
 
         x1limits = [0.75 2.25];
@@ -663,7 +663,7 @@ hold off
         set( gca, 'xlim', x1limits, 'ylim', y1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'NB-','NB+'} ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('SNR index', 'FontSize', 28,'fontname', 'arial');
-        title(['SNR Index, n=', num2str(size(SNR_Y,2)), ', p=', num2str(spikes_stat.ttest_p_SNR)])
+        title(['SNR Index, n=', num2str(size(SNR_Y,2)), ', p=', num2str(spikes_stat.wilcoxon_p_SNR)])
         
         %save figure  
 cd(path_output)
@@ -694,8 +694,8 @@ figure
 hold on
 line(Res_mod_X,Res_mod_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(Res_mod_X(:,1), mean(Res_mod_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
-text(1.5,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
+% line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
+text(1.5,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
 hold off
         x1limits = [0.75 2.25];
         x1ticks = [1,2];
@@ -735,9 +735,9 @@ hold on
 % line(MI_X,MI_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 % errorbar(MI_X(:,1), mean(MI_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
 % boxplot( spikes_stat(stim_num).MI);
-scatter(MI_X,MI_Y,150,'markeredgecolor',color_table(2,:))
-scatter(MI_X(1),mean(MI_Y),150,'markerfacecolor',color_table(2,:),'markeredgecolor',color_table(1,:))
-line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
+scatter(MI_X,MI_Y,50,'markerfacecolor',color_table(1,:),'markeredgecolor',color_table(1,:),'markerfacealpha',0.3)
+scatter(MI_X(1),mean(MI_Y),100,'markeredgecolor',color_table(2,:),'linewidth',2); %'markerfacecolor',color_table(2,:),
+% line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
 text(1,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',18)
 hold off
         x1limits = [0.9 1.1];
@@ -761,13 +761,13 @@ E = std(latency_Y,0,2);
 linex=[1;2];
 my=max(max(latency_Y))*1.1; 
 liney=[my;my];
-if spikes_stat.ttest_p_latency>0.05 
+if spikes_stat.wilcoxon_p_latency>0.05 
     asterisk='n.s.';
-else if spikes_stat.ttest_p_latency<0.05 && spikes_stat.ttest_p_latency>0.01
+else if spikes_stat.wilcoxon_p_latency<0.05 && spikes_stat.wilcoxon_p_latency>0.01
     asterisk='*';
-    else if spikes_stat.ttest_p_latency<0.01 && spikes_stat.ttest_p_latency>0.001
+    else if spikes_stat.wilcoxon_p_latency<0.01 && spikes_stat.wilcoxon_p_latency>0.001
             asterisk='**';
-    else if spikes_stat.ttest_p_latency<0.001
+    else if spikes_stat.wilcoxon_p_latency<0.001
              asterisk='***';
         end
         end
@@ -777,8 +777,8 @@ figure
 hold on
 line(latency_X,latency_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(latency_X(:,1), mean(latency_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
-text(1.5,my,asterisk,'HorizontalAlignment', 'center','fontsize',13) %'verticalAlignment','bottom',
+% line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
+text(1.5,my,asterisk,'HorizontalAlignment', 'center','fontsize',17) %'verticalAlignment','bottom',
 hold off
 
         x1limits = [0.75 2.25];
@@ -788,7 +788,7 @@ hold off
         set( gca, 'xlim', x1limits, 'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'NB-','NB+'} ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('Latency [mS]', 'FontSize', 28,'fontname', 'arial');
-        title(['Response Latency, n=', num2str(size(latency_Y,2)), ', p=', num2str(spikes_stat.ttest_p_latency)])
+        title(['Response Latency, n=', num2str(size(latency_Y,2)), ', p=', num2str(spikes_stat.wilcoxon_p_latency)])
         
         %save figure  
 cd(path_output)
@@ -803,13 +803,13 @@ E = std(latency_std_Y,0,2);
 linex=[1;2];
 my=max(max(latency_std_Y))*1.1; 
 liney=[my;my];
-if spikes_stat.ttest_p_latency_std>0.05 
+if spikes_stat.wilcoxon_p_latency_std>0.05 
     asterisk='n.s.';
-else if spikes_stat.ttest_p_latency_std<0.05 && spikes_stat.ttest_p_latency_std>0.01
+else if spikes_stat.wilcoxon_p_latency_std<0.05 && spikes_stat.wilcoxon_p_latency_std>0.01
     asterisk='*';
-    else if spikes_stat.ttest_p_latency_std<0.01 && spikes_stat.ttest_p_latency_std>0.001
+    else if spikes_stat.wilcoxon_p_latency_std<0.01 && spikes_stat.wilcoxon_p_latency_std>0.001
             asterisk='**';
-    else if spikes_stat.ttest_p_latency_std<0.001
+    else if spikes_stat.wilcoxon_p_latency_std<0.001
              asterisk='***';
         end
         end
@@ -819,8 +819,8 @@ figure
 hold on
 line(latency_std_X,latency_std_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(latency_std_X(:,1), mean(latency_std_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
-text(1.5,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
+% line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
+text(1.5,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
 hold off
 
         x1limits = [0.75 2.25];
@@ -830,7 +830,7 @@ hold off
         set( gca, 'xlim', x1limits, 'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'NB-','NB+'} ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('Latency STD [mS]', 'FontSize', 28,'fontname', 'arial');
-        title(['Response Jitter, n=', num2str(size(latency_std_Y,2)), ', p=', num2str(spikes_stat.ttest_p_latency_std)])
+        title(['Response Jitter, n=', num2str(size(latency_std_Y,2)), ', p=', num2str(spikes_stat.wilcoxon_p_latency_std)])
         
         %save figure  
 cd (path_output)
@@ -861,8 +861,8 @@ figure
 hold on
 line(success_rate_X,success_rate_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(success_rate_X(:,1), mean(success_rate_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
-text(1.5,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
+% line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
+text(1.5,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
 hold off
 
         x1limits = [0.75 2.25];

@@ -2,13 +2,13 @@
 clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
-exp_type=3; %1-NBES, 2-ChAT, 3-NBES VC
+exp_type=1; %1-NBES, 2-ChAT, 3-NBES VC
 trace_type_input=2; %
 analyze_time_before_train=0.1;
 analyze_train_only_flag=0;
-save_flag= 0;
+save_flag= 1;
 print_flag=0;
-paired_plot_flag=1; 
+paired_plot_flag=0; 
 norm_flag=0;
 clamp_flag=3; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 BP50HzLFP_flag=0; %removing 50Hz noise from LFP signal
@@ -129,6 +129,9 @@ data_preprocessing
                         event_halfWidthS{t,stim_num,trace} = nan;
                         event_halfWidthE{t,stim_num,trace} = nan;
                         failures{t,stim_num,trace} = nan;
+                        event_peak10prcntTime{t,stim_num,trace}=nan;
+                        event_peak90prcntTime{t,stim_num,trace}=nan;
+                        event_peak10to90Time{t,stim_num,trace}=nan;
                         event_nonspecific_count{t,stim_num,trace}=nan;
                                   continue
                  else
@@ -221,8 +224,7 @@ data_preprocessing
 %             if stim_num>galvano_nstim %if this is a cell with no test stimulus then this is not a failure
 %                failures{t,stim_num,trace}=nan;
 %             end
-            %if this was a failure then all response parameters will be
-            %NaNs:
+            %if this was a failure then all response parameters will be NaNs:
             event_on{t,stim_num,trace} = nan;
             event_onVal{t,stim_num,trace} = nan;
             event_start{t,stim_num,trace} = nan;
@@ -233,6 +235,9 @@ data_preprocessing
             event_halfWidth{t,stim_num,trace} = nan;
             event_halfWidthS{t,stim_num,trace} = nan;
             event_halfWidthE{t,stim_num,trace} = nan;
+            event_peak10prcntTime{t,stim_num,trace}=nan;
+            event_peak90prcntTime{t,stim_num,trace}=nan;
+            event_peak10to90Time{t,stim_num,trace}=nan;
         elseif starting(1)>(peak_start_int+0.03*sf{1}) %if the delay to the event was too large (more than 30ms) then this is not a response but a non-specific event
              failures{t,stim_num,trace}=1;
             event_start{t,stim_num,trace} = nan;
@@ -245,6 +250,9 @@ data_preprocessing
             event_halfWidth{t,stim_num,trace} = nan;
             event_halfWidthS{t,stim_num,trace} = nan;
             event_halfWidthE{t,stim_num,trace} = nan;
+            event_peak90prcntTime{t,stim_num,trace}=nan;
+            event_peak10prcntTime{t,stim_num,trace}=nan;
+            event_peak10to90Time{t,stim_num,trace}=nan;
             event_start_nonspecific{t,stim_num,trace}= starting(1);
             event_on_nonspecific{t,stim_num,trace}= (starting(1)-stim2{t}(1,stim_num))*dt*1000; %in msec
             event_amplitude_nonspecific{t,stim_num,trace}= amplitude(1);
@@ -268,12 +276,20 @@ data_preprocessing
             event_halfWidthS{t,stim_num,trace} =  halfWidthS(1); 
             event_halfWidthE{t,stim_num,trace} =  halfWidthE(1); 
             event_amplitude{t,stim_num,trace} = current_data(ampPos(1),trace,x_value(t))-current_data(starting(1),trace,x_value(t)); 
-            if event_amplitude{t,stim_num,trace}<=0
-                event_amplitude{t,stim_num,trace}=nan;
-            end
+           
 %             event_amplitude{t,stim_num,trace} =  amplitude(1); 
-           
-           
+% finding the delay to 10%peak and 90%peak and the rise-time (time from 10%to90% peak)
+             peak_int=event_start{t,stim_num,trace}: event_ampPos{t,stim_num,trace};            
+             event_peak90prcntLoc{t,stim_num,trace}=find((current_data(peak_int,trace,x_value(t))-event_onVal{t,stim_num,trace})>=0.9.*event_amplitude{t,stim_num,trace},1);
+             event_peak10prcntLoc{t,stim_num,trace}=find((current_data(peak_int,trace,x_value(t))-event_onVal{t,stim_num,trace})>=0.1.*event_amplitude{t,stim_num,trace},1);
+             event_peak90prcntTime{t,stim_num,trace}=event_peak90prcntLoc{t,stim_num,trace}.*dt.*1000+3; %[time from stimulus onset (hence added 3ms) to 90% of peak, in mS]
+             event_peak10prcntTime{t,stim_num,trace}=event_peak10prcntLoc{t,stim_num,trace}.*dt.*1000+3; %[time from stimulus onset (hence added 3ms) to 10% of peak, in mS]
+             event_peak10to90Time{t,stim_num,trace}=event_peak90prcntTime{t,stim_num,trace}-event_peak10prcntTime{t,stim_num,trace};
+
+              if event_amplitude{t,stim_num,trace}<=0
+                event_amplitude{t,stim_num,trace}=nan;
+              end
+            
         end
         if length(starting)>1
             event_start_nonspecific{t,stim_num,trace}=[event_start_nonspecific{t,stim_num,trace}, starting(2:end)];
@@ -331,6 +347,9 @@ data_preprocessing
             event_evoked(fileind).halfWidth = event_halfWidth; 
             event_evoked(fileind).halfWidthS = event_halfWidthS; 
             event_evoked(fileind).halfWidthE = event_halfWidthE; 
+            event_evoked(fileind).peak90prcntTime=event_peak90prcntTime; 
+            event_evoked(fileind).peak10prcntTime=event_peak10prcntTime; 
+            event_evoked(fileind).peak10to90Time=event_peak10to90Time; 
             event_evoked(fileind).nonspecific_count =event_nonspecific_count;
             event_evoked(fileind).onset_nonspecific = event_on_nonspecific;
             event_evoked(fileind).amplitude_nonspecific = event_amplitude_nonspecific;
@@ -341,12 +360,17 @@ data_preprocessing
             event_evoked(fileind).halfWidthE_nonspecific = event_halfWidthE_nonspecific; 
             
             %% cell stats: within cell there is no logic to use normalized values
+clear onset_mat onVal_mat   amplitude_mat    ampDel_mat  ampVal_mat  halfWidth_mat peak90prcntTime_mat peak10prcntTime_mat peak10to90Time_mat...
+    failures_mat nonspecific_count_mat  amplitude_mat_M adapt_amp adapt_amp_M
 onset_mat=cell2mat(event_on); 
 onVal_mat=cell2mat(event_onVal); 
 amplitude_mat=cell2mat(event_amplitude); 
 ampDel_mat=cell2mat(event_ampDel); 
 ampVal_mat=cell2mat(event_ampVal); 
 halfWidth_mat=cell2mat(event_halfWidth); 
+peak90prcntTime_mat=cell2mat(event_peak90prcntTime); 
+peak10prcntTime_mat=cell2mat(event_peak10prcntTime); 
+peak10to90Time_mat=cell2mat(event_peak10to90Time); 
 failures_mat=cell2mat(failures); 
 nonspecific_count_mat = cell2mat(event_nonspecific_count);
 amplitude_mat_M=nanmean(amplitude_mat,3);
@@ -512,6 +536,34 @@ tmp=[];
 
         clear  tmp
         
+    %delay to 90%peak
+        tmp(:,:) = peak90prcntTime_mat(1:2,stim_num,:);        
+        event_evoked_stat.fileind(fileind).stim_num(stim_num).peak90prcntTime=tmp';
+        event_evoked_stat.fileind(fileind).stim_num(stim_num).peak90prcntTime_m=nanmean(event_evoked_stat.fileind(fileind).stim_num(stim_num).peak90prcntTime,1);
+        event_evoked_stat.fileind(fileind).stim_num(stim_num).peak90prcntTime_std=nanstd(event_evoked_stat.fileind(fileind).stim_num(stim_num).peak90prcntTime,0,1);  
+        event_evoked_stat.stim_num(stim_num).peak90prcntTime_m(fileind,:)= event_evoked_stat.fileind(fileind).stim_num(stim_num).peak90prcntTime_m;
+        event_evoked_stat.stim_num(stim_num).peak90prcntTime_std(fileind,:)= event_evoked_stat.fileind(fileind).stim_num(stim_num).peak90prcntTime_std;
+
+        clear tmp
+        
+    %delay to 10%peak
+        tmp(:,:) = peak10prcntTime_mat(1:2,stim_num,:);        
+        event_evoked_stat.fileind(fileind).stim_num(stim_num).peak10prcntTime=tmp';
+        event_evoked_stat.fileind(fileind).stim_num(stim_num).peak10prcntTime_m=nanmean(event_evoked_stat.fileind(fileind).stim_num(stim_num).peak10prcntTime,1);
+        event_evoked_stat.fileind(fileind).stim_num(stim_num).peak10prcntTime_std=nanstd(event_evoked_stat.fileind(fileind).stim_num(stim_num).peak10prcntTime,0,1);  
+        event_evoked_stat.stim_num(stim_num).peak10prcntTime_m(fileind,:)= event_evoked_stat.fileind(fileind).stim_num(stim_num).peak10prcntTime_m;
+        event_evoked_stat.stim_num(stim_num).peak10prcntTime_std(fileind,:)= event_evoked_stat.fileind(fileind).stim_num(stim_num).peak10prcntTime_std;
+
+        clear tmp
+        
+    %rise-time from 10%-90% peak
+        tmp(:,:) = peak10to90Time_mat(1:2,stim_num,:);        
+        event_evoked_stat.fileind(fileind).stim_num(stim_num).peak10to90Time=tmp';
+        event_evoked_stat.fileind(fileind).stim_num(stim_num).peak10to90Time_m=nanmean(event_evoked_stat.fileind(fileind).stim_num(stim_num).peak10to90Time,1);
+        event_evoked_stat.fileind(fileind).stim_num(stim_num).peak10to90Time_std=nanstd(event_evoked_stat.fileind(fileind).stim_num(stim_num).peak10to90Time,0,1);  
+        event_evoked_stat.stim_num(stim_num).peak10to90Time_m(fileind,:)= event_evoked_stat.fileind(fileind).stim_num(stim_num).peak10to90Time_m;
+        event_evoked_stat.stim_num(stim_num).peak10to90Time_std(fileind,:)= event_evoked_stat.fileind(fileind).stim_num(stim_num).peak10to90Time_std;
+
 %        if any(stim_num==[1,5,11])
 %                 cell_stat_amplitude.wilk_h{fileind,stim_num}=event_evoked_stat.fileind(fileind).stim_num(stim_num).wilcoxon_h_amplitude;         
 %                 cell_stat_amplitude.wilk_p{fileind,stim_num}=event_evoked_stat.fileind(fileind).stim_num(stim_num).wilcoxon_p_amplitude;   
@@ -816,6 +868,21 @@ tmp=[];
         [event_evoked_stat.stim_num(stim_num).ttest_h_halfWidth_std, event_evoked_stat.stim_num(stim_num).ttest_p_halfWidth_std]= ttest(event_evoked_stat.stim_num(stim_num).halfWidth_std(:,1),event_evoked_stat.stim_num(stim_num).halfWidth_std(:,2));
             
         clear  diff_halfWidth_std tmp
+
+%delay from stimulus onset to 10% peak
+        tmp(:,:) = event_evoked_stat.stim_num(stim_num).peak10prcntTime_m;
+        event_evoked_stat.stim_num(stim_num).peak10prcntTime_m_m= nanmean(tmp,1);
+        event_evoked_stat.stim_num(stim_num).peak10prcntTime_m_std= nanstd(tmp,0,1);
+
+%delay from stimulus onset to 90% peak
+        tmp(:,:) = event_evoked_stat.stim_num(stim_num).peak90prcntTime_m;
+        event_evoked_stat.stim_num(stim_num).peak90prcntTime_m_m= nanmean(tmp,1);
+        event_evoked_stat.stim_num(stim_num).peak90prcntTime_m_std= nanstd(tmp,0,1);
+        
+%rise-time from 10% to 90% peak
+        tmp(:,:) = event_evoked_stat.stim_num(stim_num).peak10to90Time_m;
+        event_evoked_stat.stim_num(stim_num).peak10to90Time_m_m= nanmean(tmp,1);
+        event_evoked_stat.stim_num(stim_num).peak10to90Time_m_std= nanstd(tmp,0,1);
         
         %adaptation amplitude ratio
         tmp(:,:) = event_evoked_stat.stim_num(stim_num).adapt_amp_m;           
@@ -993,6 +1060,18 @@ end
      halfWidth_m_mat{2}(:,stim_num)= event_evoked_stat.stim_num(stim_num).halfWidth_m(:,2);
      halfWidth_std_mat{1}(:,stim_num)= event_evoked_stat.stim_num(stim_num).halfWidth_std(:,1);
      halfWidth_std_mat{2}(:,stim_num)= event_evoked_stat.stim_num(stim_num).halfWidth_std(:,2);
+     peak10prcntTime_m_mat{1}(:,stim_num)=event_evoked_stat.stim_num(stim_num).peak10prcntTime_m(:,1);
+     peak10prcntTime_m_mat{2}(:,stim_num)=event_evoked_stat.stim_num(stim_num).peak10prcntTime_m(:,2);
+     peak10prcntTime_std_mat{1}(:,stim_num)=event_evoked_stat.stim_num(stim_num).peak10prcntTime_std(:,1);
+     peak10prcntTime_std_mat{2}(:,stim_num)=event_evoked_stat.stim_num(stim_num).peak10prcntTime_std(:,2);
+     peak90prcntTime_m_mat{1}(:,stim_num)=event_evoked_stat.stim_num(stim_num).peak90prcntTime_m(:,1);
+     peak90prcntTime_m_mat{2}(:,stim_num)=event_evoked_stat.stim_num(stim_num).peak90prcntTime_m(:,2);
+     peak90prcntTime_std_mat{1}(:,stim_num)=event_evoked_stat.stim_num(stim_num).peak90prcntTime_std(:,1);
+     peak90prcntTime_std_mat{2}(:,stim_num)=event_evoked_stat.stim_num(stim_num).peak90prcntTime_std(:,2);
+     peak10to90Time_m_mat{1}(:,stim_num)=event_evoked_stat.stim_num(stim_num).peak10to90Time_m(:,1);
+     peak10to90Time_m_mat{2}(:,stim_num)=event_evoked_stat.stim_num(stim_num).peak10to90Time_m(:,2);   
+     peak10to90Time_std_mat{1}(:,stim_num)=event_evoked_stat.stim_num(stim_num).peak10to90Time_std(:,1);
+     peak10to90Time_std_mat{2}(:,stim_num)=event_evoked_stat.stim_num(stim_num).peak10to90Time_std(:,2);   
     end     
 %% repeated measures ANOVA for amplitude over the train stim.
 [stat_failures]=fn_sensory_train_response_2_way_rmANOVA(failures_m_mat{1}(:,:), failures_m_mat{2}(:,:));
@@ -1007,6 +1086,12 @@ end
 [stat_ampDel_std]=fn_sensory_train_response_2_way_rmANOVA(ampDel_std_mat{1}(:,:), ampDel_std_mat{2}(:,:));
 [stat_halfWidth]=fn_sensory_train_response_2_way_rmANOVA(halfWidth_m_mat{1}(:,:), halfWidth_m_mat{2}(:,:));
 [stat_halfWidth_std]=fn_sensory_train_response_2_way_rmANOVA(halfWidth_std_mat{1}(:,:), halfWidth_std_mat{2}(:,:));
+[stat_peak10prcntTime]=fn_sensory_train_response_2_way_rmANOVA(peak10prcntTime_m_mat{1}(:,:), peak10prcntTime_m_mat{2}(:,:));
+[stat_peak90prcntTime]=fn_sensory_train_response_2_way_rmANOVA(peak90prcntTime_m_mat{1}(:,:), peak90prcntTime_m_mat{2}(:,:));
+[stat_peak10to90Time]=fn_sensory_train_response_2_way_rmANOVA(peak10to90Time_m_mat{1}(:,:), peak10to90Time_m_mat{2}(:,:));
+[stat_peak10prcntTime_std]=fn_sensory_train_response_2_way_rmANOVA(peak10prcntTime_std_mat{1}(:,:), peak10prcntTime_std_mat{2}(:,:));
+[stat_peak90prcntTime_std]=fn_sensory_train_response_2_way_rmANOVA(peak90prcntTime_std_mat{1}(:,:), peak90prcntTime_std_mat{2}(:,:));
+[stat_peak10to90Time_std]=fn_sensory_train_response_2_way_rmANOVA(peak10to90Time_std_mat{1}(:,:), peak10to90Time_std_mat{2}(:,:));
 %% Plots with p-values from repeated-measures ANOVA
 color_table_lines = rand(length(files_to_analyze),3);
 %% failures
@@ -1632,6 +1717,319 @@ end
         xlabel('Stim. serial number' ,'FontSize', 16);
        ylabel('Half-Width STD [mS]' ,'FontSize', 16);    
         title(['Mean Response Half-Width STD, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
+        
+                %% latency to 10% peak (mean)
+      h13=figure; 
+      stimz=size(peak10prcntTime_m_mat{2}(:,:),2);
+for stim=1:stimz
+        if stat_peak10prcntTime.p_stim{stim,1}>0.05 
+            asterisk_peak10prcntTime{stim,1}='n.s.';
+        else if stat_peak10prcntTime.p_stim{stim,1}<0.05 && stat_peak10prcntTime.p_stim{stim,1}>0.01
+            asterisk_peak10prcntTime{stim,1}='*';
+            else if stat_peak10prcntTime.p_stim{stim,1}<0.01 && stat_peak10prcntTime.p_stim{stim,1}>0.001
+                    asterisk_peak10prcntTime{stim,1}='**';
+            else if stat_peak10prcntTime.p_stim{stim,1}<0.001
+                     asterisk_peak10prcntTime{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
+        errbar_h=errorbar([1:size(peak10prcntTime_m_mat{1}(:,:),2)]-0.3,nanmean(peak10prcntTime_m_mat{1}(:,:),1),zeros(1,size(peak10prcntTime_m_mat{1}(:,:),2)), nanstd(peak10prcntTime_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        errbar_h=errorbar([1:size(peak10prcntTime_m_mat{2}(:,:),2)],nanmean(peak10prcntTime_m_mat{2}(:,:),1),zeros(1,size(peak10prcntTime_m_mat{2}(:,:),2)), nanstd(peak10prcntTime_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        bar([1:size(peak10prcntTime_m_mat{1}(:,:),2)]-0.3, nanmean(peak10prcntTime_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+        bar([1:size(peak10prcntTime_m_mat{2}(:,:),2)], nanmean(peak10prcntTime_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+%for line pair-plots:
+if paired_plot_flag==1; 
+          for stim=1:stimz
+                F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).peak10prcntTime_m;
+                F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+                F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+           end
+                for cell=1:length(files_to_analyze)
+                    for stim=1:stimz
+                        if isnan(F1_Y{stim}(cell,:))
+                        else
+                             plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',10,'markerfacecolor','k')
+%                           pause
+                        end
+                    end
+                end
+end
+        ylim_data=[get(gca,'ylim')]';
+        my=max(ylim_data)-1;
+        for stim=1:stimz
+            if strcmp('n.s.',asterisk_peak10prcntTime{stim,1})==0          
+             text(stim,my,asterisk_peak10prcntTime{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
+        hold off
+        set(gca,'xlim',[0,size(peak10prcntTime_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
+        xlabel('Stim. serial number' ,'FontSize', 16);
+        ylabel('Peak 10% Latency [mS]' ,'FontSize', 16);    
+        title(['Mean Latency to 10% of peak,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+        %% jitter to 10% peak (latency std)
+      h14=figure; 
+      stimz=size(peak10prcntTime_std_mat{2}(:,:),2);
+for stim=1:stimz
+        if stat_peak10prcntTime_std.p_stim{stim,1}>0.05 
+            asterisk_peak10prcntTime_std{stim,1}='n.s.';
+        else if stat_peak10prcntTime_std.p_stim{stim,1}<0.05 && stat_peak10prcntTime_std.p_stim{stim,1}>0.01
+            asterisk_peak10prcntTime_std{stim,1}='*';
+            else if stat_peak10prcntTime_std.p_stim{stim,1}<0.01 && stat_peak10prcntTime_std.p_stim{stim,1}>0.001
+                    asterisk_peak10prcntTime_std{stim,1}='**';
+            else if stat_peak10prcntTime_std.p_stim{stim,1}<0.001
+                     asterisk_peak10prcntTime_std{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
+        errbar_h=errorbar([1:size(peak10prcntTime_std_mat{1}(:,:),2)]-0.3,nanmean(peak10prcntTime_std_mat{1}(:,:),1),zeros(1,size(peak10prcntTime_std_mat{1}(:,:),2)), nanstd(peak10prcntTime_std_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        errbar_h=errorbar([1:size(peak10prcntTime_std_mat{2}(:,:),2)],nanmean(peak10prcntTime_std_mat{2}(:,:),1),zeros(1,size(peak10prcntTime_std_mat{2}(:,:),2)), nanstd(peak10prcntTime_std_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        bar([1:size(peak10prcntTime_std_mat{1}(:,:),2)]-0.3, nanmean(peak10prcntTime_std_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+        bar([1:size(peak10prcntTime_std_mat{2}(:,:),2)], nanmean(peak10prcntTime_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+%for line pair-plots:
+if paired_plot_flag==1; 
+          for stim=1:stimz
+                F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).peak10prcntTime_m;
+                F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+                F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+           end
+                for cell=1:length(files_to_analyze)
+                    for stim=1:stimz
+                        if isnan(F1_Y{stim}(cell,:))
+                        else
+                             plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',10,'markerfacecolor','k')
+%                           pause
+                        end
+                    end
+                end
+end
+        ylim_data=[get(gca,'ylim')]';
+        my=max(ylim_data)-1;
+        for stim=1:stimz
+            if strcmp('n.s.',asterisk_peak10prcntTime_std{stim,1})==0          
+             text(stim,my,asterisk_peak10prcntTime_std{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
+        hold off
+        set(gca,'xlim',[0,size(peak10prcntTime_std_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
+        xlabel('Stim. serial number' ,'FontSize', 16);
+        ylabel('Peak 10% Jitter [mS]' ,'FontSize', 16);    
+        title(['Mean Latency STD to 10% of peak,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+                        %% latency to 90% peak (mean)
+      h15=figure; 
+      stimz=size(peak90prcntTime_m_mat{2}(:,:),2);
+for stim=1:stimz
+        if stat_peak90prcntTime.p_stim{stim,1}>0.05 
+            asterisk_peak90prcntTime{stim,1}='n.s.';
+        else if stat_peak90prcntTime.p_stim{stim,1}<0.05 && stat_peak90prcntTime.p_stim{stim,1}>0.01
+            asterisk_peak90prcntTime{stim,1}='*';
+            else if stat_peak90prcntTime.p_stim{stim,1}<0.01 && stat_peak90prcntTime.p_stim{stim,1}>0.001
+                    asterisk_peak90prcntTime{stim,1}='**';
+            else if stat_peak90prcntTime.p_stim{stim,1}<0.001
+                     asterisk_peak90prcntTime{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
+        errbar_h=errorbar([1:size(peak90prcntTime_m_mat{1}(:,:),2)]-0.3,nanmean(peak90prcntTime_m_mat{1}(:,:),1),zeros(1,size(peak90prcntTime_m_mat{1}(:,:),2)), nanstd(peak90prcntTime_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        errbar_h=errorbar([1:size(peak90prcntTime_m_mat{2}(:,:),2)],nanmean(peak90prcntTime_m_mat{2}(:,:),1),zeros(1,size(peak90prcntTime_m_mat{2}(:,:),2)), nanstd(peak90prcntTime_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        bar([1:size(peak90prcntTime_m_mat{1}(:,:),2)]-0.3, nanmean(peak90prcntTime_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+        bar([1:size(peak90prcntTime_m_mat{2}(:,:),2)], nanmean(peak90prcntTime_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+%for line pair-plots:
+if paired_plot_flag==1; 
+          for stim=1:stimz
+                F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).peak90prcntTime_m;
+                F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+                F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+           end
+                for cell=1:length(files_to_analyze)
+                    for stim=1:stimz
+                        if isnan(F1_Y{stim}(cell,:))
+                        else
+                             plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',90,'markerfacecolor','k')
+%                           pause
+                        end
+                    end
+                end
+end
+        ylim_data=[get(gca,'ylim')]';
+        my=max(ylim_data)-1;
+        for stim=1:stimz
+            if strcmp('n.s.',asterisk_peak90prcntTime{stim,1})==0          
+             text(stim,my,asterisk_peak90prcntTime{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
+        hold off
+        set(gca,'xlim',[0,size(peak90prcntTime_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
+        xlabel('Stim. serial number' ,'FontSize', 16);
+        ylabel('Peak 90% Latency [mS]' ,'FontSize', 16);    
+        title(['Mean Latency to 90% of peak,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+        %% jitter to 90% peak (latency std)
+      h16=figure; 
+      stimz=size(peak90prcntTime_std_mat{2}(:,:),2);
+for stim=1:stimz
+        if stat_peak90prcntTime_std.p_stim{stim,1}>0.05 
+            asterisk_peak90prcntTime_std{stim,1}='n.s.';
+        else if stat_peak90prcntTime_std.p_stim{stim,1}<0.05 && stat_peak90prcntTime_std.p_stim{stim,1}>0.01
+            asterisk_peak90prcntTime_std{stim,1}='*';
+            else if stat_peak90prcntTime_std.p_stim{stim,1}<0.01 && stat_peak90prcntTime_std.p_stim{stim,1}>0.001
+                    asterisk_peak90prcntTime_std{stim,1}='**';
+            else if stat_peak90prcntTime_std.p_stim{stim,1}<0.001
+                     asterisk_peak90prcntTime_std{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
+        errbar_h=errorbar([1:size(peak90prcntTime_std_mat{1}(:,:),2)]-0.3,nanmean(peak90prcntTime_std_mat{1}(:,:),1),zeros(1,size(peak90prcntTime_std_mat{1}(:,:),2)), nanstd(peak90prcntTime_std_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        errbar_h=errorbar([1:size(peak90prcntTime_std_mat{2}(:,:),2)],nanmean(peak90prcntTime_std_mat{2}(:,:),1),zeros(1,size(peak90prcntTime_std_mat{2}(:,:),2)), nanstd(peak90prcntTime_std_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        bar([1:size(peak90prcntTime_std_mat{1}(:,:),2)]-0.3, nanmean(peak90prcntTime_std_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+        bar([1:size(peak90prcntTime_std_mat{2}(:,:),2)], nanmean(peak90prcntTime_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+%for line pair-plots:
+if paired_plot_flag==1; 
+          for stim=1:stimz
+                F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).peak90prcntTime_m;
+                F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+                F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+           end
+                for cell=1:length(files_to_analyze)
+                    for stim=1:stimz
+                        if isnan(F1_Y{stim}(cell,:))
+                        else
+                             plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',10,'markerfacecolor','k')
+%                           pause
+                        end
+                    end
+                end
+end
+        ylim_data=[get(gca,'ylim')]';
+        my=max(ylim_data)-1;
+        for stim=1:stimz
+            if strcmp('n.s.',asterisk_peak90prcntTime_std{stim,1})==0          
+             text(stim,my,asterisk_peak90prcntTime_std{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
+        hold off
+        set(gca,'xlim',[0,size(peak90prcntTime_std_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
+        xlabel('Stim. serial number' ,'FontSize', 16);
+        ylabel('Peak 90% Jitter [mS]' ,'FontSize', 16);    
+        title(['Mean Latency STD to 90% of peak,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+                        %% rise-time from 10% to 90% peak (mean)
+      h17=figure; 
+      stimz=size(peak10to90Time_m_mat{2}(:,:),2);
+for stim=1:stimz
+        if stat_peak10to90Time.p_stim{stim,1}>0.05 
+            asterisk_peak10to90Time{stim,1}='n.s.';
+        else if stat_peak10to90Time.p_stim{stim,1}<0.05 && stat_peak10to90Time.p_stim{stim,1}>0.01
+            asterisk_peak10to90Time{stim,1}='*';
+            else if stat_peak10to90Time.p_stim{stim,1}<0.01 && stat_peak10to90Time.p_stim{stim,1}>0.001
+                    asterisk_peak10to90Time{stim,1}='**';
+            else if stat_peak10to90Time.p_stim{stim,1}<0.001
+                     asterisk_peak10to90Time{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
+        errbar_h=errorbar([1:size(peak10to90Time_m_mat{1}(:,:),2)]-0.3,nanmean(peak10to90Time_m_mat{1}(:,:),1),zeros(1,size(peak10to90Time_m_mat{1}(:,:),2)), nanstd(peak10to90Time_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        errbar_h=errorbar([1:size(peak10to90Time_m_mat{2}(:,:),2)],nanmean(peak10to90Time_m_mat{2}(:,:),1),zeros(1,size(peak10to90Time_m_mat{2}(:,:),2)), nanstd(peak10to90Time_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        bar([1:size(peak10to90Time_m_mat{1}(:,:),2)]-0.3, nanmean(peak10to90Time_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+        bar([1:size(peak10to90Time_m_mat{2}(:,:),2)], nanmean(peak10to90Time_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+%for line pair-plots:
+if paired_plot_flag==1; 
+          for stim=1:stimz
+                F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).peak10to90Time_m;
+                F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+                F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+           end
+                for cell=1:length(files_to_analyze)
+                    for stim=1:stimz
+                        if isnan(F1_Y{stim}(cell,:))
+                        else
+                             plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',10,'markerfacecolor','k')
+%                           pause
+                        end
+                    end
+                end
+end
+        ylim_data=[get(gca,'ylim')]';
+        my=max(ylim_data)-1;
+        for stim=1:stimz
+            if strcmp('n.s.',asterisk_peak10to90Time{stim,1})==0          
+             text(stim,my,asterisk_peak10to90Time{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
+        hold off
+        set(gca,'xlim',[0,size(peak10to90Time_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
+        xlabel('Stim. serial number' ,'FontSize', 16);
+        ylabel('Rise-Time [mS]' ,'FontSize', 16);    
+        title(['Rise-time from 10% to 90% peak, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
+        %% jitter in rise-time from 10% to 90% peak (std)
+      h18=figure; 
+      stimz=size(peak10to90Time_std_mat{2}(:,:),2);
+for stim=1:stimz
+        if stat_peak10to90Time_std.p_stim{stim,1}>0.05 
+            asterisk_peak10to90Time_std{stim,1}='n.s.';
+        else if stat_peak10to90Time_std.p_stim{stim,1}<0.05 && stat_peak10to90Time_std.p_stim{stim,1}>0.01
+            asterisk_peak10to90Time_std{stim,1}='*';
+            else if stat_peak10to90Time_std.p_stim{stim,1}<0.01 && stat_peak10to90Time_std.p_stim{stim,1}>0.001
+                    asterisk_peak10to90Time_std{stim,1}='**';
+            else if stat_peak10to90Time_std.p_stim{stim,1}<0.001
+                     asterisk_peak10to90Time_std{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
+        errbar_h=errorbar([1:size(peak10to90Time_std_mat{1}(:,:),2)]-0.3,nanmean(peak10to90Time_std_mat{1}(:,:),1),zeros(1,size(peak10to90Time_std_mat{1}(:,:),2)), nanstd(peak10to90Time_std_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        errbar_h=errorbar([1:size(peak10to90Time_std_mat{2}(:,:),2)],nanmean(peak10to90Time_std_mat{2}(:,:),1),zeros(1,size(peak10to90Time_std_mat{2}(:,:),2)), nanstd(peak10to90Time_std_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        bar([1:size(peak10to90Time_std_mat{1}(:,:),2)]-0.3, nanmean(peak10to90Time_std_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+        bar([1:size(peak10to90Time_std_mat{2}(:,:),2)], nanmean(peak10to90Time_std_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+%for line pair-plots:
+if paired_plot_flag==1; 
+          for stim=1:stimz
+                F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).peak10to90Time_m;
+                F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+                F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+           end
+                for cell=1:length(files_to_analyze)
+                    for stim=1:stimz
+                        if isnan(F1_Y{stim}(cell,:))
+                        else
+                             plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',10,'markerfacecolor','k')
+%                           pause
+                        end
+                    end
+                end
+end
+        ylim_data=[get(gca,'ylim')]';
+        my=max(ylim_data)-1;
+        for stim=1:stimz
+            if strcmp('n.s.',asterisk_peak10to90Time_std{stim,1})==0          
+             text(stim,my,asterisk_peak10to90Time_std{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
+        hold off
+        set(gca,'xlim',[0,size(peak10to90Time_std_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
+        xlabel('Stim. serial number' ,'FontSize', 16);
+        ylabel('Rise-Time STD [mS]' ,'FontSize', 16);    
+        title(['Rise-Time STD 10%-90% of peak,n=' num2str(length(files_to_analyze))] ,'FontSize', 16);  
 %% rmANOVA with matlab function -amplitude. 
 % peak_amp_noNB(:,:)= amplitude_m_mat{1}(:,:);
 % peak_amp_NB(:,:)= amplitude_m_mat{2}(:,:);
@@ -2153,7 +2551,7 @@ else if event_evoked_stat.stim_num(stim_num).wilcoxon_p_adapt_amp<0.05 && event_
         end
     end
 end
-my=max(max(event_evoked_stat.stim_num(stim_num).adapt_amp_m))*1.1; 
+my=max(max(event_evoked_stat.stim_num(stim_num).adapt_amp_m))*1; 
 g1=figure;
 hold on
 line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
@@ -2200,11 +2598,25 @@ print(h11,'Evoked Half-Width','-dpng','-r600','-opengl')
 saveas(h11,'Evoked Half-Width','fig') 
 print(h12,'Evoked Half-Width STD','-dpng','-r600','-opengl')
 saveas(h12,'Evoked Half-Width STD','fig') 
+saveas(h13,'Peak 10% Latency','fig') 
+print(h13,'Peak 10% Latency','-dpng','-r600','-opengl')
+saveas(h14,'Peak 10% Latency STD','fig') 
+print(h14,'Peak 10% Latency STD','-dpng','-r600','-opengl')
+saveas(h15,'Peak 90% Latency','fig') 
+print(h15,'Peak 90% Latency','-dpng','-r600','-opengl')
+saveas(h16,'Peak 90% Latency STD','fig') 
+print(h16,'Peak 90% Latency STD','-dpng','-r600','-opengl')
+saveas(h17,'Rise Time 10-90% Peak','fig') 
+print(h17,'Rise Time 10-90% Peak','-dpng','-r600','-opengl')
+saveas(h18,'Rise Time 10-90% Peak STD','fig') 
+print(h18,'Rise Time 10-90% Peak STD','-dpng','-r600','-opengl')
+
 
 print(g1,'Evoked Adaptation Amplitude Ratio_paired plot','-dpng','-r600','-opengl')
 saveas(g1,'Evoked Adaptation Amplitude Ratio_paired_plot','fig') 
 
 filename='Evoked activity event detection'; 
 save(filename, 'files_to_analyze', 'event_evoked', 'event_evoked_stat','stat_failures','stat_nonspecific_count','stat_onset',...
-    'stat_onset_std','stat_amp','stat_amp_std','stat_ampVal','stat_onVal','stat_ampDel','stat_ampDel_std','stat_halfWidth','stat_halfWidth_std')
+    'stat_onset_std','stat_amp','stat_amp_std','stat_ampVal','stat_onVal','stat_ampDel','stat_ampDel_std','stat_halfWidth','stat_halfWidth_std',...
+    'stat_peak10prcntTime', 'stat_peak10prcntTime_std', 'stat_peak90prcntTime', 'stat_peak90prcntTime_std','stat_peak10to90Time', 'stat_peak10to90Time_std')
 end
