@@ -69,34 +69,28 @@ set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 %% xlimits, y limits, ticks etc.
  
 %% Positions:
-spont_trace_Off_f46_pos(1,:) = [0.05 , 0.9 , 0.43 , 0.05];
+spont_trace_Off_f46_pos(1,:) = [0.05 , 0.9 , 0.4 , 0.05];
 for i=1:(length(spont_trace_Off_f46_ax)-1)/2
-spont_trace_Off_f46_pos(2*i,:) = spont_trace_Off_f46_pos(2*i-1,:)-[0 , spont_trace_Off_f46_pos(2*i-1,4)-0.02 , 0 , 0];
-spont_trace_Off_f46_pos(2*i+1,:) = spont_trace_Off_f46_pos(2*i,:)-[0 , spont_trace_Off_f46_pos(2*i,4)+0.03 , 0 , 0];
+spont_trace_Off_f46_pos(2*i,:) = spont_trace_Off_f46_pos(2*i-1,:)-[0 , spont_trace_Off_f46_pos(2*i-1,4)+0.01 , 0 , 0];
+spont_trace_Off_f46_pos(2*i+1,:) = spont_trace_Off_f46_pos(2*i,:)-[0 , spont_trace_Off_f46_pos(2*i,4) , 0 , 0];
 end
 
-spont_trace_On_f46_pos(1,:) = spont_trace_Off_f46_pos(1,:); spont_trace_On_f46_pos(1,2)=spont_trace_Off_f46_pos(6,2)-spont_trace_Off_f46_pos(1,4)-0.04;
-for i=1:(length(spont_trace_On_f46_ax)-1)/2
-spont_trace_On_f46_pos(2*i,:) = spont_trace_On_f46_pos(2*i-1,:)-[0 , spont_trace_On_f46_pos(2*i-1,4)-0.04 , 0 , 0];
-spont_trace_On_f46_pos(2*i+1,:) = spont_trace_On_f46_pos(2*i,:)-[0 , spont_trace_On_f46_pos(2*i,4)+0.03 , 0 , 0];
+spont_trace_On_f46_pos(1,:) = spont_trace_Off_f46_pos(1,:); spont_trace_On_f46_pos(1,2)=spont_trace_Off_f46_pos(6,2)-spont_trace_Off_f46_pos(1,4)-0.02;
+for i=2:length(spont_trace_On_f46_ax)-1
+spont_trace_On_f46_pos(i,:) = spont_trace_On_f46_pos(i-1,:)-[0 , spont_trace_On_f46_pos(i-1,4) , 0 , 0];
 end
 spont_trace_Off_f46_pos_top = spont_trace_Off_f46_pos(1,2)+spont_trace_Off_f46_pos(1,4);
 spont_trace_On_f46_pos_top = spont_trace_On_f46_pos(1,2)+spont_trace_On_f46_pos(1,4);
 
-h_dist1=spont_trace_Off_f46_pos(1,1)+spont_trace_Off_f46_pos(1,3)+0.05;
-evoked_trace_Off_f46_pos(1,:) = [h_dist1 , spont_trace_Off_f46_pos(1,2) ,  spont_trace_Off_f46_pos(1,3) ,  spont_trace_Off_f46_pos(1,4)];
-for i=1:(length(evoked_trace_Off_f46_ax)-1)/2
-evoked_trace_Off_f46_pos(2*i,:) = evoked_trace_Off_f46_pos(2*i-1,:)-[0 , evoked_trace_Off_f46_pos(2*i-1,4)-0.02 , 0 , 0];
-evoked_trace_Off_f46_pos(2*i+1,:) = evoked_trace_Off_f46_pos(2*i,:)-[0 , evoked_trace_Off_f46_pos(2*i,4)+0.03 , 0 , 0];
+h_dist1=spont_trace_Off_f46_pos(1,1)+spont_trace_Off_f46_pos(1,3)+0.02;
+evoked_trace_Off_f46_pos(1,:) = [h_dist1 , spont_trace_Off_f46_pos(1,2) ,  spont_trace_Off_f46_pos(1,3)+0.05 ,  spont_trace_Off_f46_pos(1,4)];
+for i=2:length(evoked_trace_Off_f46_ax)-1
+evoked_trace_Off_f46_pos(i,:) = evoked_trace_Off_f46_pos(i-1,:)-[0 , evoked_trace_Off_f46_pos(i-1,4) , 0 , 0];
 end
-% for i=2:length(evoked_trace_Off_f46_ax)-1
-% evoked_trace_Off_f46_pos(i,:) = evoked_trace_Off_f46_pos(i-1,:)-[0 , evoked_trace_Off_f46_pos(i-1,4) , 0 , 0];
-% end
 
 evoked_trace_On_f46_pos(1,:) = [h_dist1, spont_trace_On_f46_pos(1,2) ,  evoked_trace_Off_f46_pos(1,3) ,  spont_trace_Off_f46_pos(1,4)];
-for i=1:(length(evoked_trace_On_f46_ax)-1)/2
-evoked_trace_On_f46_pos(2*i,:) = evoked_trace_On_f46_pos(2*i-1,:)-[0 , evoked_trace_On_f46_pos(2*i-1,4)-0.04 , 0 , 0];
-evoked_trace_On_f46_pos(2*i+1,:) = evoked_trace_On_f46_pos(2*i,:)-[0 , evoked_trace_On_f46_pos(2*i,4)+0.03 , 0 , 0];
+for i=2:length(evoked_trace_On_f46_ax)-1
+evoked_trace_On_f46_pos(i,:) = evoked_trace_On_f46_pos(i-1,:)-[0 , evoked_trace_On_f46_pos(i-1,4) , 0 , 0];
 end
 evoked_trace_Off_f46_pos_top = evoked_trace_Off_f46_pos(1,2)+evoked_trace_Off_f46_pos(1,4);
 evoked_trace_On_f46_pos_top = evoked_trace_On_f46_pos(1,2)+evoked_trace_On_f46_pos(1,4);
@@ -133,7 +127,7 @@ end
       
 %    l=legend('Vm','LFP'); set(l,'box','off'), set(l,'FontSize', 8) ; set(l,'linewidth',1.5);set(l,'position',[0.73 0.89 0.03 0.03]);
 
-   %Cell 46 evoked
+   %Cell 46 evokedt_
        evoked_trace_Off_f46_ax_copy = copyobj(evoked_trace_Off_f46_ax,F); % copy axes to new fig
 for i=2:length(evoked_trace_Off_f46_ax)
     set(evoked_trace_Off_f46_ax_copy(i),'position',evoked_trace_Off_f46_pos(i-1,:))
@@ -141,7 +135,7 @@ end
    
 %position legend:
 a=evoked_trace_Off_f46_ax_copy(1).Position;
-set(evoked_trace_Off_f46_ax_copy(1),'position',[0.92 evoked_trace_Off_f46_pos_top-0.01 0.08 0.05])
+set(evoked_trace_Off_f46_ax_copy(1),'position',[0.91 evoked_trace_Off_f46_pos_top-0.025 0.08 0.05])
 evoked_trace_Off_f46_ax_copy(1).FontSize=11;
 evoked_trace_Off_f46_ax_copy(1).LineWidth=1.5;  
 %  
@@ -150,7 +144,7 @@ for i=2:length(evoked_trace_On_f46_ax)
     set(evoked_trace_On_f46_ax_copy(i),'position',evoked_trace_On_f46_pos(i-1,:))
 end
 %position legend
-set(evoked_trace_On_f46_ax_copy(1),'position',[0.92 evoked_trace_On_f46_pos_top-0.01 0.08 0.05]) 
+set(evoked_trace_On_f46_ax_copy(1),'position',[0.91 evoked_trace_On_f46_pos_top-0.025 0.08 0.05]) 
 evoked_trace_On_f46_ax_copy(1).FontSize=11;
 evoked_trace_On_f46_ax_copy(1).LineWidth=1.5;  
  %%
@@ -188,40 +182,40 @@ evoked_cc_On_f46_ax_copy(1).FontSize=11;
 evoked_cc_On_f46_ax_copy(1).LineWidth=1.5;
 
 %   annotation:
-annotation('textbox', [spont_trace_Off_f46_pos(1,1) spont_trace_Off_f46_pos_top 0 0]+[0.1 0 0.5 0.05],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Spontaneous Activity', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
-annotation('textbox', [evoked_trace_Off_f46_pos(1,1) evoked_trace_Off_f46_pos_top 0 0]+[0.12 0 0.5 0.05],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Sensory-evoked Responses', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
+% annotation('textbox', [spont_trace_Off_f46_pos(1,1) spont_trace_Off_f46_pos_top 0 0]+[0.1 0 0.5 0.05],...
+%      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Spontaneous Activity', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
+% annotation('textbox', [evoked_trace_Off_f46_pos(1,1) evoked_trace_Off_f46_pos_top 0 0]+[0.12 0 0.5 0.05],...
+%      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Sensory-evoked Responses', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
 %  
  a_pos1=[0.03 -0.01 0.04 0.04];
  a_pos2=[0.06 -0.01 0.04 0.04];
  a_pos3=[-0.04 -0.01 0.04 0.04];
  a_pos4=[-0.04 0.01 0.04 0.04];
-annotation('textbox', [spont_trace_Off_f46_pos(1,1) spont_trace_Off_f46_pos_top 0 0]+a_pos3,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- annotation('textbox', [spont_trace_On_f46_pos(1,1) spont_trace_On_f46_pos_top 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- annotation('textbox', [evoked_trace_Off_f46_pos(1,1) evoked_trace_Off_f46_pos_top 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- annotation('textbox', [evoked_trace_On_f46_pos(1,1) evoked_trace_On_f46_pos_top 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- annotation('textbox', [spont_cc_Off_f46_pos(1,1) spont_cc_Off_f46_pos_top 0 0]+a_pos3,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- annotation('textbox', [spont_cc_On_f46_pos(1,1) spont_cc_On_f46_pos_top 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- annotation('textbox', [evoked_cc_Off_f46_pos(1,1) evoked_cc_Off_f46_pos_top 0 0]+a_pos3,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'G', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- annotation('textbox', [evoked_cc_On_f46_pos(1,1) evoked_cc_On_f46_pos_top 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'H', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
-  annotation('textbox', [cc_paired_plot_shuff_pos(1,1) cc_paired_plot_shuff_pos_top 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'I', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
-  annotation('textbox', [cc_paired_plot_pos(1,1) cc_paired_plot_pos_top 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'J', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
-
- annotation('textbox', [spont_trace_Off_f46_pos(1,1) spont_trace_Off_f46_pos_top 0 0]+[0.08 -0.02 0.1 0.04],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'NB-', 'FontName','arial', 'fontsize', 12, 'color', [0 0 153]/256)
- annotation('textbox', [spont_trace_On_f46_pos(1,1) spont_trace_On_f46_pos_top 0 0]+[0.08 -0.02 0.1 0.04],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'NB+', 'FontName','arial', 'fontsize', 12, 'color', [0 0 153]/256)
+% annotation('textbox', [spont_trace_Off_f46_pos(1,1) spont_trace_Off_f46_pos_top 0 0]+a_pos1,...
+%      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+%  annotation('textbox', [spont_trace_On_f46_pos(1,1) spont_trace_On_f46_pos_top 0 0]+a_pos1,...
+%      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+%  annotation('textbox', [evoked_trace_Off_f46_pos(1,1) evoked_trace_Off_f46_pos_top 0 0]+a_pos2,...
+%      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+%  annotation('textbox', [evoked_trace_On_f46_pos(1,1) evoked_trace_On_f46_pos_top 0 0]+a_pos2,...
+%      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+%  annotation('textbox', [spont_cc_Off_f46_pos(1,1) spont_cc_Off_f46_pos_top 0 0]+a_pos3,...
+%      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+%  annotation('textbox', [spont_cc_On_f46_pos(1,1) spont_cc_On_f46_pos_top 0 0]+a_pos4,...
+%      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+%  annotation('textbox', [evoked_cc_Off_f46_pos(1,1) evoked_cc_Off_f46_pos_top 0 0]+a_pos3,...
+%      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'G', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+%  annotation('textbox', [evoked_cc_On_f46_pos(1,1) evoked_cc_On_f46_pos_top 0 0]+a_pos4,...
+%      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'H', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+%   annotation('textbox', [cc_paired_plot_shuff_pos(1,1) cc_paired_plot_shuff_pos_top 0 0]+a_pos4,...
+%      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'I', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+%   annotation('textbox', [cc_paired_plot_pos(1,1) cc_paired_plot_pos_top 0 0]+a_pos4,...
+%      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'J', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+% 
+%  annotation('textbox', [spont_trace_Off_f46_pos(1,1) spont_trace_Off_f46_pos_top 0 0]+[0.08 -0.02 0.1 0.04],...
+%      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'NB-', 'FontName','arial', 'fontsize', 12, 'color', [0 0 153]/256)
+%  annotation('textbox', [spont_trace_On_f46_pos(1,1) spont_trace_On_f46_pos_top 0 0]+[0.08 -0.02 0.1 0.04],...
+%      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'NB+', 'FontName','arial', 'fontsize', 12, 'color', [0 0 153]/256)
 %  
 %  annotation('textbox', [cc_paired_plot_pos(1,1) cc_paired_plot_pos_top 0 0]+[0.02 0.0 0.2 0.04],...
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Noise Correlations', 'FontName','arial', 'fontsize', 12,'color', [0 0 153]/256)
@@ -235,7 +229,6 @@ cc_paired_plot_ax_copy.FontSize=14;
 
 cc_paired_plot_shuff_ax_copy = copyobj(cc_paired_plot_shuff_ax,F); % copy axes to new fig
 set(cc_paired_plot_shuff_ax_copy,'position',cc_paired_plot_shuff_pos(1,:))
-   set(F, 'currentaxes', cc_paired_plot_shuff_ax_copy); yl=ylabel('');
 cc_paired_plot_shuff_ax_copy.FontSize=14;
     %   'fontname', 'arial','fontsize',13,'linewidth',1.5,'box','off'); %, 'ylim', y6limits,'ytick', y6ticks,'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
 %  set(F, 'currentaxes', Response_modulation_ax_copy); t=title(''); yl=ylabel('Spikes/Stim. train','fontsize',13);

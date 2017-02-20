@@ -21,10 +21,10 @@ cc_stat=[]; cc_spont=[]; cc_evoked=[]; cc=[]; cc_shuffled_it=[]; cc_shuff_sub=[]
 exp_type=2; %1-NBES, 2-ChAT
 trace_type_input=[1,2]; %[3,2] for exp_type=1; %for exp_type=2 or 3 use [1,2]
 analyze_time_before_train=0;
-analyze_train_only_flag=1;
-add_to_plot=0.15; %seconds from each side of the trace
-save_flag=0;
-print_flag=0;
+analyze_train_only_flag=1; %use analyze_train_only_flag=1
+add_to_plot=0.08; %seconds from each side of the trace. use 0.1 for NBES and 0.080 for ChAT
+save_flag=1;
+print_flag=1;
 norm_flag=0;
 clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
@@ -88,8 +88,8 @@ end
         data_used='data_no_spikes';
         end
     data_preprocessing
-   if ~isempty(current_data_filt)
-     current_data=current_data_filt;
+   if isempty(current_data_filt)
+     current_data_filt=current_data;
  end
 %% set the path for saving figures and variables
 if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1 && BPLFP_flag==1
@@ -153,13 +153,13 @@ for t=1:2
 %% Subtract mean from the interval (fragment of trace)
 data_LFP{t}=Ch2_data_filt(interval(:,t),:,x_value(t));
 data_LFP_noDC{t} = fn_Subtract_Mean(data_LFP{t});
-data_Vm{t}=current_data(interval(:,t),:,x_value(t));   
+data_Vm{t}=current_data_filt(interval(:,t),:,x_value(t));   
 data_Vm_noDC{t} = fn_Subtract_Mean(data_Vm{t});
-data_Vm_filt{t}=current_data(interval(:,t),:,x_value(t));
+data_Vm_filt{t}=current_data_filt(interval(:,t),:,x_value(t));
 data_Vm_filt_noDC{t} = fn_Subtract_Mean(data_Vm_filt{t});
 % for plots:
-     interval_plot(:,t)=[interval(1,t)-add_to_plot*sf{1}:interval(end,t)+add_to_plot*sf{1}]; 
-    data_Vm_plot{t}=current_data(interval_plot(:,t),:,x_value(t));
+     interval_plot(:,t)=[interval(1,t)-round(add_to_plot*sf{1}):interval(end,t)+round(add_to_plot*sf{1})]; 
+    data_Vm_plot{t}=current_data_filt(interval_plot(:,t),:,x_value(t));
     data_LFP_plot{t}=Ch2_data_filt(interval_plot(:,t),:,x_value(t)).*20;
 
 %normalize data (so that a general decrease in the power of the trace will not affect the correlations:
@@ -210,36 +210,54 @@ c_maxdiff(:,1)=cc_shuff_sub{fileind,1}(max_diff_loc,:);
 c_maxdiff(:,2)=cc_shuff_sub{fileind,2}(max_diff_loc,:);
 %% Plots
 trace_fontsize=12;
-scalebar_fontsize=12;
+scalebar_fontsize=10;
 
     if print_flag==1;
 % plotting one trace of data and LFP against each other -
  trace=[2,3,4];%1:size(current_data,2); %5;
+lengthh_vert=[5,10,5]; %[1,2,10]; %lengthh_vert(1) is for spontaneous, lengthh_vert(2) is for evoked
 
 %          interval_plot(:,1)=[interval(1,1)-add_to_plot*sf{1}:interval(end,1)+add_to_plot*sf{1}];  
 %          data_Vm_plot=data_Vm_filt{1}(:,trace);
 %          data_LFP_plot=data_LFP{1}(:,trace).*20;
 
 Fig{fileind}(trace_type)=figure;
+ymax=max([data_Vm_plot{1}(:,trace),data_Vm_plot{2}(:,trace)]);
+ymin=min([data_Vm_plot{1}(:,trace),data_Vm_plot{2}(:,trace)]);
+ydiff=ymax-ymin;
+yrange=ceil(1.2*max(ydiff));
+ymaxLFP=max([data_LFP_plot{1}(:,trace),data_LFP_plot{2}(:,trace)]);
+yminLFP=min([data_LFP_plot{1}(:,trace),data_LFP_plot{2}(:,trace)]);
+ydiffLFP=ymaxLFP-yminLFP;
+yrangeLFP=ceil(max(ydiffLFP));
+
 for tr_ind=1:length(trace)
 subplot(2*length(trace),1,2*tr_ind)
     hold on
         p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot{1}(:,tr_ind), 'color',color_table(1,:),'LineWidth',1.2);
-        axis tight
                            
-        if trace_type==2;
-            fn_plot_sensory_stim(dt, stim2{1},whisker_stim_color)
-            xlm=get(gca,'xlim'); xlm(2)=end_sample(1).*dt*1000; set(gca,'xlim',xlm); %showing only the part of trace that was used for CC analysis
-        end
-        
+        axis tight
+     ylim_data=[get(gca,'ylim')]';
+     ylim_data(2)=ylim_data(1)+yrange;
+     xlim_data=[get(gca,'xlim')]';
+  set(gca,'ylim',ylim_data, 'xlim',xlim_data)  
+  
+          if trace_type==2;   
+%             delete(p1)
+%             p1=plot([interval_plot(1,1):end_sample(1)].*dt*1000,data_Vm_plot{1}(1:end_sample(1)-interval_plot(1,1)+1,tr_ind),'color',color_table(1,:),'LineWidth',1.2);
+            fn_plot_sensory_stim(dt, stim2{1}(:,1:10),whisker_stim_color)
+          end
+            
         %plotting scale bar
 horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
- horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
-        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=lengthh_vert(trace_type);     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+        [b3,b4] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+         if tr_ind~=length(trace);
+             delete(b1); delete(b2); delete(b3); delete(b4);
+        end
     hold off
-    ylim_data=[get(gca,'ylim')]';
-    xlim_data=[get(gca,'xlim')]';
+   
     set(gca, 'visible', 'off') ;
     
   subplot(2*length(trace),1,2*tr_ind-1)     
@@ -248,17 +266,24 @@ horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0
 %         text(interval_plot(1,1).*dt*1000,data_Vm_plot{1}(1),[num2str(floor(data_Vm_plot{1}(1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')  
 
         axis tight            
-
-        if trace_type==2;
-            fn_plot_sensory_stim(dt,stim2{1},whisker_stim_color)
-            xlm=get(gca,'xlim'); xlm(2)=end_sample(1).*dt*1000; set(gca,'xlim',xlm); %showing only the part of trace that was used for CC analysis
-        end
+     ylim_data=[get(gca,'ylim')]';
+     ylim_data(1)=ylim_data(2)-yrangeLFP;
+     xlim_data=[get(gca,'xlim')]';
+     set(gca,'ylim',ylim_data, 'xlim',xlim_data)  
+     
+  if trace_type==2;
+            fn_plot_sensory_stim(dt, stim2{1}(:,1:10),whisker_stim_color)
+%             delete(p2)
+%             p2=plot([interval_plot(1,1):end_sample(1)].*dt*1000,data_LFP_plot{1}(1:end_sample(1)-interval_plot(1,1)+1,tr_ind),'color',color_table(2,:),'LineWidth',1.2);
+  end
         
         %plotting scale bar
- horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh./20), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
-        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+             horiz_vert=0;        lengthh=20;     textit=[num2str(lengthh./20), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+                [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+         if tr_ind~=length(trace);
+             delete(b1); delete(b2); 
+        end
     hold off  
-    set(gca,'xlim',xlim_data)
     set(gca, 'visible', 'off') ;
 
 end
@@ -273,30 +298,43 @@ end
 
 % after ES
        
-%         interval_plot(:,2)=[interval(1,2)-add_to_plot*sf{1}:interval(end,2)+add_to_plot*sf{1}]; 
-%         data_Vm_plot=data_Vm_filt{2}(:,trace);
-%         data_LFP_plot=data_LFP{2}(:,trace);  
+% ymax=max(data_Vm_plot{2}(:,trace));
+% ymin=min(data_Vm_plot{2}(:,trace));
+% ydiff=ymax-ymin;
+% yrange=ceil(1.4*max(ydiff));
+% ymaxLFP=max(data_LFP_plot{2}(:,trace));
+% yminLFP=min(data_LFP_plot{2}(:,trace));
+% ydiffLFP=ymaxLFP-yminLFP;
+% yrangeLFP=ceil(max(ydiffLFP));
           
 Fig{fileind}(trace_type+3)=figure;
 for tr_ind=1:length(trace)
 subplot(2*length(trace),1,2*tr_ind)
     hold on
         p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot{2}(:,tr_ind),'color',color_table(5,:),'LineWidth',1.2);
-        axis tight
                            
-        if trace_type==2;
-            fn_plot_sensory_stim(dt, stim2{1},whisker_stim_color)
-            xlm=get(gca,'xlim'); xlm(2)=end_sample(1).*dt*1000; set(gca,'xlim',xlm); %showing only the part of trace that was used for CC analysis
-        end
+        axis tight
+    ylim_data=[get(gca,'ylim')]';
+     ylim_data(2)=ylim_data(1)+yrange;
+     xlim_data=[get(gca,'xlim')]';
+  set(gca,'ylim',ylim_data, 'xlim',xlim_data)  
+  
+   if trace_type==2;
+            fn_plot_sensory_stim(dt, stim2{1}(:,1:10),whisker_stim_color)
+%             delete(p1)
+%             p1=plot([interval_plot(1,1):end_sample(1)].*dt*1000,data_Vm_plot{2}(1:end_sample(1)-interval_plot(1,1)+1,tr_ind),'color',color_table(5,:),'LineWidth',1.2);
+   end
         
         %plotting scale bar
-horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
-        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
- horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
-        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+            horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+                    [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+             horiz_vert=0;        lengthh=lengthh_vert(trace_type);     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+                    [b3,b4] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+       if tr_ind~=length(trace);
+             delete(b1); delete(b2); delete(b3); delete(b4);
+        end
     hold off
-    ylim_data=[get(gca,'ylim')]';
-    xlim_data=[get(gca,'xlim')]';
+    
     set(gca, 'visible', 'off') ;
     
   subplot(2*length(trace),1,2*tr_ind-1)
@@ -305,17 +343,25 @@ horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0
 %         text(interval_plot(1,1).*dt*1000,data_Vm_plot{2}(1),[num2str(floor(data_Vm_plot{2}(1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')  
 
         axis tight            
+     ylim_data=[get(gca,'ylim')]';
+     ylim_data(1)=ylim_data(2)-yrangeLFP;
+     xlim_data=[get(gca,'xlim')]';
+     set(gca,'ylim',ylim_data, 'xlim',xlim_data)  
 
-        if trace_type==2;
-            fn_plot_sensory_stim(dt,stim2{1},whisker_stim_color)
-            xlm=get(gca,'xlim'); xlm(2)=end_sample(1).*dt*1000; set(gca,'xlim',xlm); %showing only the part of trace that was used for CC analysis
-        end
+       if trace_type==2;          
+            fn_plot_sensory_stim(dt, stim2{1}(:,1:10),whisker_stim_color)
+%             delete(p2)
+%             p2=plot([interval_plot(1,1):end_sample(1)].*dt*1000,data_LFP_plot{2}(1:end_sample(1)-interval_plot(1,1)+1,tr_ind),'color',color_table(4,:),'LineWidth',1.2);
+       end
         
-        %plotting scale bar
- horiz_vert=0;        lengthh=0.5;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
-        [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+        %plotting scale bar 
+             horiz_vert=0;        lengthh=20;     textit=[num2str(lengthh./20), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+                [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+         if tr_ind~=length(trace);
+             delete(b1); delete(b2);
+        end
     hold off  
-    set(gca,'xlim',xlim_data)
+   
     set(gca, 'visible', 'off') ;
 end
 title('Vm-LFP single trace ES On','FontSize', 16); 
@@ -381,9 +427,13 @@ Fig{fileind}(trace_type+9)=figure;
  hold on
  h1=fn_shadedErrorBar(lags{fileind,1}.*dt,cc_shuff_sub_mean{fileind}(:,1),cc_shuff_sub_sem1,{'LineWidth',1.5,'color', color_table(1,:)},1);
 h2=fn_shadedErrorBar(lags{fileind,1}.*dt,cc_shuff_sub_mean{fileind}(:,2),cc_shuff_sub_sem2,{'LineWidth',1.5,'color', color_table(5,:)},1);
-% ylim=get(gca,'ylim');
-ylim=[-0.4 0.4];
-yticks=[-0.4, -0.2 0, 0.2];
+ylim=get(gca,'ylim');
+% ylim=[-0.4 0.4];
+% yticks=[-0.4, -0.2 0, 0.2];
+%  if trace_type==2
+% ylim=[-0.8 0.8];
+% yticks=[-0.8, -0.4, 0, 0.4, 0.8];
+%  end
 % hline_zero=line([0 0],[ylim(1) ylim(2)],'linestyle','-.','color',[136 137 138]./256,'linewidth',1);
 % title('Vm-LFP crosscorrelation','FontSize', 16); 
 l=legend([h1.mainLine h2.mainLine ],legend_string,'Location','northeast', 'box', 'off');
@@ -392,7 +442,9 @@ l.FontSize=11;
 % legend('ES off mean cc','ES on mean cc'); legend('boxoff');%legend('boxoff','fontsize',6,'linewidth',1.5,'Position',[0.39,0.45,0.25,0.1]);
 xlabel('Lags [S]' ,'FontSize', 14); ylabel('CC' ,'FontSize', 14);
 set(gca,'xlim',[-0.5 0.5],'xtick',[-0.5 0 0.5],'fontsize',14); 
-% set(gca,'xlim',[-0.5 0.5],'xtick',[-0.5 0 0.5],'ylim', ylim, 'ytick',yticks,'fontsize',14); 
+if trace_type~=2
+    set(gca,'ylim',ylim);
+end
 hold off
 
 Fig{fileind}(trace_type+12)=figure;
@@ -400,21 +452,22 @@ Fig{fileind}(trace_type+12)=figure;
 h3=fn_shadedErrorBar(lags{fileind,1}.*dt,cc_shuffled_mean{fileind}(:,1),cc_shuffled_sem1,{'LineWidth',1.5,'linestyle','--','color', color_table(1,:)},1);
 h4=fn_shadedErrorBar(lags{fileind,1}.*dt,cc_shuffled_mean{fileind}(:,2),cc_shuffled_sem2,{'LineWidth',1.5,'linestyle','--','color', color_table(5,:)},1);
 %  ylim=get(gca,'ylim');
-ylim=[-0.2, 0.2];
- yticks=[-0.2,0,0.2];
- if trace_type==2
-ylim=[-0.8 0.8];
-yticks=[-0.8, -0.4, 0, 0.4, 0.8];
- end
+% ylim=[-0.2, 0.2];
+%  yticks=[-0.2,0,0.2];
+%  if trace_type==2
+% ylim=[-0.8 0.8];
+% yticks=[-0.8, -0.4, 0, 0.4, 0.8];
+%  end
 % hline_zero=line([0 0],[ylim(1) ylim(2)],'linestyle','-.','color',[136 137 138]./256,'linewidth',1);
 % title('Vm-LFP crosscorrelation','FontSize', 16); 
 l=legend([h3.mainLine h4.mainLine ],legend_string_shuff,'Location','northeast', 'box', 'off');
 l.LineWidth=1.5;
 l.FontSize=11;
-% legend('ES off mean cc','ES on mean cc'); legend('boxoff');%legend('boxoff','fontsize',6,'linewidth',1.5,'Position',[0.39,0.45,0.25,0.1]);
 xlabel('Lags [S]' ,'FontSize', 14); ylabel('CC' ,'FontSize', 14);
 set(gca,'xlim',[-0.5 0.5],'xtick',[-0.5 0 0.5],'fontsize',14);
-% set(gca,'xlim',[-0.5 0.5],'xtick',[-0.5 0 0.5],'ylim',ylim,'ytick',yticks,'fontsize',14); 
+if trace_type~=2
+    set(gca,'ylim',ylim);
+end
 hold off
 % pause
         %% Save figures    
@@ -755,6 +808,7 @@ lag0_spont(:,1)=[lag0_spont_noNB;lag0_spont_NB];
 lag0_evoked(:,1)=[lag0_evoked_noNB;lag0_evoked_NB];
  S_1(:,1)=1:length(files_to_analyze);
 
+ta_vector_names={'lag0_spont_noNB','lag0_spont_NB','lag0_evoked_noNB','lag0_evoked_NB'};
 ta=table(S_1,lag0_spont_noNB,lag0_spont_NB,lag0_evoked_noNB,lag0_evoked_NB,...
     'variablenames', {'cells','Y1','Y2','Y3','Y4'});
 factorNames = {'Sensory_stim','NB'};
@@ -762,7 +816,7 @@ within = table({'Sp';'Sp';'Ev';'Ev'},{'N';'Y';'N';'Y'},'VariableNames',factorNam
 % fit the repeated measures model
 rm_lag0 = fitrm(ta,'Y1-Y4~1','WithinDesign',within);
 %test for sphericity
-mauchly(rm_lag0)
+mauchly_lag0=mauchly(rm_lag0);
 % run my repeated measures anova here
 [ranovatbl_lag0] = ranova(rm_lag0, 'WithinModel','Sensory_stim*NB');
 %multiple comparisons:
@@ -813,7 +867,7 @@ within = table({'Sp';'Sp';'Ev';'Ev'},{'N';'Y';'N';'Y'},'VariableNames',factorNam
 % fit the repeated measures model
 rm_lag0_shuff = fitrm(ta,'Y1-Y4~1','WithinDesign',within);
 %test for sphericity
-mauchly(rm_lag0_shuff)
+mauchly_lag0_shuff=mauchly(rm_lag0_shuff);
 % run my repeated measures anova here
 [ranovatbl_lag0_shuff] = ranova(rm_lag0_shuff, 'WithinModel','Sensory_stim*NB');
 %multiple comparisons:
@@ -957,11 +1011,12 @@ CC_X_ev(1,:)=3*ones(1,size(CC_Y_max_val_ev,2));
 CC_X_ev(2,:)=4*ones(1,size(CC_Y_max_val_ev,2));
 E_ev = std(CC_Y_max_val_ev,0,2);
 linex=[1 3;2 4];
-my=max(max([cc_stat.spont.max_val,cc_stat.evoked.max_val]))*1.1; 
+% my=max(max([cc_stat.spont.max_val,cc_stat.evoked.max_val]))*1.1; 
+my=0.8;
 liney=[my my;my my];
 x1limits = [0.75 4.25];
 x1ticks = [1,2,3,4];
- y1limits = [-0.1 1.1];
+ y1limits = [-0.1 1];
 y1ticks = [0,0.5,1];
 max_val_p_spont=mv_stat.spont_p;
 max_val_p_evoked=mv_stat.evoked_p;
@@ -1001,8 +1056,8 @@ errorbar(CC_X_ev(:,1), mean(CC_Y_max_val_ev,2),E_ev,'k','linewidth',2.5,'markers
 % line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
 text(1.5,my,asterisk_sp,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
 text(3.5,my,asterisk_ev,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
-text(1.5,my+0.15,'Spontaneous','HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
-text(3.5,my+0.15,'Sensory evoked','HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
+text(1.5,my+0.15,'Spontaneous','HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',10)
+text(3.5,my+0.15,'Sensory evoked','HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',10)
 hold off
 
 set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',22,'linewidth',1, 'ytick', y1ticks,...
@@ -1024,7 +1079,7 @@ CC_X_ev_shuff(1,:)=3*ones(1,size(CC_Y_max_val_ev_shuff,2));
 CC_X_ev_shuff(2,:)=4*ones(1,size(CC_Y_max_val_ev_shuff,2));
 E_ev_shuff = std(CC_Y_max_val_ev_shuff,0,2);
 linex=[1 3;2 4];
-my=max(max([cc_stat.spont.max_val_shuff,cc_stat.evoked.max_val_shuff]))*1.1; 
+% my=max(max([cc_stat.spont.max_val_shuff,cc_stat.evoked.max_val_shuff]))*1.1; 
 liney=[my my;my my];
 x1limits = [0.75 4.25];
 x1ticks = [1,2,3,4];
@@ -1068,8 +1123,8 @@ errorbar(CC_X_ev_shuff(:,1), mean(CC_Y_max_val_ev_shuff,2),E_ev_shuff,'k','linew
 % line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
 text(1.5,my,asterisk_sp,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
 text(3.5,my,asterisk_ev,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
-text(1.5,my+0.15,'Spontaneous','HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
-text(3.5,my+0.15,'Sensory evoked','HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
+text(1.5,my+0.15,'Spontaneous','HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',10)
+text(3.5,my+0.15,'Sensory evoked','HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',10)
 hold off
 
 set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',22,'linewidth',1, 'ytick', y1ticks,...
@@ -1091,38 +1146,12 @@ CC_X_ev(1,:)=3*ones(1,size(CC_Y_max_val_ev,2));
 CC_X_ev(2,:)=4*ones(1,size(CC_Y_max_val_ev,2));
 E_ev = std(CC_Y_max_val_ev,0,2);
 linex=[1 3;2 4];
-my=max(max([cc_stat.spont.max_val.*cc_stat.spont.max_val_sign,cc_stat.evoked.max_val.*cc_stat.evoked.max_val_sign]))*1.1; 
+% my=max(max([cc_stat.spont.max_val.*cc_stat.spont.max_val_sign,cc_stat.evoked.max_val.*cc_stat.evoked.max_val_sign]))*1.1; 
 liney=[my my;my my];
 x1limits = [0.75 4.25];
 x1ticks = [1,2,3,4];
  y1limits = [-1 1];
 y1ticks = [-1,-0.5,0,0.5,1];
-
-% if max_val_p_spont{1,1} >0.05 
-%     asterisk_sp='n.s.';
-% else if max_val_p_spont{1,1}<0.05 && max_val_p_spont{1,1}>0.01
-%     asterisk_sp='*';
-%     else if max_val_p_spont{1,1}<0.01 && max_val_p_spont{1,1}>0.001
-%             asterisk_sp='**';
-%     else if max_val_p_spont{1,1}<0.001
-%              asterisk_sp='***';
-%         end
-%         end
-%     end
-% end
-
-% if max_val_p_evoked{1,1} >0.05 
-%     asterisk_ev='n.s.';
-% else if max_val_p_evoked{1,1}<0.05 && max_val_p_evoked{1,1}>0.01
-%     asterisk_ev='*';
-%     else if max_val_p_evoked{1,1}<0.01 && max_val_p_evoked{1,1}>0.001
-%             asterisk_ev='**';
-%     else if max_val_p_evoked{1,1}<0.001
-%              asterisk_ev='***';
-%         end
-%         end
-%     end
-% end
 
 figure
 hold on
@@ -1134,8 +1163,8 @@ errorbar(CC_X_ev(:,1), mean(CC_Y_max_val_ev,2),E_ev,'k','linewidth',2.5,'markers
 % line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
 % text(1.5,my,asterisk_sp,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
 % text(3.5,my,asterisk_ev,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
-text(1.5,my+0.15,'Spontaneous','HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
-text(3.5,my+0.15,'Sensory evoked','HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
+text(1.5,my+0.15,'Spontaneous','HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',10)
+text(3.5,my+0.15,'Sensory evoked','HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',10)
 hold off
 
 set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',22,'linewidth',1,'ytick', y1ticks,...
@@ -1157,38 +1186,12 @@ CC_X_ev_shuff(1,:)=3*ones(1,size(CC_Y_max_val_ev_shuff,2));
 CC_X_ev_shuff(2,:)=4*ones(1,size(CC_Y_max_val_ev_shuff,2));
 E_ev_shuff = std(CC_Y_max_val_ev_shuff,0,2);
 linex=[1 3;2 4];
-my=max(max([cc_stat.spont.max_val_shuff.*cc_stat.spont.max_val_shuff_sign,cc_stat.evoked.max_val_shuff.*cc_stat.evoked.max_val_shuff_sign]))*1.1; 
+% my=max(max([cc_stat.spont.max_val_shuff.*cc_stat.spont.max_val_shuff_sign,cc_stat.evoked.max_val_shuff.*cc_stat.evoked.max_val_shuff_sign]))*1.1; 
 liney=[my my;my my];
 x1limits = [0.75 4.25];
 x1ticks = [1,2,3,4];
  y1limits = [-1 1];
 y1ticks = [-1,-0.5,0,0.5];
-
-% if max_val_shuff_p_spont{1,1} >0.05 
-%     asterisk_sp='n.s.';
-% else if max_val_shuff_p_spont{1,1}<0.05 && max_val_shuff_p_spont{1,1}>0.01
-%     asterisk_sp='*';
-%     else if max_val_shuff_p_spont{1,1}<0.01 && max_val_shuff_p_spont{1,1}>0.001
-%             asterisk_sp='**';
-%     else if max_val_shuff_p_spont{1,1}<0.001
-%              asterisk_sp='***';
-%         end
-%         end
-%     end
-% end
-% 
-% if max_val_shuff_p_evoked{1,1} >0.05 
-%     asterisk_ev='n.s.';
-% else if max_val_shuff_p_evoked{1,1}<0.05 && max_val_shuff_p_evoked{1,1}>0.01
-%     asterisk_ev='*';
-%     else if max_val_shuff_p_evoked{1,1}<0.01 && max_val_shuff_p_evoked{1,1}>0.001
-%             asterisk_ev='**';
-%     else if max_val_shuff_p_evoked{1,1}<0.001
-%              asterisk_ev='***';
-%         end
-%         end
-%     end
-% end
 
 figure
 hold on
@@ -1200,8 +1203,8 @@ errorbar(CC_X_ev_shuff(:,1), mean(CC_Y_max_val_ev_shuff,2),E_ev_shuff,'k','linew
 % line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
 % text(1.5,my,asterisk_sp,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
 % text(3.5,my,asterisk_ev,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
-text(1.5,my+0.15,'Spontaneous','HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
-text(3.5,my+0.15,'Sensory evoked','HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',13)
+text(1.5,my+0.15,'Spontaneous','HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',10)
+text(3.5,my+0.15,'Sensory evoked','HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',10)
 hold off
 
 set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',22,'linewidth',1, 'ylim', y1limits,'ytick', y1ticks,...

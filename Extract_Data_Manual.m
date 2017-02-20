@@ -3,7 +3,7 @@
 % close all; 
 clear all; clc;
 set=1; %1 for set 1, 2 for set 2
-traces_to_remove = 1:12; %1:length(Exp.Header(run_header).headerInfo.blockLocations);
+traces_to_remove = []; %1:12; %1:length(Exp.Header(run_header).headerInfo.blockLocations);
 ex
 disp('after opening file of interest, press any key to continue');
 pause
@@ -13,7 +13,7 @@ EXPGLOBALS;
 global Exp;
 
 protocol_type = 2; %protocol_type is 1 if each header is a whole protocol and 2 if each header is a single repeat of the protocol or standby
-headers=[2]; %headers to extract
+headers=[2:34]; %headers to extract
 switch set
     case 1
         ch_Data1=1;
@@ -205,7 +205,7 @@ end
 
 path='D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
 fname = Exp.namepath.name;
- name = [fname(1:(findstr(fname,'.')-1)) '_h2'];
+ name = [fname(1:(findstr(fname,'.')-1)) '_h2-34'];
  cd(path);
  save( name, 'data', 'headers');
 cd(Exp.namepath.path);

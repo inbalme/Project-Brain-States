@@ -37,7 +37,7 @@ yl = get(gca,'ylim');
 if horiz_vert;
     barXstart=max(xl)+perc1*diff(xl)-lengthh;
     barXend=max(xl)+perc1*diff(xl);
-    barYstart=min(yl)-perc1*diff(yl);
+    barYstart=min(yl)-2*perc1*diff(yl);
     barYend=barYstart; 
     pos = get(gca,'position');  
     y_units=perc2*diff(yl);
@@ -53,7 +53,7 @@ else
     pos = get(gca,'position');
    p1 = plot([barXstart, barXend],[barYstart, barYend],'linewidth',2,'color',c);
     p2 = text(barXstart+x_units,barYstart+lengthh/2,textit,'HorizontalAlignment', 'center','VerticalAlignment', 'bottom', 'rotation',90,'fontsize',fonsizes);
-set(gca,'xlim',[xl(1),barXend+x_units]);  %setting new ylim for the axes to contain the scale bar
+set(gca,'xlim',[xl(1),barXend+x_units]);  %setting new xlim for the axes to contain the scale bar
 end;
 
 
