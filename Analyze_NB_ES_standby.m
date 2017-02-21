@@ -6,7 +6,7 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
 %different ES depth. same LFP location in barrel cortex:
 % load Set2-2015-03-23-002_h1-7 %data1, different depths
 %  load Set2-2015-04-02-001_h3-12 %different depths
- load 2016-10-20-001_h2-34 %different depths data1
+%  load 2016-10-20-001_h2-34 %different depths data1
 %Atropine+Mecamylamine:
 % load 2015-12-28-006_h1-6 %data2
 % load 2015-07-29-002_h1-6 %data2 ESdel7sec, trace 15sec
@@ -38,14 +38,17 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
 % load Set2-2015-06-29-001_h3-4
 % load Set2-2015-07-07-001_h2+3
 % load Set2-2015-07-09-001_h1+2
+ load 2016-10-24-001_h1-8 
+
 
 %%
- orig_header=34; %[27,28,29,30,31,33,34];
+ orig_header=6; %[27,28,29,30,31,33,34];
  save_flag=0;
  galvano_flag=0;
  ES_del=10;
  dataCh=1;
  gain=10; %20;
+ DC_int=1;
  trace_ind = [2,3,4,5,6]; %1:size(plot_data,2);  %trace_ind is the numbers of traces to be plotted
  header=find(headers==orig_header);
  stim2_X=[];
@@ -53,6 +56,8 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
  dt=1/sf;
  sf_galvano = 800;
  dt_galvano = 1/sf_galvano;
+ 
+stim1_X=[ES_del*sf, (ES_del+0.5)*sf];           
 
  start_time=[ES_del-3, ES_del+2];
 duration = 2; %[sec]
@@ -73,14 +78,18 @@ interval(:,t) = start_sample(:,t):end_sample(:,t);
  end
  %dividing by the recording gain:
  data_mat=data_mat./gain;
-%bandpass filtering to remove 50Hznoise from LFP channel, and then low pass
-%300 Hz
-f1=[-300];
+%bandpass filtering to remove 50Hznoise from LFP channel, and then low pass 200 Hz
+%filtering before and after ES separately because the high frequencies insert artifacts when filtered.
+f1=[-1];
     for trace= 1:size(data_mat,2)    
             jl=data_mat(:,trace);
-            data_mat_filt1(:,trace)=bandPass_fft_IL_NEW2016(jl,dt,49,51,1,0); %filtering out 50Hz noise from LFP and Vm           
-             km=data_mat_filt1(:,trace);
-             data_mat_filt2(:,trace)=bandPass_fft_IL_NEW2016(km,dt,f1,300,0,0); %low-pass 300Hz
+            data_mat_filt1(1:stim1_X(1)-1,trace)=bandPass_fft_IL_NEW2016(jl(1:stim1_X(1)-1),dt,49,51,1,0); %filtering out 50Hz noise from LFP and Vm           
+            data_mat_filt1(stim1_X(1):stim1_X(2),trace)=data_mat(stim1_X(1):stim1_X(2),trace);
+            data_mat_filt1(stim1_X(2)+1:length(jl),trace)=bandPass_fft_IL_NEW2016(jl(stim1_X(2)+1:end),dt,49,51,1,0); %filtering out 50Hz noise from LFP and Vm            
+            km=data_mat_filt1(:,trace);
+             data_mat_filt2(1:stim1_X(1)-1,trace)=bandPass_fft_IL_NEW2016(km(1:stim1_X(1)-1),dt,f1,300,0,0); %low-pass 300Hz
+            data_mat_filt2(stim1_X(1):stim1_X(2),trace)=data_mat(stim1_X(1):stim1_X(2),trace);
+            data_mat_filt2(stim1_X(2)+1:length(km),trace)=bandPass_fft_IL_NEW2016(km(stim1_X(2)+1:end),dt,f1,300,0,0); %low-pass 300Hz
     end
     
  if galvano_flag==1;
@@ -113,7 +122,6 @@ f1=[-300];
                             stim2_X = locations_x_galvano(:,:);
                         end
                 end
-     stim1_X=[ES_del*sf, (ES_del+0.5)*sf];           
                 %% Plotting traces
 trace_fontsize=12;
 scalebar_fontsize=12;
@@ -138,7 +146,7 @@ plot_data_std =  nanstd(plot_data,0,2);
 % plot_data_ff = (-1).*plot_data_var./plot_data_mean; 
        l=size(plot_data(:,trace_ind),1);
         l=l/2-1;
-        DC=1.*(0:length(trace_ind)-1);
+        DC=DC_int.*(0:length(trace_ind)-1);
         DC=wextend('addrow', 'per', DC, l);        
               
 %         x2lim=[stim2_X{x_value(1)}(1,1).*dt-0.5,stim2_X{2}(1,1).*dt+2];
@@ -164,7 +172,7 @@ set(rec2,'Position',[x_axis_short(2,1)*dt,ylim_data(1),(x_axis_short(2,end)-x_ax
 rec3=rectangle('Position',[stim1_X(1)*dt-0.05,ylim_data(1),(stim1_X(2)-stim1_X(1))*dt+0.05,ylim_data(2)-ylim_data(1)],'faceColor',color_table(3,:),'edgecolor','none');
 
 %plotting scale bar
-yline_start=ylim_data(1)-0.5; yline_end=yline_start+1; %10;
+yline_start=ylim_data(1)-0.5; yline_end=yline_start+0.5; %10;
 % yline_start=yline_start./gain; yline_end=yline_end./gain;
 xline_start=x_axis_long(1,1)*dt-1; xline_end=xline_start+1;
 xline=[xline_start xline_start;xline_end xline_start]; yline=[yline_start yline_start; yline_start yline_end];

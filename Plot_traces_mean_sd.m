@@ -5,7 +5,8 @@ clear all
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data
  global exp_type
 exp_type=2; %1-NBES, 2-ChAT
-save_flag= 1;
+data_type='LFP'; %'LFP', 'Vm'
+save_flag= 0;
 print_flag=0;
 clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 % short_flag=0; %1- short trace, 0- long trace
@@ -18,9 +19,9 @@ BPLFP_flag=1; %filtering LFP. the default filter is the one used to filter LFP i
 bp_manual_LFP=[1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
 bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
-lengthh_vert=[1,2,5]; %[1,2,10]; %lengthh_vert(1) is for STD, lengthh_vert(2) is for mean and (3) is for traces
-trace_ind =[2,4,5]; %if trace_ind is empty, the default would be to take all traces
-DC_factor = 12; %sets the spacing between plotted traces
+lengthh_vert=[0.1,0.1,0.5];%[1,2,5]; %[1,2,10]; %lengthh_vert(1) is for STD, lengthh_vert(2) is for mean and (3) is for traces
+trace_ind =[2,3,4,5,6]; %if trace_ind is empty, the default would be to take all traces
+DC_factor = 1; %sets the spacing between plotted traces
  %% set the path for saving figures and variables
 % if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1 && BPLFP_flag==1
 %     path_output=['LFP_50Hz+BP Vm_ 50Hz+BP\BP',num2str(bp_manual_Vm(1)),'-',num2str(bp_manual_Vm(2))];
@@ -114,6 +115,7 @@ end
     load(fname) 
     %%
     Ch2_data= raw_data{3}./20; %dividing by the LFP gain       
+%     Ch2_data= raw_data{3};
       if isempty(data_no_spikes)
             current_data=raw_data{channel};
              if clamp_flag==1
@@ -127,7 +129,12 @@ end
         end
         data_used='data_no_spikes';
       end
-        
+      
+    if strcmp(data_type,'LFP')
+    current_data=Ch2_data;
+    data_used='Ch2_data';
+    end
+
    data_preprocessing 
    
     if isempty(current_data_filt)
@@ -502,24 +509,41 @@ set(gca, 'visible', 'off') ;
 %%
 if save_flag==1;    
             cd(path_output1)
-                          
-        saveas(s1,['f' num2str(files_to_analyze(fileind)) '_traces_x1_v2'],'fig') 
-        print(s1,['f' num2str(files_to_analyze(fileind)) '_traces_x1_v2'],'-dpng','-r600','-opengl') 
-        saveas(s2,['f' num2str(files_to_analyze(fileind)) '_mean_x1_v2'],'fig') 
-        print(s2,['f' num2str(files_to_analyze(fileind)) '_mean_x1_v2'],'-dpng','-r600','-opengl') 
-        saveas(s3,['f' num2str(files_to_analyze(fileind)) '_std_x1_mean-subt_v2'],'fig') 
-        print(s3,['f' num2str(files_to_analyze(fileind)) '_std_x1_mean-subt_v2'],'-dpng','-r600','-opengl') 
+    if strcmp(data_type,'LFP')
+        filename1= ['f' num2str(files_to_analyze(fileind)) '_traces_x1_LFP'];
+         filename2= ['f' num2str(files_to_analyze(fileind)) '_mean_x1_LFP'];
+         filename3= ['f' num2str(files_to_analyze(fileind)) '_std_x1_mean-subt_LFP'];
+         filename4=['f' num2str(files_to_analyze(fileind)) '_traces_x1_noES_LFP'];
+        filename5=['f' num2str(files_to_analyze(fileind)) '_traces_x1_ES_LFP'];
+        filename6=['f' num2str(files_to_analyze(fileind)) '_mean_x1_LFP'];
+        filename7=['f' num2str(files_to_analyze(fileind)) '_std_x1_mean-subt_LFP'];
+        else
+         filename1= ['f' num2str(files_to_analyze(fileind)) '_traces_x1_v2'];
+         filename2= ['f' num2str(files_to_analyze(fileind)) '_mean_x1_v2'];
+         filename3= ['f' num2str(files_to_analyze(fileind)) '_std_x1_mean-subt_v2'];
+         filename4=['f' num2str(files_to_analyze(fileind)) '_traces_x1_noES_v2'];
+        filename5=['f' num2str(files_to_analyze(fileind)) '_traces_x1_ES_v2'];
+        filename6=['f' num2str(files_to_analyze(fileind)) '_mean_x1_v2'];
+        filename7=['f' num2str(files_to_analyze(fileind)) '_std_x1_mean-subt_v2'];
+    end
+         
+        saveas(s1,filename1,'fig') 
+        print(s1,filename1,'-dpng','-r600','-opengl') 
+        saveas(s2,filename2,'fig') 
+        print(s2,filename2,'-dpng','-r600','-opengl') 
+        saveas(s3,filename3,'fig') 
+        print(s3,filename2,'-dpng','-r600','-opengl') 
     
          cd(path_output2)
-    
-       saveas(s4,['f' num2str(files_to_analyze(fileind)) '_traces_x1_noES_v2'],'fig') 
-        print(s4,['f' num2str(files_to_analyze(fileind)) '_traces_x1_noES_v2'],'-dpng','-r600','-opengl') 
-        saveas(s5,['f' num2str(files_to_analyze(fileind)) '_traces_x1_ES_v2'],'fig') 
-        print(s5,['f' num2str(files_to_analyze(fileind)) '_traces_x1_ES_v2'],'-dpng','-r600','-opengl') 
-        saveas(s6,['f' num2str(files_to_analyze(fileind)) '_mean_x1_v2'],'fig') 
-        print(s6,['f' num2str(files_to_analyze(fileind)) '_mean_x1_v2'],'-dpng','-r600','-opengl') 
-        saveas(s7,['f' num2str(files_to_analyze(fileind)) '_std_x1_mean-subt_v2'],'fig') 
-        print(s7,['f' num2str(files_to_analyze(fileind)) '_std_x1_mean-subt_v2'],'-dpng','-r600','-opengl') 
+            
+         saveas(s4,filename4,'fig') 
+        print(s4,filename4,'-dpng','-r600','-opengl') 
+        saveas(s5,filename5,'fig') 
+        print(s5,filename5,'-dpng','-r600','-opengl') 
+        saveas(s6,filename6,'fig') 
+        print(s6,filename6,'-dpng','-r600','-opengl') 
+        saveas(s7,filename7,'fig') 
+        print(s7,filename7,'-dpng','-r600','-opengl') 
 end
 
 %% Evoked figures

@@ -2,7 +2,7 @@
 % This file was created on 15/1/2017 based on "Analyze_NBES_Vm_hist_and_powerspec_10_20Hz_v2'
 %This file is used for the analysis of files created with extract_NBES_Data_v3 or Extract_ChAT_Data_v3
 %when running: pay attention to change the exp_type and files_to_analyze.
-%To analyze LFP, change current_data=Ch2_data. for powerspect
+%To analyze LFP, change current_data=Ch2_data. for powerspectrum this is in line 400.
 
 %       protocol 5 (NBES+galvnao (5 x-values))
 %       protocol 6 (ChAT intracellular current injections light+galvnao (15 x-values))
@@ -17,7 +17,7 @@ close all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
 exp_type=1; %1-NBES, 2-ChAT
-
+data_type='Vm'; %'LFP', 'Vm'
 trace_type_input=1; %
 analyze_time_before_train=0;
 analyze_train_only_flag=0;
@@ -37,7 +37,7 @@ data_vec_all{1} = []; data_vec_all{2} = []; data_vec_residual_all{1} = []; data_
 %%
 switch exp_type
     case 1
-        files_to_analyze =[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; %[44,46,48,52,56,58,62,72,75,82,84]; %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
+        files_to_analyze =44; %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; %[44,46,48,52,56,58,62,72,75,82,84]; %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB+', 'NB-'};
@@ -48,7 +48,7 @@ switch exp_type
         end        
 
     case 2
-        files_to_analyze =[74,76,77,80,82,84,87]; %[74,76,77,80,82,84,87]; %
+        files_to_analyze =80; %[74,76,77,80,82,84,87]; %[74,76,77,80,82,84,87]; %
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};
@@ -384,7 +384,7 @@ hold on
 line(Vm_5prctile_X,Vm_5prctile_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(Vm_5prctile_X(:,1), mean(Vm_5prctile_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
 % line(linex,liney,'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-text(1.5,my,asterisk_sp,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',20)
+text(1.5,my,asterisk_sp,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
 hold off
 
         x1limits = [0.75 2.25];
@@ -426,8 +426,12 @@ if analyze_powerspec_flag==1
     cd(path)
     load(fname) 
    %%
-   Ch2_data= raw_data{3}./20; %dividing by the LFP gain           
+   Ch2_data= raw_data{3}./20; %dividing by the LFP gain      
+if strcmp(data_type,'LFP')
+    current_data=Ch2_data;
+else
     current_data= data_no_spikes{channel};  % Ch2_data;  data_no_spikes{channel};
+end
     galvano_nstim = Param.facade(6);
     galvano_freq = Param.facade(7);
 
@@ -455,12 +459,14 @@ for t=1:length(start_time);
 DC=[]; spec_mat_noDC=[]; spec_mat = []; 
 spec_mat = current_data_filt(interval(:,t),:,x_value(t));
 DC= mean(spec_mat,1);
-l=size(spec_mat,1);
-l=l/2-1;
-DC=wextend('addrow', 'per', DC, l);
-spec_mat_noDC = spec_mat-DC;
+spec_mat_noDC=bsxfun(@minus,spec_mat,DC);
+% l=size(spec_mat,1);
+% l=l/2-1;
+% DC=wextend('addrow', 'per', DC, l);
+% spec_mat_noDC = spec_mat-DC;
 
 [Y_abs(:,:,t),f(:,t)] = fn_Amp_Spectrum(spec_mat_noDC,sf{channel},0,0);
+Y_abs_sem(:,t)=std(Y_abs(:,:,t),0,2)./sqrt(size(Y_abs(:,:,t),2));
 Y_abs_sum(t,:)=sum(Y_abs(:,:,t),1);
 Y_abs_norm(:,:,t)=bsxfun(@rdivide,Y_abs(:,:,t),Y_abs_sum(t,:));
 
@@ -492,29 +498,6 @@ Y_alpha_all(fileind,:)=Y_abs_alpha;
 Y_beta_all(fileind,:)=Y_abs_beta;
 Y_gamma_all(fileind,:)=Y_abs_gamma;
 Y_sum(fileind,:)=mean(Y_abs_sum,2);
-
-%% Plot power spectrum without shaded error bar
-% figure
-%         xlabel('Frequency [Hz]','fontsize',20, 'fontname', 'arial')
-%         ylabel('Power spectral density [mV^2/Hz]','fontsize',20, 'fontname', 'arial')
-%         set(gca,'xscale','log');
-%         set(gca,'yscale','log');
-%  for t=1:length(start_time);
-%       hold on
-%         plot(f(:,t),mean(Y_abs(:,:,t),2),'color', color_table(t,:))        
-%         xlim([0 1000]); ylim([0.001 10])
-% %         title('')
-%         set(gca,'fontsize',20, 'fontname', 'arial', 'box', 'off','linewidth',2)        
-%       hold off
-%  end
-%  pause
-%      end %temp file loop
-
-%             if save_flag==1;
-%                 cd(path_output)
-%                     saveas(Fig2,['f' num2str(files_to_analyze(fileind)) '_Vm_power_spectrum.fig']) 
-%                     print(Fig2,['f' num2str(files_to_analyze(fileind)) '_Vm_power_spectrum'],'-dpng','-r600','-opengl') 
-%             end
      end %end of files loop
 powerspec.delta_range=delta;
 powerspec.theta_range=theta;
@@ -532,6 +515,7 @@ powerspec.BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 powerspec.BPLFP_flag=0; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
 powerspec.BPVm_flag=0; 
 
+if length(files_to_analyze)>4;
 [powerspec.delta_lillietest_h,powerspec.delta_lillietest_p]=lillietest(powerspec.delta(:,2)-powerspec.delta(:,1));
 [powerspec.delta_ttest_h,powerspec.delta_ttest_p]=ttest(powerspec.delta(:,1),powerspec.delta(:,2));
 [powerspec.delta_wilcoxon_p,powerspec.delta_wilcoxon_h]=signrank(powerspec.delta(:,1),powerspec.delta(:,2));
@@ -555,7 +539,44 @@ powerspec.BPVm_flag=0;
 [powerspec.Y_sum_lillietest_h,powerspec.Y_sum_lillietest_p]=lillietest(powerspec.Y_sum(:,2)-powerspec.Y_sum(:,1));
 [powerspec.Y_sum_ttest_h,powerspec.Y_sum_ttest_p]=ttest(powerspec.Y_sum(:,1),powerspec.Y_sum(:,2));
 [powerspec.Y_sum_wilcoxon_p,powerspec.Y_sum_wilcoxon_h]=signrank(powerspec.Y_sum(:,1),powerspec.Y_sum(:,2));
+end
 %% plots
+%% Powerspec
+j1=figure;
+for t=1:length(start_time)
+      hold on
+   d1(t)= fn_shadedErrorBar(f(f(:,t)<49,t),mean(Y_abs(f(:,t)<49,:,t),2),Y_abs_sem(f(:,t)<49,t),{'LineWidth',2,'color', color_table(t,:)});  
+end
+    hold off
+
+ xlim([1 100]); 
+ if strcmp(data_type,'LFP')
+     ylim([0 0.01])
+     y1tick=[10e-7,10e-6, 10e-5, 10e-4, 10e-3, 10e-2];
+ else
+   ylim([0 10])
+     y1tick=[10e-4, 10e-3, 10e-2,10e-1,10e0];  
+ end
+        set(gca,'xscale','log');
+        set(gca,'yscale','log');
+        set(gca,'fontsize',20, 'fontname', 'arial', 'box', 'off','linewidth',2, 'xtick',[1, 10,100],'ytick', y1tick,'yminortick','on') 
+         xlabel('Frequency [Hz]','fontsize',20, 'fontname', 'arial')
+        ylabel('PSD [mV^2/Hz]','fontsize',20, 'fontname', 'arial'); %Power spectral density
+l=legend([d1(1).mainLine d1(2).mainLine ],legend_string,'Location','northeast', 'box', 'off');
+l.LineWidth=1.5;
+l.FontSize=12;
+
+            if save_flag==1;
+                cd(path_output)
+                 if strcmp(data_type,'LFP') 
+                     filename=['f' num2str(files_to_analyze(fileind)) '_LFP_power_spectrum'];
+                 else
+                     filename=['f' num2str(files_to_analyze(fileind)) '_Vm_power_spectrum'];
+                 end
+                    saveas(j1,filename,'fig') 
+                    print(j1,filename,'-dpng','-r600','-opengl') 
+            end
+%%
 % Delta Power
 tmp_Y= powerspec.delta';
 tmp_X(1,:)=ones(1,size(tmp_Y,2));
