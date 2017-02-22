@@ -5,7 +5,7 @@ clear all
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data
  global exp_type
 exp_type=2; %1-NBES, 2-ChAT
-data_type='LFP'; %'LFP', 'Vm'
+data_type='Vm'; %'LFP', 'Vm'
 save_flag= 0;
 print_flag=0;
 clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
@@ -19,9 +19,9 @@ BPLFP_flag=1; %filtering LFP. the default filter is the one used to filter LFP i
 bp_manual_LFP=[1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
 bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
-lengthh_vert=[0.1,0.1,0.5];%[1,2,5]; %[1,2,10]; %lengthh_vert(1) is for STD, lengthh_vert(2) is for mean and (3) is for traces
+lengthh_vert=[1,2,5]; %[0.1,0.1,0.5];%[1,2,5]; %[1,2,10]; %lengthh_vert(1) is for STD, lengthh_vert(2) is for mean and (3) is for traces
 trace_ind =[2,3,4,5,6]; %if trace_ind is empty, the default would be to take all traces
-DC_factor = 1; %sets the spacing between plotted traces
+DC_factor = 12; %sets the spacing between plotted traces. set DC_factor=1 for LFP
  %% set the path for saving figures and variables
 % if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1 && BPLFP_flag==1
 %     path_output=['LFP_50Hz+BP Vm_ 50Hz+BP\BP',num2str(bp_manual_Vm(1)),'-',num2str(bp_manual_Vm(2))];
@@ -217,9 +217,10 @@ switch exp_type
         curr_inj_2=Param.facade(22)+curr_inj_dur+Param.facade(23); %in sec        
         curr_inj_1_end=curr_inj_1+curr_inj_dur+0.1;
         curr_inj_2_end=curr_inj_2+curr_inj_dur+0.1;
-        x_axis_Slong=round(1*sf{1}:12*sf{1}-1);
+        x_axis_Slong=round(1:12*sf{1}-1);
         x_axis_Sshort(1,:)=round(0.4*sf{1}:2.9*sf{1});
-        x_axis_Sshort(2,:)=round(stim2{1}(1,1)-0.05*sf{1}:stim2{1}(1,1)+2.45*sf{1});
+        x_axis_Sshort(2,:)=stim1_X{1}(1,1)+0.4*sf{1}:stim1_X{1}(1,1)+2.9*sf{1};
+%         x_axis_Sshort(2,:)=round(stim2{1}(1,1)-0.05*sf{1}:stim2{1}(1,1)+2.45*sf{1});
         x_axis_Elong=round(1*sf{1}:12*sf{1}-1);
         x_axis_Eshort(1,:)=round(stim2{1}(1,1)-0.05*sf{1}:stim2{1}(1,1)+2.45*sf{1});
         x_axis_Eshort(2,:)=round(stim2{1}(1,1)-0.05*sf{1}:stim2{1}(1,1)+2.45*sf{1});

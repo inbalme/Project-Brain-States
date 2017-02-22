@@ -21,9 +21,9 @@ data_type='Vm'; %'LFP', 'Vm'
 trace_type_input=1; %
 analyze_time_before_train=0;
 analyze_train_only_flag=0;
-analyze_hist_flag=0;
-analyze_powerspec_flag=1;
-save_flag= 1;
+analyze_hist_flag=1;
+analyze_powerspec_flag=0;
+save_flag= 0;
 print_flag=1;
 norm_flag=0;
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
@@ -93,14 +93,15 @@ data_preprocessing
      interval=[]; data_vec=[]; data_vec_residual=[]; data_vec_5traces=[]; data_vec_5traces_residual=[]; 
  intervals_to_analyze         
         %%
+        binsize=1; %[mV];
         for t=1:size(interval,2);
               data_vec(:,t)=reshape(current_data_filt(interval(:,t),:,x_value(t)),numel(current_data_filt(interval(:,t),:,x_value(t))),1); %take only data from x_value=1, and connect all traces into one long vector;
               data_vec_residual(:,t)=data_vec(:,t)-mean(data_vec(:,t));
               data_vec_5traces(:,t)=reshape(current_data_filt(interval(:,t),1:5,x_value(t)),numel(current_data_filt(interval(:,t),1:5,x_value(t))),1); %take only data from x_value=1, and connect all traces into one long vector;
               data_vec_5traces_residual(:,t)=data_vec_5traces(:,t)-mean(data_vec_5traces(:,1));
-%               nbin=ceil(range(data_vec(:,1))); %set the range according to the interval before ES
+              nbin(t)=ceil(range(data_vec(:,t)))./binsize; %set the range according to the interval before ES
             end
-             nbin = 30;
+%              nbin = 30;
              data_vec_median{trace_type}(fileind,:) = median(data_vec);
              data_vec_residual_median{trace_type}(fileind,:) = median(data_vec_residual);
              data_vec_5prctile{trace_type}(fileind,:)  = prctile(data_vec,5,1);
@@ -129,40 +130,48 @@ data_preprocessing
  if print_flag==1;
             Fig1=figure;
             hold on
-            [ncounts(1,:),nbins(1,:)]=hist(data_vec(:,1),nbin);
-            ncounts(1,:)=ncounts(1,:)./length(data_vec(:,1));
-            [ncounts(2,:),nbins(2,:)]=hist(data_vec(:,2),nbin);
-            ncounts(2,:)=ncounts(2,:)./length(data_vec(:,2));
-            h1=bar(nbins(1,:),ncounts(1,:));
-            h2=bar(nbins(2,:),ncounts(2,:));
+            [ncounts{1}(1,:),nbins{1}(1,:)]=hist(data_vec(:,1),nbin(1));
+            ncounts{1}(1,:)=ncounts{1}(1,:)./length(data_vec(:,1));
+            [ncounts{2}(1,:),nbins{2}(1,:)]=hist(data_vec(:,2),nbin(2));
+            ncounts{2}(1,:)=ncounts{2}(1,:)./length(data_vec(:,2));
+            h1=bar(nbins{1}(1,:),ncounts{1}(1,:));
+            h2=bar(nbins{2}(1,:),ncounts{2}(1,:));
             
 %             obj = gmdistribution.fit(data_vec(:,1),2);
-            set(h2,'FaceColor',[0 0 1],'EdgeColor','w')
-            set(h1,'FaceColor',[0 0 0],'EdgeColor','w','faceAlpha', 0.3)
+            set(h2,'FaceColor',color_table(2,:),'EdgeColor','w','faceAlpha', 0.7)
+            set(h1,'FaceColor',color_table(1,:),'EdgeColor','w','faceAlpha', 0.6)
             ylim1=get(gca,'ylim');
-            median1(1)=line([data_vec_median{trace_type}(fileind,1) data_vec_median{trace_type}(fileind,1)],[ylim1(1) ylim1(2)],'linestyle','-.','color',[0 0 0],'linewidth',1);
-            median1(2)=line([data_vec_median{trace_type}(fileind,2) data_vec_median{trace_type}(fileind,2)],[ylim1(1) ylim1(2)],'linestyle','-.','color',[0 0 1],'linewidth',1);
+            median1(1)=line([data_vec_median{trace_type}(fileind,1) data_vec_median{trace_type}(fileind,1)],[ylim1(1) ylim1(2)],'linestyle','-.','color',color_table(1,:),'linewidth',1.5);
+            median1(2)=line([data_vec_median{trace_type}(fileind,2) data_vec_median{trace_type}(fileind,2)],[ylim1(1) ylim1(2)],'linestyle','-.','color',color_table(2,:),'linewidth',1.5);
             hold off
+            axis tight
+            xlim1=get(gca,'xlim');
+            xrim=diff(xlim).*0.1;
+            xlim1(1)=xlim1(1)-xrim;
+            xlim1(2)=xlim1(2)+xrim;
+            set(gca,'xlim',xlim1,'FontSize', 20,'fontname', 'arial')
+            xlabel('Vm [mV]', 'FontSize', 20,'fontname', 'arial');
+            ylabel('Probability', 'FontSize', 20,'fontname', 'arial')
 %             pause
 %% plotting mean subtracted-Vm histogram for each cell:
-            Fig2=figure;
-            hold on
-%             hist(data_vec_residual(:,1),nbin)
-%             hist(data_vec_residual(:,2),nbin)
-            [ncounts_residual(1,:),nbins_residual(1,:)]=hist(data_vec_residual(:,1),nbin);
-            ncounts_residual(1,:)=ncounts_residual(1,:)./length(data_vec_residual(:,1));
-            [ncounts_residual(2,:),nbins_residual(2,:)]=hist(data_vec_residual(:,2),nbin);
-            ncounts_residual(2,:)=ncounts_residual(2,:)./length(data_vec_residual(:,2));
-            h1=bar(nbins_residual(1,:),ncounts_residual(1,:));
-            h2=bar(nbins_residual(2,:),ncounts_residual(2,:));
-%             obj = gmdistribution.fit(data_vec(:,1),2);
-            set(h2,'FaceColor',[0 0 1],'EdgeColor','w')
-            set(h1,'FaceColor',[0 0 0],'EdgeColor','w','faceAlpha', 0.3)
-            ylim1=get(gca,'ylim');
-            median_residual(1)=line([data_vec_residual_median{trace_type}(fileind,1) data_vec_residual_median{trace_type}(fileind,1)],[ylim1(1) ylim1(2)],'linestyle','-.','color',[0 0 0],'linewidth',1);
-            median_residual(2)=line([data_vec_residual_median{trace_type}(fileind,2) data_vec_residual_median{trace_type}(fileind,2)],[ylim1(1) ylim1(2)],'linestyle','-.','color',[0 0 1],'linewidth',1);
-            hold off
-%             pause
+%             Fig2=figure;
+%             hold on
+% %             hist(data_vec_residual(:,1),nbin)
+% %             hist(data_vec_residual(:,2),nbin)
+%             [ncounts_residual(1,:),nbins_residual(1,:)]=hist(data_vec_residual(:,1),nbin);
+%             ncounts_residual(1,:)=ncounts_residual(1,:)./length(data_vec_residual(:,1));
+%             [ncounts_residual(2,:),nbins_residual(2,:)]=hist(data_vec_residual(:,2),nbin);
+%             ncounts_residual(2,:)=ncounts_residual(2,:)./length(data_vec_residual(:,2));
+%             h1=bar(nbins_residual(1,:),ncounts_residual(1,:));
+%             h2=bar(nbins_residual(2,:),ncounts_residual(2,:));
+% %             obj = gmdistribution.fit(data_vec(:,1),2);
+%             set(h2,'FaceColor',[0 0 1],'EdgeColor','w')
+%             set(h1,'FaceColor',[0 0 0],'EdgeColor','w','faceAlpha', 0.3)
+%             ylim1=get(gca,'ylim');
+%             median_residual(1)=line([data_vec_residual_median{trace_type}(fileind,1) data_vec_residual_median{trace_type}(fileind,1)],[ylim1(1) ylim1(2)],'linestyle','-.','color',[0 0 0],'linewidth',1);
+%             median_residual(2)=line([data_vec_residual_median{trace_type}(fileind,2) data_vec_residual_median{trace_type}(fileind,2)],[ylim1(1) ylim1(2)],'linestyle','-.','color',[0 0 1],'linewidth',1);
+%             hold off
+% %             pause
             
        clear data_no_spike_no_DC data_vec data_vec_residual
        %% saving figures
@@ -170,11 +179,11 @@ data_preprocessing
   cd(path_output)
                     saveas(Fig1,['f' num2str(files_to_analyze(fileind)) '_Vm_histogram_', type_strng{trace_type},'.fig']) 
                     print(Fig1,['f' num2str(files_to_analyze(fileind)) '_Vm_histogram_', type_strng{trace_type}],'-dpng','-r600','-opengl') 
-                    saveas(Fig2,['f' num2str(files_to_analyze(fileind)) '_Vm_histogram_residuals_',type_strng{trace_type},'.fig']) 
-                    print(Fig2,['f' num2str(files_to_analyze(fileind)) '_Vm_histogram_residuals_', type_strng{trace_type}],'-dpng','-r600','-opengl') 
+%                     saveas(Fig2,['f' num2str(files_to_analyze(fileind)) '_Vm_histogram_residuals_',type_strng{trace_type},'.fig']) 
+%                     print(Fig2,['f' num2str(files_to_analyze(fileind)) '_Vm_histogram_residuals_', type_strng{trace_type}],'-dpng','-r600','-opengl') 
             end
  end
-    end %temp for file loop
+    end 
     end 
               
 %% plotting a Vm histogram for all the cells 
