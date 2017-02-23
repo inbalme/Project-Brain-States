@@ -3,7 +3,7 @@
 close all
 clear all
 save_flag=1;
-exp_type=1; %1- NBES, 2- ChAT
+exp_type=2; %1- NBES, 2- ChAT
 %opening saved figures:
 switch exp_type
     case 1
@@ -138,12 +138,10 @@ annotation('textbox', [spont_Vm_5prcentile_pos(1,1),spont_Vm_5prcentile_pos_top 
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
  annotation('textbox', [spont_event_amp_pos(1,1) spont_event_amp_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- annotation('textbox', [spont_Rin_pos(1,1) spont_Rin_pos_top 0 0]+a_pos1,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+ annotation('textbox', [spont_Rin_pos(1,1) spont_event_amp_pos_top 0 0]+a_pos1,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
  annotation('textbox', [spont_event_halfwidth_pos(1,1) spont_event_halfwidth_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
-  annotation('textbox', [spont_event_risetime_pos(1,1) spont_event_risetime_pos_top 0 0]+a_pos1,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'G', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 
 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'

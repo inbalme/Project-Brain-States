@@ -5,12 +5,12 @@ clear all
 save_flag=0;
 
 %opening saved figures:
-cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Vm Histograms and Powerspec\Spontaneous'
+cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Vm Histograms and Powerspec\Spontaneous histograms'
 
 spont_Vm_5prcentile = open('Vm_5prcentile_ongoing.fig');    
 spont_Vm_5prcentile_ax = get(gcf, 'children');
 
-cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Spontaneous'
+cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Spontaneous histograms'
 spont_event_freq = open('Spontaneous event frequency.fig');    
 spont_event_freq_ax = get(gcf, 'children');
 

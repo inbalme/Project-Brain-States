@@ -2,12 +2,12 @@
 
 close all
 clear all
-save_flag=1;
+save_flag=0;
 exp_type=1; %1- NBES, 2- ChAT
 %opening saved figures:
 switch exp_type
     case 1
-        cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm Histograms and Powerspec\Spontaneous histograms'
+        cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm Histograms and Powerspec\Powerspec Vm'
         spont_Vm_hist = open('f46_Vm_histogram_ongoing.fig');
         spont_Vm_hist_ax = get(gcf, 'children');
     case 2

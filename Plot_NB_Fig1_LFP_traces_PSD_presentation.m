@@ -43,8 +43,8 @@ set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 
 %% Positions:
 traces_depth1_pos(1,:) = [0.05 , 0.68 , 0.58 , 0.2];
-traces_depth2_pos(1,:) = [0.05 , 0.6 , traces_depth1_pos(1,3) , traces_depth1_pos(1,4)]; traces_depth2_pos(1,2)=traces_depth1_pos(1,2)-traces_depth1_pos(1,4)-0.09;
-traces_depth3_pos(1,:) = [0.05 , traces_depth2_pos(1,2)-traces_depth2_pos(1,4)-0.09 , traces_depth1_pos(1,3) , traces_depth1_pos(1,4)];
+traces_depth2_pos(1,:) = [0.05 , 0.6 , traces_depth1_pos(1,3) , traces_depth1_pos(1,4)]; traces_depth2_pos(1,2)=traces_depth1_pos(1,2)-traces_depth1_pos(1,4)-0.07;
+traces_depth3_pos(1,:) = [0.05 , traces_depth2_pos(1,2)-traces_depth2_pos(1,4)-0.07 , traces_depth1_pos(1,3) , traces_depth1_pos(1,4)];
 
 traces_depth1_pos_top = traces_depth1_pos(1,2)+traces_depth1_pos(1,4);
 traces_depth2_pos_top = traces_depth2_pos(1,2)+traces_depth2_pos(1,4);

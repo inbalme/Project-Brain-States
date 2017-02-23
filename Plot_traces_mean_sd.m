@@ -5,7 +5,7 @@ clear all
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data
  global exp_type
 exp_type=2; %1-NBES, 2-ChAT
-data_type='Vm'; %'LFP', 'Vm'
+data_type='LFP'; %'LFP', 'Vm'
 save_flag= 0;
 print_flag=0;
 clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
@@ -19,9 +19,9 @@ BPLFP_flag=1; %filtering LFP. the default filter is the one used to filter LFP i
 bp_manual_LFP=[1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
 bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
-lengthh_vert=[1,2,5]; %[0.1,0.1,0.5];%[1,2,5]; %[1,2,10]; %lengthh_vert(1) is for STD, lengthh_vert(2) is for mean and (3) is for traces
-trace_ind =[2,3,4,5,6]; %if trace_ind is empty, the default would be to take all traces
-DC_factor = 12; %sets the spacing between plotted traces. set DC_factor=1 for LFP
+lengthh_vert=[0.1,0.1,0.5]; %[0.1,0.1,0.5];%[1,2,5]; %[1,2,10]; %lengthh_vert(1) is for STD, lengthh_vert(2) is for mean and (3) is for traces
+trace_ind =[1,3,4,5,8];%[2,3,4,5,6]; %if trace_ind is empty, the default would be to take all traces
+DC_factor = 0.7; %12; %sets the spacing between plotted traces. set DC_factor=1 for LFP
  %% set the path for saving figures and variables
 % if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1 && BPLFP_flag==1
 %     path_output=['LFP_50Hz+BP Vm_ 50Hz+BP\BP',num2str(bp_manual_Vm(1)),'-',num2str(bp_manual_Vm(2))];
@@ -74,7 +74,7 @@ switch exp_type
       end 
 
     case 2
-        files_to_analyze =80; %[74,76,77,80,82,84,87];
+        files_to_analyze =76; %[74,76,77,80,82,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};    y_ax_label={'Vm'}; y_ax_units={'mV'}; 
@@ -315,20 +315,20 @@ switch exp_type
         rec3=rectangle('Position',[stim1_X{1}(1)*dt-500*dt,ylim_data(1),(stim1_X{1}(2)-stim1_X{1}(1))*dt,ylim_data(2)-ylim_data(1)],'faceColor',color_table(3,:),'edgecolor','none');
     case 2
 %         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
-        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.05.*abs(ylim_data(2)-ylim_data(1)); 
+        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
         line(stim1_X{1}.*dt,stim1_Y,'LineWidth',6,'Color','b') 
     case 3
         rec3=rectangle('Position',[stim1_X{1}(1)*dt-500*dt,ylim_data(1),(stim1_X{1}(2)-stim1_X{1}(1))*dt,ylim_data(2)-ylim_data(1)],'faceColor',color_table(3,:),'edgecolor','none');
 end
-set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
         %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=lengthh_vert(3);     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc2=0.05;
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
-
-set(gca, 'visible', 'off') ;
+        
+% set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
+% set(gca, 'visible', 'off') ;
 %%
 %plot mean trace
         s2=figure;
@@ -350,7 +350,7 @@ switch exp_type
         rec3=rectangle('Position',[stim1_X{1}(1)*dt,ylim_data(1),(stim1_X{1}(2)-stim1_X{1}(1))*dt,ylim_data(2)-ylim_data(1)],'faceColor',color_table(3,:),'edgecolor','none');
     case 2
 %         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2);
-        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.05.*abs(ylim_data(2)-ylim_data(1)); 
+        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
         line(stim1_X{1}.*dt,stim1_Y,'LineWidth',6,'Color','b')
     case 3
         rec3=rectangle('Position',[stim1_X{1}(1)*dt,ylim_data(1),(stim1_X{1}(2)-stim1_X{1}(1))*dt,ylim_data(2)-ylim_data(1)],'faceColor',color_table(3,:),'edgecolor','none');    
@@ -385,7 +385,7 @@ switch exp_type
         rec3=rectangle('Position',[stim1_X{1}(1)*dt,ylim_data(1),(stim1_X{1}(2)-stim1_X{1}(1))*dt,ylim_data(2)-ylim_data(1)],'faceColor',color_table(3,:),'edgecolor','none');
     case 2
 %         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
-        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.05.*abs(ylim_data(2)-ylim_data(1)); 
+        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
         line(stim1_X{1}.*dt,stim1_Y,'LineWidth',6,'Color','b') 
      case 3
         rec3=rectangle('Position',[stim1_X{1}(1)*dt,ylim_data(1),(stim1_X{1}(2)-stim1_X{1}(1))*dt,ylim_data(2)-ylim_data(1)],'faceColor',color_table(3,:),'edgecolor','none');    
@@ -439,7 +439,7 @@ xlim_data=get(gca,'xlim');
 set(rec1,'Position',[x_axis_Sshort(2,1)*dt,ylim_data(1),(x_axis_Sshort(2,end)-x_axis_Sshort(2,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
 if exp_type==2;
 %         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
-        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.05.*abs(ylim_data(2)-ylim_data(1)); 
+        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
         line((stim1_X{1}).*dt,stim1_Y,'LineWidth',6,'Color','b') 
 end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
@@ -466,7 +466,7 @@ xlim_data=get(gca,'xlim');
 set(rec1,'Position',[x_axis_Sshort(1,1)*dt,ylim_data(1),(x_axis_Sshort(1,end)-x_axis_Sshort(1,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
 if exp_type==2;
 %         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
-        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.05.*abs(ylim_data(2)-ylim_data(1)); 
+        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
         line((stim1_X{1}-x_axis_Sshort(2,1)+x_axis_Sshort(1,1)).*dt,stim1_Y,'LineWidth',6,'Color','b') 
 end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
@@ -492,7 +492,7 @@ ylim_data=[get(gca,'ylim')]';
 xlim_data=get(gca,'xlim');
 set(rec1,'Position',[x_axis_Sshort(1,1)*dt,ylim_data(1),(x_axis_Sshort(1,end)-x_axis_Sshort(1,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
 if exp_type==2;
-        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.05.*abs(ylim_data(2)-ylim_data(1)); 
+        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
         line((stim1_X{1}-x_axis_Sshort(2,1)+x_axis_Sshort(1,1)).*dt,stim1_Y,'LineWidth',6,'Color','b') 
 end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
@@ -623,7 +623,7 @@ set(rec1,'Position',[x_axis_Elong(1)*dt,ylim_data(1),(x_axis_Elong(end)-x_axis_E
 switch exp_type
     case 1
     case 2
-        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.05.*abs(ylim_data(2)-ylim_data(1)); 
+        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
         line(stim1_X{1}.*dt,stim1_Y,'LineWidth',6,'Color','b') 
 end
 
@@ -667,7 +667,7 @@ switch exp_type
     case 1
     case 2
 %         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
-        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.05.*abs(ylim_data(2)-ylim_data(1)); 
+        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
         line(stim1_X{1}.*dt,stim1_Y,'LineWidth',6,'Color','b') 
 end
 
@@ -712,7 +712,7 @@ switch exp_type
     case 1
     case 2
 %         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
-        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.05.*abs(ylim_data(2)-ylim_data(1)); 
+        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
         line(stim1_X{1}.*dt,stim1_Y,'LineWidth',6,'Color','b') 
 end
 
@@ -823,7 +823,7 @@ set(rec1,'Position',[x_axis_Eshort(2,1)*dt,ylim_data(1),(x_axis_Eshort(2,end)-x_
 switch exp_type
     case 1
     case 2
-        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.05.*abs(ylim_data(2)-ylim_data(1)); 
+        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
         line(stim1_X{1}.*dt,stim1_Y,'LineWidth',6,'Color','b') 
 end
 
@@ -866,7 +866,7 @@ set(rec1,'Position',[x_axis_Eshort(1,1)*dt,ylim_data(1),(x_axis_Eshort(1,end)-x_
 switch exp_type
     case 1
     case 2
-        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.05.*abs(ylim_data(2)-ylim_data(1)); 
+        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
         line(stim1_X{1}.*dt,stim1_Y,'LineWidth',6,'Color','b') 
 end
 
@@ -910,7 +910,7 @@ set(rec1,'Position',[x_axis_Eshort(1,1)*dt,ylim_data(1),(x_axis_Eshort(1,end)-x_
 switch exp_type
     case 1
     case 2
-        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.05.*abs(ylim_data(2)-ylim_data(1)); 
+        stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
         line(stim1_X{1}.*dt,stim1_Y,'LineWidth',6,'Color','b') 
 end
 

@@ -16,13 +16,13 @@ clear all
 close all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
-exp_type=1; %1-NBES, 2-ChAT
-data_type='Vm'; %'LFP', 'Vm'
+exp_type=2; %1-NBES, 2-ChAT
+data_type='LFP'; %'LFP', 'Vm'
 trace_type_input=1; %
 analyze_time_before_train=0;
 analyze_train_only_flag=0;
-analyze_hist_flag=1;
-analyze_powerspec_flag=0;
+analyze_hist_flag=0;
+analyze_powerspec_flag=1;
 save_flag= 0;
 print_flag=1;
 norm_flag=0;
@@ -48,7 +48,7 @@ switch exp_type
         end        
 
     case 2
-        files_to_analyze =80; %[74,76,77,80,82,84,87]; %[74,76,77,80,82,84,87]; %
+        files_to_analyze =76; %[74,76,77,80,82,84,87]; %[74,76,77,80,82,84,87]; %
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light On', 'Light Off'};
