@@ -18,12 +18,12 @@ cc_stat=[]; cc_spont=[]; cc_evoked=[]; cc=[]; cc_shuffled_it=[]; cc_shuff_sub=[]
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X
  
  global exp_type
-exp_type=2; %1-NBES, 2-ChAT
-trace_type_input=[1,2]; %[3,2] for exp_type=1; %for exp_type=2 or 3 use [1,2]
+exp_type=1; %1-NBES, 2-ChAT
+trace_type_input=[3,2]; %[3,2] for exp_type=1; %for exp_type=2 or 3 use [1,2]
 analyze_time_before_train=0;
 analyze_train_only_flag=1; %use analyze_train_only_flag=1
-add_to_plot=0.08; %seconds from each side of the trace. use 0.1 for NBES and 0.080 for ChAT
-save_flag=1;
+add_to_plot=0.1; %seconds from each side of the trace. use 0.1 for NBES and 0.080 for ChAT
+save_flag=0;
 print_flag=1;
 norm_flag=0;
 clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
@@ -36,18 +36,18 @@ bp_manual_Vm=[0,300];%[0,300]; %if bp_manual=[] the default would be to take bp_
     
 switch exp_type
     case 1
-        files_to_analyze =[44,46,48,52,56,58,62,72,75,82,84]; %[44,46,48,50,52,56,58,62,72,75]; 
+        files_to_analyze =46; %[44,46,48,52,56,58,62,72,75,82,84]; %[44,46,48,50,52,56,58,62,72,75]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
-        legend_string={'NB+', 'NB-'}; y_ax_label={'Vm'}; y_ax_units={'mV'};   
-        legend_string_shuff={'NB+ shuffled', 'NB- shuffled'};       
+        legend_string={'NB-', 'NB+'}; y_ax_label={'Vm'}; y_ax_units={'mV'};   
+        legend_string_shuff={'NB- shuffled', 'NB+ shuffled'};       
 
     case 2
-        files_to_analyze =[76,77,80,82,84,87];
+        files_to_analyze =80; %[76,77,80,82,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
-        legend_string={'Light On', 'Light Off'}; y_ax_label={'Vm'}; y_ax_units={'mV'};   
-        legend_string_shuff={'Light On shuffled', 'Light Off shuffled'};
+        legend_string={ 'Light Off','Light On'}; y_ax_label={'Vm'}; y_ax_units={'mV'};   
+        legend_string_shuff={'Light Off shuffled','Light On shuffled'};
         
     case 3 
         files_to_analyze =[31,38,42,51,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77]; [51,67];
@@ -210,7 +210,7 @@ c_maxdiff(:,1)=cc_shuff_sub{fileind,1}(max_diff_loc,:);
 c_maxdiff(:,2)=cc_shuff_sub{fileind,2}(max_diff_loc,:);
 %% Plots
 trace_fontsize=12;
-scalebar_fontsize=10;
+scalebar_fontsize=11;
 
     if print_flag==1;
 % plotting one trace of data and LFP against each other -
@@ -249,11 +249,11 @@ subplot(2*length(trace),1,2*tr_ind)
           end
             
         %plotting scale bar
-horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=0.03; perc2=[];
         [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
- horiz_vert=0;        lengthh=lengthh_vert(trace_type);     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+ horiz_vert=0;        lengthh=lengthh_vert(trace_type);     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=0.03; perc2=[];
         [b3,b4] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
-         if tr_ind~=length(trace);
+         if tr_ind~=length(trace)-1;
              delete(b1); delete(b2); delete(b3); delete(b4);
         end
     hold off
@@ -278,10 +278,13 @@ horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0
   end
         
         %plotting scale bar
-             horiz_vert=0;        lengthh=20;     textit=[num2str(lengthh./20), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+             horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=[]; perc2=[];
                 [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+             horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh./20), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=[]; perc2=[];
+                [b3,b4] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+           delete(b1); delete(b2); 
          if tr_ind~=length(trace);
-             delete(b1); delete(b2); 
+             delete(b3); delete(b4); 
         end
     hold off  
     set(gca, 'visible', 'off') ;
@@ -289,8 +292,13 @@ horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0
 end
     title('Vm-LFP single trace ES Off','FontSize', 16); 
     ylabel('Potential [mV]' ,'FontSize', 14); xlabel('Time [S]','FontSize', 14)
-    l=legend([p2,p1],{'LFP','Vm'},'linewidth',1.5,'Location','northeast', 'box', 'off'); 
-    l.LineWidth=1.5;
+l=legend([p2,p1],{'LFP','Vm'}, 'box', 'off','position',[0.8,0.9,0.2,0.1]); 
+    l.FontSize=11;
+    for ix=1:length(l.String)
+      str = l.String{ix};
+      h = findobj(gcf,'DisplayName',str);
+      h.LineWidth =2;
+    end
 
 % pause
 % close(gcf);
@@ -326,11 +334,11 @@ subplot(2*length(trace),1,2*tr_ind)
    end
         
         %plotting scale bar
-            horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+            horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=0.03; perc2=[];
                     [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
-             horiz_vert=0;        lengthh=lengthh_vert(trace_type);     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+             horiz_vert=0;        lengthh=lengthh_vert(trace_type);     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=0.03; perc2=[];
                     [b3,b4] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
-       if tr_ind~=length(trace);
+       if tr_ind~=length(trace)-1;
              delete(b1); delete(b2); delete(b3); delete(b4);
         end
     hold off
@@ -355,10 +363,14 @@ subplot(2*length(trace),1,2*tr_ind)
        end
         
         %plotting scale bar 
-             horiz_vert=0;        lengthh=20;     textit=[num2str(lengthh./20), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=0.05;
+            horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=[]; perc2=[];
                 [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+             horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh./20), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=[]; perc2=[];
+                [b3,b4] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+                delete(b1); delete(b2);
+                
          if tr_ind~=length(trace);
-             delete(b1); delete(b2);
+             delete(b3); delete(b4);
         end
     hold off  
    
@@ -366,8 +378,13 @@ subplot(2*length(trace),1,2*tr_ind)
 end
 title('Vm-LFP single trace ES On','FontSize', 16); 
 ylabel('Potential [mV]' ,'FontSize', 14); xlabel('Time [S]','FontSize', 14)
-l=legend([p2,p1],{'LFP','Vm'},'linewidth',1.5,'Location','northeast', 'box', 'off'); 
-l.LineWidth=1.5;
+l=legend([p2,p1],{'LFP','Vm'}, 'box', 'off','position',[0.8,0.9,0.2,0.1]); 
+l.FontSize=11;
+for ix=1:length(l.String)
+  str = l.String{ix};
+  h = findobj(gcf,'DisplayName',str);
+  h.LineWidth =1.5;
+end
 
 %% clear prcntile1_off prcntile2_off ci_off patch_xdata patch_ydata
 %plotting the crosscorrelation for a single trace+the mean
@@ -406,7 +423,6 @@ hline_zero=line([0 0],[ylim(1) ylim(2)],'linestyle','-.','color',[136 137 138]./
 
 % title('Vm-LFP crosscorrelation','FontSize', 16); 
 l=legend([h1.mainLine h2.mainLine h3.mainLine h4.mainLine],{'NB-','NB+','NB- shuffled', 'NB+ shuffled'},'fontsize',12,'Location','northeast', 'box', 'off');
-l.LineWidth=1.5;
 l.FontSize=11;
 % legend('ES off mean cc','ES on mean cc'); legend('boxoff');%legend('boxoff','fontsize',6,'linewidth',1.5,'Position',[0.39,0.45,0.25,0.1]);
 xlabel('Lags [S]' ,'FontSize', 14); ylabel('CC' ,'FontSize', 14);
@@ -437,8 +453,12 @@ ylim=get(gca,'ylim');
 % hline_zero=line([0 0],[ylim(1) ylim(2)],'linestyle','-.','color',[136 137 138]./256,'linewidth',1);
 % title('Vm-LFP crosscorrelation','FontSize', 16); 
 l=legend([h1.mainLine h2.mainLine ],legend_string,'Location','northeast', 'box', 'off');
-l.LineWidth=1.5;
 l.FontSize=11;
+for ix=1:length(l.String)
+  str = l.String{ix};
+  h = findobj(gcf,'DisplayName',str);
+  h.LineWidth =1.5;
+end
 % legend('ES off mean cc','ES on mean cc'); legend('boxoff');%legend('boxoff','fontsize',6,'linewidth',1.5,'Position',[0.39,0.45,0.25,0.1]);
 xlabel('Lags [S]' ,'FontSize', 14); ylabel('CC' ,'FontSize', 14);
 set(gca,'xlim',[-0.5 0.5],'xtick',[-0.5 0 0.5],'fontsize',14); 
@@ -461,8 +481,12 @@ h4=fn_shadedErrorBar(lags{fileind,1}.*dt,cc_shuffled_mean{fileind}(:,2),cc_shuff
 % hline_zero=line([0 0],[ylim(1) ylim(2)],'linestyle','-.','color',[136 137 138]./256,'linewidth',1);
 % title('Vm-LFP crosscorrelation','FontSize', 16); 
 l=legend([h3.mainLine h4.mainLine ],legend_string_shuff,'Location','northeast', 'box', 'off');
-l.LineWidth=1.5;
 l.FontSize=11;
+for ix=1:length(l.String)
+  str = l.String{ix};
+  h = findobj(gcf,'DisplayName',str);
+  h.LineWidth =1.5;
+end
 xlabel('Lags [S]' ,'FontSize', 14); ylabel('CC' ,'FontSize', 14);
 set(gca,'xlim',[-0.5 0.5],'xtick',[-0.5 0 0.5],'fontsize',14);
 if trace_type~=2

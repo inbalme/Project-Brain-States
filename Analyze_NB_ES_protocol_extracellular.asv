@@ -639,12 +639,16 @@ my=max(max(SNR_Y))*1.1;
 liney=[my;my];
 if spikes_stat.wilcoxon_p_SNR>0.05 
     asterisk='n.s.';
+    a_fontsize=13;
 else if spikes_stat.wilcoxon_p_SNR<0.05 && spikes_stat.wilcoxon_p_SNR>0.01
     asterisk='*';
+    a_fontsize=17;
     else if spikes_stat.wilcoxon_p_SNR<0.01 && spikes_stat.wilcoxon_p_SNR>0.001
             asterisk='**';
+            a_fontsize=17;
     else if spikes_stat.wilcoxon_p_SNR<0.001
              asterisk='***';
+             a_fontsize=17;
         end
         end
     end
@@ -654,7 +658,7 @@ hold on
 line(SNR_X,SNR_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(SNR_X(:,1), mean(SNR_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
 % line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
-text(1.5,my,asterisk,'HorizontalAlignment', 'center','fontsize',17) %'verticalAlignment','bottom',
+text(1.5,my,asterisk,'HorizontalAlignment', 'center','fontsize',a_fontsize) %'verticalAlignment','bottom',
 hold off
 
         x1limits = [0.75 2.25];
@@ -681,12 +685,16 @@ my=max(max(Res_mod_Y))*1.1;
 liney=[my;my];
 if spikes_stat.wilcoxon_p_res_modulation>0.05 
     asterisk='n.s.';
+    a_fontsize=13;
 else if spikes_stat.wilcoxon_p_res_modulation<0.05 && spikes_stat.wilcoxon_p_res_modulation>0.01
     asterisk='*';
+    a_fontsize=17;
     else if spikes_stat.wilcoxon_p_res_modulation<0.01 && spikes_stat.wilcoxon_p_res_modulation>0.001
             asterisk='**';
+            a_fontsize=17;
     else if spikes_stat.wilcoxon_p_res_modulation<0.001
              asterisk='***';
+             a_fontsize=17;
         end
         end
     end
@@ -696,7 +704,7 @@ hold on
 line(Res_mod_X,Res_mod_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(Res_mod_X(:,1), mean(Res_mod_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
 % line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
-text(1.5,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
+text(1.5,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',a_fontsize)
 hold off
         x1limits = [0.75 2.25];
         x1ticks = [1,2];
@@ -721,12 +729,17 @@ my=max(max(MI_Y))*1.2;
 liney=[my;my];
 if spikes_stat.wilcoxon_p_MI>0.05 
     asterisk='n.s.';
+    a_fontsize=13;
+    a_fontsize=17;
 else if spikes_stat.wilcoxon_p_MI<0.05 && spikes_stat.wilcoxon_p_MI>0.01
     asterisk='*';
+    a_fontsize=17;
     else if spikes_stat.wilcoxon_p_MI<0.01 && spikes_stat.wilcoxon_p_MI>0.001
             asterisk='**';
+            a_fontsize=17;
     else if spikes_stat.wilcoxon_p_MI<0.001
              asterisk='***';
+             a_fontsize=17;
         end
         end
     end
@@ -739,7 +752,7 @@ hold on
 scatter(MI_X,MI_Y,50,'markerfacecolor',color_table(1,:),'markeredgecolor',color_table(1,:),'markerfacealpha',0.3)
 scatter(MI_X(1),mean(MI_Y),100,'markeredgecolor',color_table(2,:),'linewidth',2); %'markerfacecolor',color_table(2,:),
 % line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
-text(1,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',18)
+text(1,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',a_fontsize)
 hold off
         x1limits = [0.9 1.1];
         x1ticks = [];

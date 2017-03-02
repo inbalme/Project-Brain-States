@@ -22,7 +22,7 @@ switch exp_type
         files_to_analyze =[8,10,12,14,15,16,22,37,40,1,44,46,48,52,56,58,62,72,75,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
-        legend_string={'NB+', 'NB-'};  y_ax_label={'Vm'}; y_ax_units={'mV'};  
+        legend_string={'NB-', 'NB+'};  y_ax_label={'Vm'}; y_ax_units={'mV'};  
         path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Spontaneous';
         a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
         if a==0;
@@ -33,7 +33,7 @@ switch exp_type
         files_to_analyze =[74,76,77,80,82,84,87]; %,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
-        legend_string={'Light On', 'Light Off'};  y_ax_label={'Vm'}; y_ax_units={'mV'};  
+        legend_string={'Light Off', 'Light On'};  y_ax_label={'Vm'}; y_ax_units={'mV'};  
         path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Spontaneous';
         a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
         if a==0;
@@ -43,7 +43,7 @@ switch exp_type
             files_to_analyze =[31,38,42,51,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77];61,64,
             cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
             load NBES_Files_v2
-            legend_string={'NB+', 'NB-'};    y_ax_label={'Im'}; y_ax_units={'pA'};    
+            legend_string={'NB-', 'NB+'};    y_ax_label={'Im'}; y_ax_units={'pA'};    
             path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis_VC\Evoked';   
             a = exist(path_output,'dir'); %a will be 7 if a folder "name" exists and 0 otherwise
             if a==0;

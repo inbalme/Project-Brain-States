@@ -15,12 +15,12 @@ clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
  channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
-exp_type=3; %1-NBES, 2-ChAT
+exp_type=1; %1-NBES, 2-ChAT
 trace_type_input=[2]; %for exp_type=2||3 use [1,2], for exp_type=1 use [3,2]
 trace_type=trace_type_input;
 analyze_time_before_train=0;
 analyze_train_only_flag=1;
-save_flag= 1;
+save_flag=0;
 print_flag=1;
 norm_flag=0;
 clamp_flag=3; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
@@ -28,7 +28,7 @@ BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 BPLFP_flag=0; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
 bp_manual_LFP=[0.1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
-BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
+BPVm_flag=0; %filtering LFP and Vm same as LFP was filtered in the multiclamp
 bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 
  %% set the path for saving figures and variables
@@ -64,7 +64,7 @@ switch exp_type
         files_to_analyze =[74,76,77,80,82,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
-        legend_string={'Light On', 'Light Off'};  y_ax_label={'Vm'}; y_ax_units={'mV'};    
+        legend_string={'Light Off', 'Light On'};  y_ax_label={'Vm'}; y_ax_units={'mV'};    
          path_output=['D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary\',path_output];        
         a = exist(path_output,'dir'); %a will be 7 if a folder "name" exists and 0 otherwise
             if a==0;
@@ -1853,18 +1853,23 @@ hAnnotation = get(errbar_h1,'Annotation');  hLegendEntry = get(hAnnotation,'Lege
 hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
 % [legh,objh,outh,outm] = legend('NB Off','NB On','Location','northeast');
 l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
+
 ylim_data=[get(gca,'ylim')]';
-  my=max([peaks_stat(1).pre_response_STD_std,peaks_stat(1).Vm_res_STD_meanstim_std,peaks_stat(1).post_train_STD_std])*1.1+max([peaks_stat(1).pre_response_STD_m,peaks_stat(1).Vm_res_STD_meanstim_m,peaks_stat(1).post_train_STD_m]); 
+  my=8; %max([peaks_stat(1).pre_response_STD_std,peaks_stat(1).Vm_res_STD_meanstim_std,peaks_stat(1).post_train_STD_std])*1.1+max([peaks_stat(1).pre_response_STD_m,peaks_stat(1).Vm_res_STD_meanstim_m,peaks_stat(1).post_train_STD_m]); 
 linex=[1-0.15; 2-0.15];
 liney=[my-0.1; my-0.1];
         if VmSTD_stat.p_before{1,1} >0.05 
     asterisk_before='n.s.';
+     a1_fontsize=13;
 else if VmSTD_stat.p_before{1,1}<0.05 && VmSTD_stat.p_before{1,1}>0.01
     asterisk_before='*';
+     a1_fontsize=17;
     else if VmSTD_stat.p_before{1,1}<0.01 && VmSTD_stat.p_before{1,1}>0.001
             asterisk_before='**';
+             a1_fontsize=17;
     else if VmSTD_stat.p_before{1,1}<0.001
              asterisk_before='***';
+             a1_fontsize=17;
         end
         end
     end
@@ -1872,40 +1877,48 @@ end
 
 if VmSTD_p_during{1,1} >0.05 
     asterisk_during='n.s.';
+    a2_fontsize=13;
 else if VmSTD_stat.p_during{1,1}<0.05 && VmSTD_stat.p_during{1,1}>0.01
     asterisk_during='*';
+    a2_fontsize=17;
     else if VmSTD_stat.p_during{1,1}<0.01 && VmSTD_stat.p_during{1,1}>0.001
             asterisk_during='**';
+            a2_fontsize=17;
     else if VmSTD_stat.p_during{1,1}<0.001
              asterisk_during='***';
+             a2_fontsize=17;
         end
         end
     end
 end
 if VmSTD_stat.p_after{1,1} >0.05 
     asterisk_after='n.s.';
+    a3_fontsize=13;
 else if VmSTD_stat.p_after{1,1}<0.05 && VmSTD_stat.p_after{1,1}>0.01
     asterisk_after='*';
+     a3_fontsize=17;
     else if VmSTD_stat.p_after{1,1}<0.01 && VmSTD_stat.p_after{1,1}>0.001
             asterisk_after='**';
+             a3_fontsize=17;
     else if VmSTD_stat.p_after{1,1}<0.001
              asterisk_after='***';
+              a3_fontsize=17;
         end
         end
     end
 end
-text(1,my,asterisk_before,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
+text(1,my,asterisk_before,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a1_fontsize)
 % line([1-0.15;1+0.15],[my;my],'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','b')
-text(2,my,asterisk_during,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
+text(2,my,asterisk_during,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a2_fontsize)
 % line([2-0.15;2+0.15],[my;my],'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','b')
-text(3,my,asterisk_after,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
+text(3,my,asterisk_after,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a3_fontsize)
 % line([3-0.15;3+0.15],[my;my],'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','b')
 % line(linex,liney,'color',[0 0 1],'linewidth',1.5,'markersize',10,'markerfacecolor','b')
 % text(1.5-0.15,liney(1,1),asterisk_sensory,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17,'color',[0 0 1])        
         hold off
 %         ylim_data=[0 14];
         x1limits = [0.5 3.5];   x1ticks = [1,2,3];    
-        set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
+        set( gca, 'xlim', x1limits,'xtick', x1ticks,'ylim',[0 8],'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','FontSize', 16,'xticklabel',{'Before','During','After'} ,'box', 'off'); %'fontweight', 'bold', 'ylim',ylim_data,
         xlabel('Sensory Stimulation' ,'FontSize', 16);
         ylabel([y_ax_label{1},' STD [',y_ax_units{1},']'] ,'FontSize', 16);    
@@ -1931,8 +1944,8 @@ hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'Lege
 l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
 ylim_data=[get(gca,'ylim')]';
 if ylim_data(2)<=0
-    my=min(ylim_data)+2;
-    ylim_data=[ylim_data(1)-5 ylim_data(1)+25]; %get(gca,'ylim'); %[0 8.5];
+    my=[-70];%min(ylim_data)+2;
+    ylim_data=[-73, -45]; %[ylim_data(1)-5 ylim_data(1)+25]; 
 else
     my=max(ylim_data)-1;
     ylim_data(1)=0;
@@ -1942,12 +1955,16 @@ linex=[1-0.15; 2-0.15];
 liney=[my-0.1; my-0.1];
         if VmM_stat.p_before{1,1} >0.05 
     asterisk_before='n.s.';
+    a1_fontsize=13;
 else if VmM_stat.p_before{1,1}<0.05 && VmM_stat.p_before{1,1}>0.01
     asterisk_before='*';
+    a1_fontsize=17;
     else if VmM_stat.p_before{1,1}<0.01 && VmM_stat.p_before{1,1}>0.001
             asterisk_before='**';
+            a1_fontsize=17;
     else if VmM_stat.p_before{1,1}<0.001
              asterisk_before='***';
+             a1_fontsize=17;
         end
         end
     end
@@ -1955,33 +1972,45 @@ end
 
 if VmM_stat.p_during{1,1} >0.05 
     asterisk_during='n.s.';
+    a2_fontsize=13;
 else if VmM_stat.p_during{1,1}<0.05 && VmM_stat.p_during{1,1}>0.01
     asterisk_during='*';
+    a2_fontsize=17;
     else if VmM_stat.p_during{1,1}<0.01 && VmM_stat.p_during{1,1}>0.001
             asterisk_during='**';
+            a2_fontsize=17;
     else if VmM_stat.p_during{1,1}<0.001
              asterisk_during='***';
+             a2_fontsize=17;
         end
         end
     end
 end
 if VmM_stat.p_after{1,1} >0.05 
     asterisk_after='n.s.';
+    a3_fontsize=13;
 else if VmM_stat.p_after{1,1}<0.05 && VmM_stat.p_after{1,1}>0.01
     asterisk_after='*';
+    a3_fontsize=17;
     else if VmM_stat.p_after{1,1}<0.01 && VmM_stat.p_after{1,1}>0.001
             asterisk_after='**';
+            a3_fontsize=17;
     else if VmM_stat.p_after{1,1}<0.001
              asterisk_after='***';
+             a3_fontsize=17;
         end
         end
     end
 end
-text(1,my,asterisk_before,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
+text(1,my,asterisk_before,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a1_fontsize)
 % line([1-0.15;1+0.15],[my;my],'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','b')
-text(2,my,asterisk_during,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
+text(2,my,asterisk_during,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a2_fontsize)
 % line([2-0.15;2+0.15],[my;my],'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','b')
-text(3,my,asterisk_after,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
+if exp_type==2
+    text(3,my,asterisk_after,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',a3_fontsize)
+else
+    text(3,my,asterisk_after,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a3_fontsize)
+end
 % line([3-0.15;3+0.15],[my;my],'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','b')
 % set(gca,'ydir','reverse')
         hold off
@@ -2020,16 +2049,20 @@ SNR1_X(1,:)=ones(1,size(SNR1_Y,2));
 SNR1_X(2,:)=2*ones(1,size(SNR1_Y,2));
 E =peaks_stat(stim_num).SNR1_std;
 linex=[1;2];
-my=max(max(SNR1_Y))*1.1; 
+my=10; %max(max(SNR1_Y))*1.1; 
 liney=[my;my];
 if peaks_stat(stim_num).wilcoxon_p_SNR1>0.05 
     asterisk='n.s.';
+    a_fontsize=13;
 else if peaks_stat(stim_num).wilcoxon_p_SNR1<0.05 && peaks_stat(stim_num).wilcoxon_p_SNR1>0.01
     asterisk='*';
+    a_fontsize=17;
     else if peaks_stat(stim_num).wilcoxon_p_SNR1<0.01 && peaks_stat(stim_num).wilcoxon_p_SNR1>0.001
             asterisk='**';
+            a_fontsize=17;
     else if peaks_stat(stim_num).wilcoxon_p_SNR1<0.001
              asterisk='***';
+             a_fontsize=17;
         end
         end
     end
@@ -2039,12 +2072,12 @@ hold on
 line(SNR1_X,SNR1_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(SNR1_X(:,1), mean(SNR1_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
 % line(linex,liney,'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-text(1.5,my,asterisk,'HorizontalAlignment', 'center','fontsize',17) %,'verticalAlignment','bottom'
+text(1.5,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a_fontsize) %,'verticalAlignment','bottom'
 % boxplot(peaks_stat(stim_num).SNR1);
 hold off
         x1limits = [0.75 2.25];
         x1ticks = [1,2];
-        y1limits = [-1.5 11];
+        y1limits = [-1.5 10];
         y1ticks = [0,5,10];
         set( gca, 'xlim', x1limits,'xtick', x1ticks, 'ylim', y1limits,'ytick',y1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
@@ -2077,16 +2110,20 @@ Amplitude_signal_X(1,:)=ones(1,size(Amplitude_signal_Y,2));
 Amplitude_signal_X(2,:)=2*ones(1,size(Amplitude_signal_Y,2));
 E =peaks_stat(stim_num).Amplitude_signal_std;
 linex=[1;2];
-my=max(max(Amplitude_signal_Y))*1.1+0.3; 
+my=6; %max(max(Amplitude_signal_Y))*1.1+0.3; 
 liney=[my;my];
 if peaks_stat(stim_num).wilcoxon_p_Amplitude_signal>0.05 
     asterisk='n.s.';
+    a_fontsize=13;
 else if peaks_stat(stim_num).wilcoxon_p_Amplitude_signal<0.05 && peaks_stat(stim_num).wilcoxon_p_Amplitude_signal>0.01
     asterisk='*';
+    a_fontsize=17;
     else if peaks_stat(stim_num).wilcoxon_p_Amplitude_signal<0.01 && peaks_stat(stim_num).wilcoxon_p_Amplitude_signal>0.001
             asterisk='**';
+            a_fontsize=17;
     else if peaks_stat(stim_num).wilcoxon_p_Amplitude_signal<0.001
              asterisk='***';
+             a_fontsize=17;
         end
         end
     end
@@ -2096,14 +2133,14 @@ hold on
 line(Amplitude_signal_X,Amplitude_signal_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(Amplitude_signal_X(:,1), mean(Amplitude_signal_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
 % line(linex,liney,'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-text(1.5,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
+text(1.5,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a_fontsize)
 % boxplot(peaks_stat(stim_num).Amplitude_signal);
 hold off
         x1limits = [0.75 2.25];
         x1ticks = [1,2];
-%         y1limits = [0 7];
-%         y1ticks = [0,3,6];
-        set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
+        y1limits = [0 6];
+        y1ticks = [0,3,6];
+        set( gca, 'xlim', x1limits,'xtick', x1ticks,'ylim', y1limits,'ytick', y1ticks, 'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold','ylim', y1limits,'ytick', y1ticks, 
         ylabel(['Signal Amplitude [',y_ax_units{1},']'], 'FontSize', 28,'fontname', 'arial');
         title(['Amplitude signal, n=' num2str(length(files_to_analyze)) ', p=' num2str(peaks_stat(stim_num).wilcoxon_p_Amplitude_signal)] ,'FontSize', 20,'fontname', 'arial');   
@@ -2114,16 +2151,20 @@ Amplitude_noise1_X(1,:)=ones(1,size(Amplitude_noise1_Y,2));
 Amplitude_noise1_X(2,:)=2*ones(1,size(Amplitude_noise1_Y,2));
 E =peaks_stat(stim_num).Amplitude_noise1_std;
 linex=[1;2];
-my=max(max(Amplitude_noise1_Y))*1.3; 
+my=6; %max(max(Amplitude_noise1_Y))*1.3; 
 liney=[my;my];
 if peaks_stat(stim_num).wilcoxon_p_Amplitude_noise1>0.05 
     asterisk='n.s.';
+    a_fontsize=13;
 else if peaks_stat(stim_num).wilcoxon_p_Amplitude_noise1<0.05 && peaks_stat(stim_num).wilcoxon_p_Amplitude_noise1>0.01
     asterisk='*';
+    a_fontsize=17;
     else if peaks_stat(stim_num).wilcoxon_p_Amplitude_noise1<0.01 && peaks_stat(stim_num).wilcoxon_p_Amplitude_noise1>0.001
             asterisk='**';
+            a_fontsize=17;
     else if peaks_stat(stim_num).wilcoxon_p_Amplitude_noise1<0.001
              asterisk='***';
+             a_fontsize=17;
         end
         end
     end
@@ -2134,14 +2175,14 @@ hold on
 line(Amplitude_noise1_X,Amplitude_noise1_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(Amplitude_noise1_X(:,1), mean(Amplitude_noise1_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
 % line(linex,liney,'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-text(1.5,my,asterisk,'HorizontalAlignment', 'center','fontsize',17) %,'verticalAlignment','bottom'
+text(1.5,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a_fontsize) %,'verticalAlignment','bottom'
 % boxplot(peaks_stat(stim_num).Amplitude_noise1);
 hold off
         x1limits = [0.75 2.25];
         x1ticks = [1,2];
-%         y1limits = [0 7];
-%         y1ticks = [0,3,6];
-        set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
+        y1limits = [0 6];
+        y1ticks = [0,3,6];
+        set( gca, 'xlim', x1limits,'xtick', x1ticks,'ylim', y1limits,'ytick', y1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 'ylim', y1limits,'ytick', y1ticks,
         ylabel(['Noise Amplitude [',y_ax_units{1},']'], 'FontSize', 28,'fontname', 'arial');
         title(['Amplitude noise1, n=' num2str(length(files_to_analyze)) ', p=' num2str(peaks_stat(stim_num).wilcoxon_p_Amplitude_noise1)] ,'FontSize', 20,'fontname', 'arial');   

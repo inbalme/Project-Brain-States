@@ -2,10 +2,9 @@
 
 close all
 clear all
-save_flag=0;
+save_flag=1;
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz Presentation'
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP_50Hz+BP0.1-200 Vm_ 50Hz';
-
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP_50Hz+BP0.1-200 Vm_50Hz';
 %opening saved figures:
 
 %spontaneous:
@@ -101,7 +100,7 @@ end
 evoked_trace_Off_f46_pos_top = evoked_trace_Off_f46_pos(1,2)+evoked_trace_Off_f46_pos(1,4);
 evoked_trace_On_f46_pos_top = evoked_trace_On_f46_pos(1,2)+evoked_trace_On_f46_pos(1,4);
 
-spont_cc_On_f46_pos(1,:) = [0.08 , spont_trace_On_f46_pos(6,2)-0.13 , 0.15 , 0.08];
+spont_cc_On_f46_pos(1,:) = [0.08 , spont_trace_On_f46_pos(6,2)-0.16 , 0.15 , 0.08];
 spont_cc_Off_f46_pos(1,:) = [0.08 , 0.5 , 0.15 , 0.08]; spont_cc_Off_f46_pos(1,2)=spont_cc_On_f46_pos(1,2)-spont_cc_Off_f46_pos(1,4)-0.05;
 spont_cc_Off_f46_pos_top = spont_cc_Off_f46_pos(1,2)+spont_cc_Off_f46_pos(1,4);
 spont_cc_On_f46_pos_top = spont_cc_On_f46_pos(1,2)+spont_cc_On_f46_pos(1,4);
@@ -113,9 +112,9 @@ evoked_cc_Off_f46_pos_top = evoked_cc_Off_f46_pos(1,2)+evoked_cc_Off_f46_pos(1,4
 evoked_cc_On_f46_pos_top = evoked_cc_On_f46_pos(1,2)+evoked_cc_On_f46_pos(1,4);
 
 h_dist3=h_dist2+evoked_cc_Off_f46_pos(1,3)+0.16;
-cc_paired_plot_pos(1,:) = [h_dist3 , evoked_cc_Off_f46_pos(1,2)-0.03 , 0.15 , 0.2];  
+cc_paired_plot_pos(1,:) = [h_dist3 , evoked_cc_Off_f46_pos(1,2)-0.01 , 0.15 , 0.22];  
 cc_paired_plot_pos_top = cc_paired_plot_pos(1,2)+cc_paired_plot_pos(1,4);
-cc_paired_plot_shuff_pos(1,:) = [cc_paired_plot_pos(1,1)+cc_paired_plot_pos(1,3)+0.06 , cc_paired_plot_pos(1,2) , 0.15 , 0.2];
+cc_paired_plot_shuff_pos(1,:) = [cc_paired_plot_pos(1,1)+cc_paired_plot_pos(1,3)+0.06 , cc_paired_plot_pos(1,2) , 0.15 , cc_paired_plot_pos(1,4)];
 cc_paired_plot_shuff_pos_top = cc_paired_plot_shuff_pos(1,2)+cc_paired_plot_shuff_pos(1,4);
 
 %%
@@ -143,7 +142,6 @@ end
 a=evoked_trace_Off_f46_ax_copy(1).Position;
 set(evoked_trace_Off_f46_ax_copy(1),'position',[0.92 evoked_trace_Off_f46_pos_top-0.01 0.08 0.05])
 evoked_trace_Off_f46_ax_copy(1).FontSize=11;
-evoked_trace_Off_f46_ax_copy(1).LineWidth=1.5;  
 %  
  evoked_trace_On_f46_ax_copy = copyobj(evoked_trace_On_f46_ax,F); % copy axes to new fig
 for i=2:length(evoked_trace_On_f46_ax)
@@ -152,7 +150,6 @@ end
 %position legend
 set(evoked_trace_On_f46_ax_copy(1),'position',[0.92 evoked_trace_On_f46_pos_top-0.01 0.08 0.05]) 
 evoked_trace_On_f46_ax_copy(1).FontSize=11;
-evoked_trace_On_f46_ax_copy(1).LineWidth=1.5;  
  %%
  %Spontaneous Cross-correlations file 46 actual data+shuffled data
 spont_cc_Off_f46_ax_copy(1) = copyobj(spont_cc_Off_f46_ax(2),F); % copy axes to new fig
@@ -206,21 +203,21 @@ annotation('textbox', [spont_trace_Off_f46_pos(1,1) spont_trace_Off_f46_pos_top 
  annotation('textbox', [evoked_trace_On_f46_pos(1,1) evoked_trace_On_f46_pos_top 0 0]+a_pos4,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
  annotation('textbox', [spont_cc_Off_f46_pos(1,1) spont_cc_Off_f46_pos_top 0 0]+a_pos3,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- annotation('textbox', [spont_cc_On_f46_pos(1,1) spont_cc_On_f46_pos_top 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- annotation('textbox', [evoked_cc_Off_f46_pos(1,1) evoked_cc_Off_f46_pos_top 0 0]+a_pos3,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'G', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- annotation('textbox', [evoked_cc_On_f46_pos(1,1) evoked_cc_On_f46_pos_top 0 0]+a_pos4,...
+ annotation('textbox', [spont_cc_On_f46_pos(1,1) spont_cc_On_f46_pos_top 0 0]+a_pos4,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+ annotation('textbox', [evoked_cc_Off_f46_pos(1,1) evoked_cc_Off_f46_pos_top 0 0]+a_pos3,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'H', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+ annotation('textbox', [evoked_cc_On_f46_pos(1,1) evoked_cc_On_f46_pos_top 0 0]+a_pos4,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
   annotation('textbox', [cc_paired_plot_shuff_pos(1,1) cc_paired_plot_shuff_pos_top 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'I', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
-  annotation('textbox', [cc_paired_plot_pos(1,1) cc_paired_plot_pos_top 0 0]+a_pos4,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'J', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+  annotation('textbox', [cc_paired_plot_pos(1,1) cc_paired_plot_pos_top 0 0]+a_pos4,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'I', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 
- annotation('textbox', [spont_trace_Off_f46_pos(1,1) spont_trace_Off_f46_pos_top 0 0]+[0.08 -0.02 0.1 0.04],...
+ annotation('textbox', [spont_trace_Off_f46_pos(1,1) spont_trace_Off_f46_pos_top 0 0]+[0 -0.01 0.1 0.04],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'NB-', 'FontName','arial', 'fontsize', 12, 'color', [0 0 153]/256)
- annotation('textbox', [spont_trace_On_f46_pos(1,1) spont_trace_On_f46_pos_top 0 0]+[0.08 -0.02 0.1 0.04],...
+ annotation('textbox', [spont_trace_On_f46_pos(1,1) spont_trace_On_f46_pos_top 0 0]+[0 -0.01 0.1 0.04],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'NB+', 'FontName','arial', 'fontsize', 12, 'color', [0 0 153]/256)
 %  
 %  annotation('textbox', [cc_paired_plot_pos(1,1) cc_paired_plot_pos_top 0 0]+[0.02 0.0 0.2 0.04],...

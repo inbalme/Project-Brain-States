@@ -24,7 +24,7 @@ switch exp_type
         files_to_analyze =[8,10,12,14,15,16,22,36,37,40,1,44,46,48,52,56,58,62,72,75,82,84];  %[16,22,36,37,40,44,46,48,52,56,58,62,72,75,82,84]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
-        legend_string={'NB+', 'NB-'};  y_ax_label={'Vm'}; y_ax_units={'mV'};   
+        legend_string={'NB-', 'NB+'};  y_ax_label={'Vm'}; y_ax_units={'mV'};   
         path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Evoked';
         if paired_plot_flag==1; 
             path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Evoked paired plots';
@@ -38,7 +38,7 @@ switch exp_type
         files_to_analyze =[74,76,77,80,82,84,87]; %
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
-        legend_string={'Light On', 'Light Off'};  y_ax_label={'Vm'}; y_ax_units={'mV'};   
+        legend_string={'Light Off', 'Light On'};  y_ax_label={'Vm'}; y_ax_units={'mV'};   
         path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Evoked';
          if paired_plot_flag==1; 
              path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Evoked paired plots';
@@ -51,7 +51,7 @@ switch exp_type
         files_to_analyze =[31,38,42,51,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77];
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
-        legend_string={'NB+', 'NB-'};    y_ax_label={'Im'}; y_ax_units={'pA'};    
+        legend_string={'NB-', 'NB+'};    y_ax_label={'Im'}; y_ax_units={'pA'};    
         path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis_VC\Evoked';   
         if paired_plot_flag==1; 
             path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis_VC\Evoked paired plots';   

@@ -2,7 +2,7 @@
 clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
-exp_type=2; %1-NBES, 2-ChAT
+exp_type=1; %1-NBES, 2-ChAT
 trace_type_input=1; %
 analyze_time_before_train=0;
 analyze_train_only_flag=1;
@@ -543,10 +543,24 @@ tmp_Y= event_ongoing_stat.peak90prcntTime_m';
 tmp_X(1,:)=ones(1,size(tmp_Y,2));
 tmp_X(2,:)=2*ones(1,size(tmp_Y,2));
 E = event_ongoing_stat.peak90prcntTime_m_std;
+if event_ongoing_stat.wilcoxon_p_peak90prcntTime_m >0.05 
+    asterisk_sp='n.s.';
+else if event_ongoing_stat.wilcoxon_p_peak90prcntTime_m<0.05 && event_ongoing_stat.wilcoxon_p_peak90prcntTime_m>0.01
+    asterisk_sp='*';
+    else if event_ongoing_stat.wilcoxon_p_peak90prcntTime_m<0.01 && event_ongoing_stat.wilcoxon_p_peak90prcntTime_m>0.001
+            asterisk_sp='**';
+    else if event_ongoing_stat.wilcoxon_p_peak90prcntTime_m<0.001
+             asterisk_sp='***';
+        end
+        end
+    end
+end
+my=max(max(event_ongoing_stat.peak90prcntTime_m))-1; 
 g5=figure;
 hold on
 line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(tmp_X(:,1), nanmean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
+text(1.5,my,asterisk_sp,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
 hold off
         x1limits = [0.75 2.25];
         x1ticks = [1,2];
@@ -555,8 +569,8 @@ hold off
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('Event Rise-Time [mS]', 'FontSize', 28,'fontname', 'arial');
-        title(['Spontaneous event rise-time to 90% peak,  p=' num2str(event_ongoing_stat.wilcoxon_p_onVal_m)] ,'FontSize', 20,'fontname', 'arial');
-    
+        title(['Spontaneous event rise-time to 90% peak,  p=' num2str(event_ongoing_stat.wilcoxon_p_peak90prcntTime_m)] ,'FontSize', 20,'fontname', 'arial');
+
         %% save figures
 if save_flag==1
 cd(path_output)

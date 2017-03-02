@@ -2,7 +2,7 @@
 
 close all
 clear all
-save_flag=1;
+save_flag=0;
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH'
 
 %opening saved figures:
@@ -89,7 +89,7 @@ set(gcf,'color','w');
 set(gcf,'DefaultAxesFontSize',18);
 set(gcf,'DefaultAxesFontName','arial');
 set(gcf, 'PaperType', 'A4');
-set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 29 29.7]); %[left, bottom, width, height] 
+set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 21 29.7]); %[left, bottom, width, height] 
 set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 %% xlimits, y limits, ticks etc.
