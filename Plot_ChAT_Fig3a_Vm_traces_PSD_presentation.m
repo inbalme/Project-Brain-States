@@ -54,7 +54,7 @@ traces_depth1_pos(1,:) = [0.05 , 0.5 , 0.6 , 0.35];
 h_dist1=traces_depth1_pos(1,1)+traces_depth1_pos(1,3)+dist1;
 PSD_depth1_pos(1,:) = [h_dist1 , traces_depth1_pos(1,2)+0.04 ,  1-(2*traces_depth1_pos(1,1)+traces_depth1_pos(1,3)+dist1) ,  traces_depth1_pos(1,4)-0.04];
 
-total_power_pos(1,:) = [0.07 , 0.5 , 0.12 , 0.22]; total_power_pos(1,2)=traces_depth1_pos(1,2)-total_power_pos(1,4)-0.18;
+total_power_pos(1,:) = [0.12 , 0.5 , 0.12 , 0.22]; total_power_pos(1,2)=traces_depth1_pos(1,2)-total_power_pos(1,4)-0.18;
 delta_pos(1,:) = [total_power_pos(1,1)+total_power_pos(1,3)+dist2+0.05 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 % theta_pos(1,:) =[delta_pos(1,1)+delta_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 % alpha_pos(1,:) =[theta_pos(1,1)+theta_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
@@ -134,15 +134,21 @@ annotation('textbox', [traces_depth1_pos(1,1) traces_depth1_pos_top 0 0]+[0.17 0
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Barrel cortex Vm traces', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
 %  
  a_pos1=[0 -0.01 0.04 0.04];
- a_pos2=[-0.05 0 0.04 0.04];
- a_pos3=[0.3*traces_depth1_pos(1,3), 0.01, 0.5, 0.05];
+ a_pos2=[-0.06 0 0.04 0.04];
+ a_pos3=[-0.03, 0.02, 0.04, 0.04];
 
 annotation('textbox', [traces_depth1_pos(1,1) traces_depth1_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
- annotation('textbox', [PSD_depth1_pos(1,1) PSD_depth1_pos_top 0 0]+a_pos2,...
+ annotation('textbox', [PSD_depth1_pos(1,1) traces_depth1_pos_top+a_pos1(1,2) 0 0]+a_pos2,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- 
- 
+annotation('textbox', [total_power_pos(1,1) total_power_pos_top 0 0]+a_pos3,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
+annotation('textbox', [delta_pos(1,1) total_power_pos_top 0 0]+a_pos3,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')  
+ annotation('textbox', [beta_pos(1,1) total_power_pos_top 0 0]+a_pos3,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
+  annotation('textbox', [gamma_pos(1,1) total_power_pos_top 0 0]+a_pos3,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
 %% 
 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'

@@ -18,11 +18,11 @@ cc_stat=[]; cc_spont=[]; cc_evoked=[]; cc=[]; cc_shuffled_it=[]; cc_shuff_sub=[]
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X
  
  global exp_type
-exp_type=1; %1-NBES, 2-ChAT
-trace_type_input=[3,2]; %[3,2] for exp_type=1; %for exp_type=2 or 3 use [1,2]
+exp_type=2; %1-NBES, 2-ChAT
+trace_type_input=[1,2]; %[3,2] for exp_type=1; %for exp_type=2 or 3 use [1,2]
 analyze_time_before_train=0;
 analyze_train_only_flag=1; %use analyze_train_only_flag=1
-add_to_plot=0.1; %seconds from each side of the trace. use 0.1 for NBES and 0.080 for ChAT
+add_to_plot=0.08; %seconds from each side of the trace. use 0.1 for NBES and 0.080 for ChAT
 save_flag=0;
 print_flag=1;
 norm_flag=0;
@@ -234,7 +234,7 @@ yrangeLFP=ceil(max(ydiffLFP));
 for tr_ind=1:length(trace)
 subplot(2*length(trace),1,2*tr_ind)
     hold on
-        p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot{1}(:,tr_ind), 'color',color_table(1,:),'LineWidth',1.2);
+        p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot{1}(:,tr_ind), 'color',color_table(1,:),'LineWidth',1.5);
                            
         axis tight
      ylim_data=[get(gca,'ylim')]';
@@ -262,7 +262,7 @@ horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0
     
   subplot(2*length(trace),1,2*tr_ind-1)     
  	hold on
-        p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot{1}(:,tr_ind),'color',color_table(2,:),'LineWidth',1.2);
+        p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot{1}(:,tr_ind),'color',color_table(2,:),'LineWidth',1.5);
 %         text(interval_plot(1,1).*dt*1000,data_Vm_plot{1}(1),[num2str(floor(data_Vm_plot{1}(1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')  
 
         axis tight            
@@ -294,11 +294,11 @@ end
     ylabel('Potential [mV]' ,'FontSize', 14); xlabel('Time [S]','FontSize', 14)
 l=legend([p2,p1],{'LFP','Vm'}, 'box', 'off','position',[0.8,0.9,0.2,0.1]); 
     l.FontSize=11;
-    for ix=1:length(l.String)
-      str = l.String{ix};
-      h = findobj(gcf,'DisplayName',str);
-      h.LineWidth =2;
-    end
+%     for ix=1:length(l.String)
+%       str = l.String{ix};
+%       h = findobj(gcf,'DisplayName',str);
+%       h.LineWidth =2;
+%     end
 
 % pause
 % close(gcf);
@@ -319,7 +319,7 @@ Fig{fileind}(trace_type+3)=figure;
 for tr_ind=1:length(trace)
 subplot(2*length(trace),1,2*tr_ind)
     hold on
-        p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot{2}(:,tr_ind),'color',color_table(5,:),'LineWidth',1.2);
+        p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot{2}(:,tr_ind),'color',color_table(5,:),'LineWidth',1.5);
                            
         axis tight
     ylim_data=[get(gca,'ylim')]';
@@ -347,7 +347,7 @@ subplot(2*length(trace),1,2*tr_ind)
     
   subplot(2*length(trace),1,2*tr_ind-1)
  	hold on
-       p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot{2}(:,tr_ind),'color',color_table(4,:),'LineWidth',1.2);
+       p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot{2}(:,tr_ind),'color',color_table(4,:),'LineWidth',1.5);
 %         text(interval_plot(1,1).*dt*1000,data_Vm_plot{2}(1),[num2str(floor(data_Vm_plot{2}(1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')  
 
         axis tight            
@@ -380,11 +380,11 @@ title('Vm-LFP single trace ES On','FontSize', 16);
 ylabel('Potential [mV]' ,'FontSize', 14); xlabel('Time [S]','FontSize', 14)
 l=legend([p2,p1],{'LFP','Vm'}, 'box', 'off','position',[0.8,0.9,0.2,0.1]); 
 l.FontSize=11;
-for ix=1:length(l.String)
-  str = l.String{ix};
-  h = findobj(gcf,'DisplayName',str);
-  h.LineWidth =1.5;
-end
+% for ix=1:length(l.String)
+%   str = l.String{ix};
+%   h = findobj(gcf,'DisplayName',str);
+%   h.LineWidth =1.5;
+% end
 
 %% clear prcntile1_off prcntile2_off ci_off patch_xdata patch_ydata
 %plotting the crosscorrelation for a single trace+the mean

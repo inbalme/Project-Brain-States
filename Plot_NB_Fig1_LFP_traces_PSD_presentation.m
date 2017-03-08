@@ -73,7 +73,7 @@ PSD_depth1_pos(1,:) = [h_dist1 , traces_depth1_pos(1,2)+0.04 ,  1-(2*traces_dept
 PSD_depth2_pos(1,:) = [h_dist1, traces_depth2_pos(1,2)+0.04 ,  PSD_depth1_pos(1,3) ,  traces_depth2_pos(1,4)-0.04];
 PSD_depth3_pos(1,:) = [h_dist1 , traces_depth3_pos(1,2)+0.04 ,  PSD_depth1_pos(1,3) ,  traces_depth3_pos(1,4)-0.04];
 
-total_power_pos(1,:) = [0.07 , 0.5 , 0.1 , 0.14]; total_power_pos(1,2)=traces_depth3_pos(1,2)-total_power_pos(1,4)-0.06;
+total_power_pos(1,:) = [0.12 , 0.5 , 0.12 , 0.14]; total_power_pos(1,2)=traces_depth3_pos(1,2)-total_power_pos(1,4)-0.06;
 delta_pos(1,:) = [total_power_pos(1,1)+total_power_pos(1,3)+dist2+0.05 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 % theta_pos(1,:) =[delta_pos(1,1)+delta_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 % alpha_pos(1,:) =[theta_pos(1,1)+theta_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
@@ -174,9 +174,11 @@ yl=ylabel('');  tl=title({'30-50 Hz'; ''},'fontweight','normal','fontsize',12);
 annotation('textbox', [traces_depth1_pos(1,1) traces_depth1_pos_top 0 0]+[0.17 0.01 0.5 0.05],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Barrel cortex LFP traces', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
 %  
- a_pos1=[0 -0.01 0.04 0.04];
- a_pos2=[-0.05 0 0.04 0.04];
- a_pos3=[0.4*traces_depth1_pos(1,3), -0.01, 0.5, 0.05];
+ a_pos1=[0 -0.02 0.04 0.04];
+ a_pos2=[-0.06 0 0.04 0.04];
+ a_pos3=[0.4*traces_depth1_pos(1,3), -0.025, 0.5, 0.05];
+ a_pos4=[-0.03, 0.02, 0.04, 0.04];
+ 
 
  annotation('textbox', [traces_depth1_pos(1,1) traces_depth1_pos_top 0 0]+a_pos3,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Stimulation depth 3000 \mum', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
@@ -186,17 +188,26 @@ annotation('textbox', [traces_depth2_pos(1,1) traces_depth2_pos_top 0 0]+a_pos3,
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Stimulation depth 5000 \mum', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 %  
 annotation('textbox', [traces_depth1_pos(1,1) traces_depth1_pos_top 0 0]+a_pos1,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
  annotation('textbox', [traces_depth2_pos(1,1) traces_depth2_pos_top 0 0]+a_pos1,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
  annotation('textbox', [traces_depth3_pos(1,1) traces_depth3_pos_top 0 0]+a_pos1,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
  annotation('textbox', [PSD_depth1_pos(1,1) PSD_depth1_pos_top 0 0]+a_pos2,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
  annotation('textbox', [PSD_depth2_pos(1,1) PSD_depth2_pos_top 0 0]+a_pos2,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'G', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
   annotation('textbox', [PSD_depth3_pos(1,1) PSD_depth3_pos_top 0 0]+a_pos2,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'H', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+ annotation('textbox', [total_power_pos(1,1) total_power_pos_top 0 0]+a_pos4,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'G', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
+annotation('textbox', [delta_pos(1,1) total_power_pos_top 0 0]+a_pos4,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'H', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')  
+ annotation('textbox', [beta_pos(1,1) total_power_pos_top 0 0]+a_pos4,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'I', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
+  annotation('textbox', [gamma_pos(1,1) total_power_pos_top 0 0]+a_pos4,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'J', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
+
  
 %% 
 

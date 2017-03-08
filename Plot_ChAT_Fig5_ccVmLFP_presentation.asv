@@ -240,11 +240,11 @@ annotation('textbox', [spont_trace_Off_f80_pos(1,1) spont_trace_Off_f80_pos_top 
  %cc population paired plots
 cc_paired_plot_ax_copy = copyobj(cc_paired_plot_ax,F); % copy axes to new fig
 set(cc_paired_plot_ax_copy,'position',cc_paired_plot_pos(1,:))
-set(F, 'currentaxes', cc_paired_plot_ax_copy); yl=ylabel('');
-cc_paired_plot_ax_copy.FontSize=14;
+cc_paired_plot_ax_copy.FontSize=14; yl=ylabel('');
 
 cc_paired_plot_shuff_ax_copy = copyobj(cc_paired_plot_shuff_ax,F); % copy axes to new fig
 set(cc_paired_plot_shuff_ax_copy,'position',cc_paired_plot_shuff_pos(1,:))
+   set(F, 'currentaxes', cc_paired_plot_shuff_ax_copy); yl=ylabel('');
 cc_paired_plot_shuff_ax_copy.FontSize=14;
     %   'fontname', 'arial','fontsize',13,'linewidth',1.5,'box','off'); %, 'ylim', y6limits,'ytick', y6ticks,'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
 %  set(F, 'currentaxes', Response_modulation_ax_copy); t=title(''); yl=ylabel('Spikes/Stim. train','fontsize',13);
