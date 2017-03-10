@@ -17,7 +17,7 @@ close all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
 exp_type=1; %1-NBES, 2-ChAT
-data_type='LFP'; %'LFP', 'Vm'
+data_type='Vm'; %'LFP', 'Vm'
 trace_type_input=1; %
 analyze_time_before_train=0;
 analyze_train_only_flag=0;
@@ -37,7 +37,7 @@ data_vec_all{1} = []; data_vec_all{2} = []; data_vec_residual_all{1} = []; data_
 %%
 switch exp_type
     case 1
-        files_to_analyze =[46,52,58,62,72,75,84]; %[8,10,12,14,15,16,22,36,37,40,1,44,46,48,52,56,58,62,72,75,82,84]; %[46,52,58,62,72,75,84]; %one cell from each animal for LFP  
+        files_to_analyze =[8,10,12,14,15,16,22,36,37,40,1,44,46,48,52,56,58,62,72,75,82,84]; %[46,52,58,62,72,75,84]; %one cell from each animal for LFP  
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB-', 'NB+'};
@@ -48,7 +48,7 @@ switch exp_type
         end        
 
     case 2
-        files_to_analyze =  [74,76,77,80,82,84,87]; %[74,76,77,80,82,84,87]; %[76,80,84] one cell from each animal for LFP
+        files_to_analyze =  [76,80,84]; %[74,76,77,80,82,84,87]; %[76,80,84] one cell from each animal for LFP
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light Off', 'Light On'};
@@ -486,11 +486,13 @@ spec_mat_noDC=bsxfun(@minus,spec_mat,DC);
 Y_abs_sem(:,t)=std(Y_abs(:,:,t),0,2)./sqrt(size(Y_abs(:,:,t),2));
 Y_abs_sum(t,:)=sum(Y_abs(:,:,t),1);
 Y_abs_norm(:,:,t)=bsxfun(@rdivide,Y_abs(:,:,t),Y_abs_sum(t,:));
+Y_abs_log(:,:,t)=log(Y_abs(:,t));
 
 powerspec.fileind(fileind).fname=files_to_analyze(fileind);
 powerspec.fileind(fileind).Y_abs=Y_abs;
 powerspec.fileind(fileind).Y_abs_sum=Y_abs_sum;
 powerspec.fileind(fileind).Y_abs_norm=Y_abs_norm;
+powerspec.fileind(fileind).Y_abs_log=Y_abs_norm;
 end
 fround=round(f(:,1));
 delta=[1,4];
@@ -504,17 +506,22 @@ b=fround>=theta(1) & fround<=theta(2);
 c=fround>=alpha(1) & fround<=alpha(2);
 d=fround>=beta(1) & fround<=beta(2);
 e=fround>=gamma(1) & fround<=gamma(2);
-Y_abs_mean=mean(Y_abs_norm,2);
+e2=fround>=lowfreq(1) & fround<=lowfreq(2);
+% Y_abs_mean=mean(Y_abs_norm,2);
+Y_abs_mean=mean(Y_abs_log,2);
 Y_abs_delta(1:2)=sum(Y_abs_mean(a,1,:));
 Y_abs_theta(1:2)=sum(Y_abs_mean(b,1,:));
 Y_abs_alpha(1:2)=sum(Y_abs_mean(c,1,:));
 Y_abs_beta(1:2)=sum(Y_abs_mean(d,1,:));
 Y_abs_gamma(1:2)=sum(Y_abs_mean(e,1,:));
+Y_abs_lowfreq(1:2)=sum(Y_abs_mean(e2,1,:));
 Y_delta_all(fileind,:)=Y_abs_delta;
 Y_theta_all(fileind,:)=Y_abs_theta;
 Y_alpha_all(fileind,:)=Y_abs_alpha;
 Y_beta_all(fileind,:)=Y_abs_beta;
 Y_gamma_all(fileind,:)=Y_abs_gamma;
+Y_lowfreq_all(fileind,:)=Y_abs_lowfreq;
+Y_diff(fileind,:)=[diff(Y_abs_lowfreq), diff(Y_abs_gamma)];
 Y_sum(fileind,:)=mean(Y_abs_sum,2);
      end %end of files loop
 powerspec.delta_range=delta;
@@ -522,11 +529,14 @@ powerspec.theta_range=theta;
 powerspec.alpha_range=alpha;
 powerspec.beta_range=beta;
 powerspec.gamma_range=gamma;
+powerspec.lowfreq_range=lowfreq;
 powerspec.delta=Y_delta_all;
 powerspec.theta=Y_theta_all;
 powerspec.alpha=Y_alpha_all;
 powerspec.beta=Y_beta_all;
 powerspec.gamma=Y_gamma_all;
+powerspec.lowfreq=Y_lowfreq_all;
+powerspec.diff=Y_diff_all;
 powerspec.Y_sum=Y_sum;
 powerspec.BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
 powerspec.BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
@@ -538,63 +548,85 @@ powerspec.BPVm_flag=0;
 [powerspec.alpha_ttest_h,powerspec.alpha_ttest_p]=ttest(powerspec.alpha(:,1),powerspec.alpha(:,2));
 [powerspec.beta_ttest_h,powerspec.beta_ttest_p]=ttest(powerspec.beta(:,1),powerspec.beta(:,2));
 [powerspec.gamma_ttest_h,powerspec.gamma_ttest_p]=ttest(powerspec.gamma(:,1),powerspec.gamma(:,2));
+[powerspec.lowfreq_ttest_h,powerspec.lowfreq_ttest_p]=ttest(powerspec.lowfreq(:,1),powerspec.lowfreq(:,2));
+[powerspec.diff_ttest_h,powerspec.diff_ttest_p]=ttest(powerspec.diff(:,1),powerspec.diff(:,2));
 [powerspec.Y_sum_ttest_h,powerspec.Y_sum_ttest_p]=ttest(powerspec.Y_sum(:,1),powerspec.Y_sum(:,2));
+
+% %normalization to pre-NB instead of to the total power
+% powerspec.change_delta=[(powerspec.delta(:,2)-powerspec.delta(:,1))./abs(powerspec.delta(:,1))].*100; %percent change
+% powerspec.change_theta=[(powerspec.theta(:,2)-powerspec.theta(:,1))./abs(powerspec.theta(:,1))].*100; %percent change
+% powerspec.change_alpha=[(powerspec.alpha(:,2)-powerspec.alpha(:,1))./abs(powerspec.alpha(:,1))].*100; %percent change
+% powerspec.change_beta=[(powerspec.beta(:,2)-powerspec.beta(:,1))./abs(powerspec.beta(:,1))].*100; %percent change
+% powerspec.change_gamma=[(powerspec.gamma(:,2)-powerspec.gamma(:,1))./abs(powerspec.gamma(:,1))].*100; %percent change
+% powerspec.change_lowfreq=[(powerspec.lowfreq(:,2)-powerspec.lowfreq(:,1))./abs(powerspec.lowfreq(:,1))].*100; %percent change
 
 if length(files_to_analyze)>4;
 [powerspec.delta_lillietest_h,powerspec.delta_lillietest_p]=lillietest(powerspec.delta(:,2)-powerspec.delta(:,1));
 [powerspec.delta_wilcoxon_p,powerspec.delta_wilcoxon_h]=signrank(powerspec.delta(:,1),powerspec.delta(:,2));
+% [powerspec.change_delta_wilcoxon_p,powerspec.change_delta_wilcoxon_h]=signrank(powerspec.change_delta);
 
 [powerspec.theta_lillietest_h,powerspec.theta_lillietest_p]=lillietest(powerspec.theta(:,2)-powerspec.theta(:,1));
 [powerspec.theta_wilcoxon_p,powerspec.theta_wilcoxon_h]=signrank(powerspec.theta(:,1),powerspec.theta(:,2));
+% [powerspec.change_theta_wilcoxon_p,powerspec.change_theta_wilcoxon_h]=signrank(powerspec.change_theta);
 
 [powerspec.alpha_lillietest_h,powerspec.alpha_lillietest_p]=lillietest(powerspec.alpha(:,2)-powerspec.alpha(:,1));
 [powerspec.alpha_wilcoxon_p,powerspec.alpha_wilcoxon_h]=signrank(powerspec.alpha(:,1),powerspec.alpha(:,2));
+% [powerspec.change_alpha_wilcoxon_p,powerspec.change_alpha_wilcoxon_h]=signrank(powerspec.change_alpha);
 
 [powerspec.beta_lillietest_h,powerspec.beta_lillietest_p]=lillietest(powerspec.beta(:,2)-powerspec.beta(:,1));
 [powerspec.beta_wilcoxon_p,powerspec.beta_wilcoxon_h]=signrank(powerspec.beta(:,1),powerspec.beta(:,2));
+% [powerspec.change_beta_wilcoxon_p,powerspec.change_beta_wilcoxon_h]=signrank(powerspec.change_beta);
 
 [powerspec.gamma_lillietest_h,powerspec.gamma_lillietest_p]=lillietest(powerspec.gamma(:,2)-powerspec.gamma(:,1));
 [powerspec.gamma_wilcoxon_p,powerspec.gamma_wilcoxon_h]=signrank(powerspec.gamma(:,1),powerspec.gamma(:,2));
+% [powerspec.change_gamma_wilcoxon_p,powerspec.change_gamma_wilcoxon_h]=signrank(powerspec.change_gamma);
+
+[powerspec.lowfreq_lillietest_h,powerspec.lowfreq_lillietest_p]=lillietest(powerspec.lowfreq(:,2)-powerspec.lowfreq(:,1));
+[powerspec.lowfreq_wilcoxon_p,powerspec.lowfreq_wilcoxon_h]=signrank(powerspec.lowfreq(:,1),powerspec.lowfreq(:,2));
+% [powerspec.change_lowfreq_wilcoxon_p,powerspec.change_lowfreq_wilcoxon_h]=signrank(powerspec.change_lowfreq);
+
+[powerspec.diff_lillietest_h,powerspec.diff_lillietest_p]=lillietest(powerspec.diff(:,2)-powerspec.diff(:,1));
+[powerspec.diff_wilcoxon_p,powerspec.diff_wilcoxon_h]=signrank(powerspec.diff(:,1),powerspec.diff(:,2));
 
 [powerspec.Y_sum_lillietest_h,powerspec.Y_sum_lillietest_p]=lillietest(powerspec.Y_sum(:,2)-powerspec.Y_sum(:,1));
 [powerspec.Y_sum_wilcoxon_p,powerspec.Y_sum_wilcoxon_h]=signrank(powerspec.Y_sum(:,1),powerspec.Y_sum(:,2));
 end
 %% plots
 %% Powerspec
-j1=figure;
-for t=1:length(start_time)
-      hold on
-   d1(t)= fn_shadedErrorBar(f(f(:,t)<49,t),mean(Y_abs(f(:,t)<49,:,t),2),Y_abs_sem(f(:,t)<49,t),{'LineWidth',2,'color', color_table(t,:)});  
-end
-    hold off
-
- xlim([1 100]); 
- if strcmp(data_type,'LFP')
-     ylim([0 0.01])
-     y1tick=[10e-7,10e-6, 10e-5, 10e-4, 10e-3, 10e-2];
- else
-   ylim([0 1])
-     y1tick=[10e-6, 10e-5, 10e-4, 10e-3, 10e-2,10e-1];  
- end
-        set(gca,'xscale','log');
-        set(gca,'yscale','log');
-        set(gca,'fontsize',20, 'fontname', 'arial', 'box', 'off','linewidth',2, 'xtick',[1, 10,100],'ytick', y1tick,'yminortick','on') 
-         xlabel('Frequency [Hz]','fontsize',20, 'fontname', 'arial')
-        ylabel('PSD [mV^2/Hz]','fontsize',20, 'fontname', 'arial'); %Power spectral density
-l=legend([d1(1).mainLine d1(2).mainLine ],legend_string,'Location','northeast', 'box', 'off');
-l.LineWidth=1.5;
-l.FontSize=12;
-
-            if save_flag==1;
-                cd(path_output)
-                 if strcmp(data_type,'LFP') 
-                     filename=['f' num2str(files_to_analyze(fileind)) '_LFP_power_spectrum'];
-                 else
-                     filename=['f' num2str(files_to_analyze(fileind)) '_Vm_power_spectrum'];
-                 end
-                    saveas(j1,filename,'fig') 
-                    print(j1,filename,'-dpng','-r600','-opengl') 
-            end
+% j1=figure;
+% for t=1:length(start_time)
+%       hold on
+%    d1(t)= fn_shadedErrorBar(f(f(:,t)<49,t),mean(Y_abs(f(:,t)<49,:,t),2),Y_abs_sem(f(:,t)<49,t),{'LineWidth',2,'color', color_table(t,:)});  
+% end
+%     hold off
+% 
+%  xlim([1 100]); 
+%  if strcmp(data_type,'LFP')
+%      ylim([0 0.01])
+%      y1tick=[10e-7,10e-6, 10e-5, 10e-4, 10e-3, 10e-2];
+%  else
+%    ylim([0 1])
+%      y1tick=[10e-6, 10e-5, 10e-4, 10e-3, 10e-2,10e-1];  
+%  end
+%         set(gca,'xscale','log');
+%         set(gca,'yscale','log');
+%         set(gca,'fontsize',20, 'fontname', 'arial', 'box', 'off','linewidth',2, 'xtick',[1, 10,100],'ytick', y1tick,'yminortick','on') 
+%          xlabel('Frequency [Hz]','fontsize',20, 'fontname', 'arial')
+%         ylabel('PSD [mV^2/Hz]','fontsize',20, 'fontname', 'arial'); %Power spectral density
+% l=legend([d1(1).mainLine d1(2).mainLine ],legend_string,'Location','northeast', 'box', 'off');
+% l.LineWidth=1.5;
+% l.FontSize=12;
+% 
+%             if save_flag==1;
+%                 cd(path_output)
+%                  if strcmp(data_type,'LFP') 
+%                      filename=['f' num2str(files_to_analyze(fileind)) '_LFP_power_spectrum'];
+%                  else
+%                      filename=['f' num2str(files_to_analyze(fileind)) '_Vm_power_spectrum'];
+%                  end
+%                     saveas(j1,filename,'fig') 
+%                     print(j1,filename,'-dpng','-r600','-opengl') 
+%             end
 %%
 % Delta Power
 tmp_Y= powerspec.delta';
@@ -787,7 +819,7 @@ tmp_Y= powerspec.gamma';
 tmp_X(1,:)=ones(1,size(tmp_Y,2));
 tmp_X(2,:)=2*ones(1,size(tmp_Y,2));
 E = std(tmp_Y');
-if isfield(powerspec,gamma_wilcoxon_p')
+if isfield(powerspec,'gamma_wilcoxon_p')
     p_val=powerspec.gamma_wilcoxon_p;
 else
     p_val=powerspec.gamma_ttest_p;
@@ -873,12 +905,12 @@ hold off
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('PSD [mV^2/Hz]', 'FontSize', 28,'fontname', 'arial');
         title(['Total Power,  p=' num2str(p_val)] ,'FontSize', 20,'fontname', 'arial');  
-        %% Gamma Power
+        %% Low-frequency [1-10] Power
 tmp_Y= powerspec.lowfreq';
 tmp_X(1,:)=ones(1,size(tmp_Y,2));
 tmp_X(2,:)=2*ones(1,size(tmp_Y,2));
 E = std(tmp_Y');
-if isfield(powerspec,lowfreq_wilcoxon_p')
+if isfield(powerspec,'lowfreq_wilcoxon_p')
     p_val=powerspec.lowfreq_wilcoxon_p;
 else
     p_val=powerspec.lowfreq_ttest_p;
@@ -919,7 +951,7 @@ hold off
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'ylim',y1limits,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('Normalized PSD [A.U.]', 'FontSize', 28,'fontname', 'arial');
-        title(['lowfreq Power,  p=' num2str(p_val)] ,'FontSize', 20,'fontname', 'arial');   
+        title(['Low-frequency Power,  p=' num2str(p_val)] ,'FontSize', 20,'fontname', 'arial');   
         
 %% Save figures and data
  if save_flag==1

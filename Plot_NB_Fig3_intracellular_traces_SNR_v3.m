@@ -79,11 +79,11 @@ set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 %% Positions:
     
 v_dist=0.04;
-spont_trace_f16_pos(1,:) = [0.04 , 0.63 ,  0.42 ,  0.25];
+spont_trace_f16_pos(1,:) = [0.04 , 0.63 ,  0.44 ,  0.25];
 spont_mean_f16_pos(1,:) = [spont_trace_f16_pos(1,1), spont_trace_f16_pos(1,2)-0.12-v_dist, spont_trace_f16_pos(1,3), 0.12];
 spont_std_f16_pos(1,:) = [spont_trace_f16_pos(1,1), spont_mean_f16_pos(1,2)-spont_mean_f16_pos(1,4)-v_dist, spont_trace_f16_pos(1,3), spont_mean_f16_pos(1,4)];
 
-h_dist1=spont_trace_f16_pos(1,1)+spont_trace_f16_pos(1,3)+0.06;
+h_dist1=spont_trace_f16_pos(1,1)+spont_trace_f16_pos(1,3)+0.04;
 
 evoked_trace_Off_f16_zoom_pos(1,:) = [h_dist1, spont_trace_f16_pos(1,2)+0.1 ,  0.44 ,  0.16];
 evoked_trace_On_f16_zoom_pos(1,:) = [h_dist1, evoked_trace_Off_f16_zoom_pos(1,2)-evoked_trace_Off_f16_zoom_pos(1,4)-0.02 ,  evoked_trace_Off_f16_zoom_pos(1,3) ,  evoked_trace_Off_f16_zoom_pos(1,4)];
@@ -155,6 +155,7 @@ Peak_amp_ax_copy = copyobj(Peak_amp_ax,F); % copy axes to new fig
 set(Peak_amp_ax_copy,'position',Peak_amp_pos(1,:))
 set(F, 'currentaxes', Peak_amp_ax_copy); tl=title('');
 Peak_amp_ax_copy.FontSize=12;
+Peak_amp_ax_copy.XTickLabel(11,:)=[]; Peak_amp_ax_copy.XTickLabel(11,1)='R';
 
 SNR_ax_copy = copyobj(SNR_ax,F); % copy axes to new fig
 set(SNR_ax_copy,'position',SNR_pos(1,:))
@@ -175,19 +176,27 @@ set(F, 'currentaxes', Amplitude_Noise_ax_copy); tl=title('');
 Amplitude_Noise_ax_copy.FontSize=12;
 
 %position legend:
-set(VmM_ax_copy(1),'position',[0.9 evoked_trace_Off_f16_zoom_pos_top+0.02 0.08 0.01])
+set(VmM_ax_copy(1),'position',[0.9 evoked_trace_Off_f16_zoom_pos_top+0.03 0.08 0.01])
 VmM_ax_copy(1).FontSize=11;
 % set(evoked_mean_f16_zoom_ax_copy(1),'position',[0.9 spont_std_f16_pos_top+0.01 0.08 0.05])
 %   annotation:
-annotation('textbox', [evoked_trace_Off_f16_zoom_pos(1,1) evoked_trace_Off_f16_zoom_pos_top 0 0]+[0.06 0.01 0.5 0.05],...
+annotation('textbox', [evoked_trace_Off_f16_zoom_pos(1,1) evoked_trace_Off_f16_zoom_pos_top 0 0]+[0.06 0.03 0.5 0.05],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Sensory-evoked Responses', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
-annotation('textbox', [spont_trace_f16_pos(1,1), evoked_trace_Off_f16_zoom_pos_top 0 0]+[0.06 0.01 0.5 0.05],...
+annotation('textbox', [spont_trace_f16_pos(1,1), evoked_trace_Off_f16_zoom_pos_top 0 0]+[0.06 0.03 0.5 0.05],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Spontaneous Activity', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
  
- a_pos1=[0.01 -0.01 0.04 0.04];
-  a_pos4=[0.02 -0.01 0.04 0.04];
- a_pos2=[-0.02 0 0.04 0.04];
- a_pos3=[-0.03 0.01 0.04 0.04];
+ a_pos1=[-0.03 -0.01 0.04 0.04];
+ a_pos4=[0 -0.01 0.12 0.04];
+ a_pos2=[-0.02 -0.01 0.04 0.04];
+ a_pos3=[-0.03 0 0.04 0.04];
+ 
+ annotation('textbox', [spont_trace_f16_pos(1,1) spont_trace_f16_pos_top 0 0]+a_pos4,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Vm Traces', 'FontName','arial', 'fontsize', 12) %'fontweight', 'bold'
+annotation('textbox', [spont_mean_f16_pos(1,1) spont_mean_f16_pos_top 0 0]+a_pos4,...
+    'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Mean', 'FontName','arial', 'fontsize', 12)
+annotation('textbox', [spont_std_f16_pos(1,1) spont_std_f16_pos_top 0 0]+a_pos4,...
+    'FitHeightToText', 'on', 'edgecolor', 'none','string', 'STD', 'FontName','arial', 'fontsize', 12)
+
 annotation('textbox', [spont_trace_f16_pos(1,1) spont_trace_f16_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 annotation('textbox', [spont_mean_f16_pos(1,1) spont_mean_f16_pos_top 0 0]+a_pos1,...

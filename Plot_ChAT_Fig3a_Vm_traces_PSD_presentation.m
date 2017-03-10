@@ -16,6 +16,7 @@ cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Vm Histograms and Powerspec\Powersp
 PSD_depth1 = open('f74_Vm_power_spectrum.fig');   
 PSD_depth1_ax = get(gcf, 'children');
 
+cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Vm Histograms and Powerspec\Powerspec Vm\Not Normalized';
 %normalized power
 total_power = open('Total_Power.fig');
 total_power_ax = get(gcf, 'children');
@@ -49,13 +50,13 @@ set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 
 %% Positions:
 dist1=0.09;
-dist2=0.07;
+dist2=0.08;
 traces_depth1_pos(1,:) = [0.05 , 0.5 , 0.6 , 0.35];
 h_dist1=traces_depth1_pos(1,1)+traces_depth1_pos(1,3)+dist1;
 PSD_depth1_pos(1,:) = [h_dist1 , traces_depth1_pos(1,2)+0.04 ,  1-(2*traces_depth1_pos(1,1)+traces_depth1_pos(1,3)+dist1) ,  traces_depth1_pos(1,4)-0.04];
 
-total_power_pos(1,:) = [0.12 , 0.5 , 0.12 , 0.22]; total_power_pos(1,2)=traces_depth1_pos(1,2)-total_power_pos(1,4)-0.18;
-delta_pos(1,:) = [total_power_pos(1,1)+total_power_pos(1,3)+dist2+0.05 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
+total_power_pos(1,:) = [0.14 , 0.5 , 0.12 , 0.22]; total_power_pos(1,2)=traces_depth1_pos(1,2)-total_power_pos(1,4)-0.18;
+delta_pos(1,:) = [total_power_pos(1,1)+total_power_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 % theta_pos(1,:) =[delta_pos(1,1)+delta_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 % alpha_pos(1,:) =[theta_pos(1,1)+theta_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 % beta_pos(1,:) = [alpha_pos(1,1)+alpha_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
@@ -99,8 +100,8 @@ delta_ax_copy = copyobj(delta_ax,F); % copy axes to new fig
 set(delta_ax_copy,'position',delta_pos(1,:))
 delta_ax_copy.FontSize=ax_fontsize;
 set(F, 'currentaxes', delta_ax_copy); 
- tl=title({'1-10 Hz'; ''},'fontweight','normal','fontsize',12);
-yl=ylabel('Normalized PSD');
+ tl=title({'1-10 Hz'; ''},'fontweight','normal','fontsize',12); yl=ylabel(''); 
+% yl=ylabel('PSD [mV^2/Hz]');
 
 % theta_ax_copy = copyobj(theta_ax,F); % copy axes to new fig
 % set(theta_ax_copy,'position',theta_pos(1,:))
@@ -153,7 +154,7 @@ annotation('textbox', [delta_pos(1,1) total_power_pos_top 0 0]+a_pos3,...
 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
 if save_flag==1;
-filename='Fig 3a ChAT Vm traces+PSD_1-100Hz';
+filename='Fig 3a ChAT Vm traces+PSD_1-100Hz_not_normalized';
 saveas(F,filename,'fig'); 
 print(F,filename,'-dpng','-r600','-opengl') 
 print(F, '-depsc2', filename);

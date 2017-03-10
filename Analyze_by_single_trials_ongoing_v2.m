@@ -208,7 +208,7 @@ clear color_table
        end
      end
    
-   figure
+   fg1=figure;
         hold on
               l1=plot([dt:dt:(size(Events_forplot{1}(:,:),2)).*dt],Events_forplot{1}(1:50,:)','color',[0 0 0 0.3],'linewidth',1);
               l2=plot([dt:dt:(size(Events_forplot{1}(:,:),2)).*dt],Events_forplot{2}(1:50,:)','color',[[255 102 102]./256,0.4],'linewidth',1);
@@ -216,11 +216,17 @@ clear color_table
               l4=plot([dt:dt:(size(Events_forplot{1}(:,:),2)).*dt],mean(Events_forplot{2}',2),'color',color_table(2,:),'linewidth',2);
           hold off
 % %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=0.01;     textit=[num2str(lengthh.*1000), ' mS'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
- horiz_vert=0;        lengthh=lengthh_vert(2);     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=12;perc1=[]; perc2=[];
+ horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=12;perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
 set(gca, 'visible', 'off') ;
+if save_flag==1;
+    cd(path_output)
+    filename1=['f' num2str(files_to_analyze(fileind)) '_events overlay'];    
+        saveas(fg1,filename1,'fig') 
+        print(fg1,filename1,'-dpng','-r600','-opengl') 
+end
 
    %%
         %organizing the data in structure:  

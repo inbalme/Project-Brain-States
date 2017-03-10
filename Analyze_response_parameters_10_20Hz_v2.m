@@ -20,7 +20,7 @@ trace_type_input=[2]; %for exp_type=2||3 use [1,2], for exp_type=1 use [3,2]
 trace_type=trace_type_input;
 analyze_time_before_train=0;
 analyze_train_only_flag=1;
-save_flag=0;
+save_flag=1;
 print_flag=1;
 norm_flag=0;
 clamp_flag=3; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
@@ -54,7 +54,7 @@ switch exp_type
         files_to_analyze =[8,10,12,14,15,16,22,36,37,40,1,44,46,48,52,56,58,62,72,75,82,84];  %[8,10,11,12,14,15,16,22,36,37,40,1,44,46,48,50,52,56,58,62,72,75,82,84]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
-        legend_string={'NB+', 'NB-'};  y_ax_label={'Vm'}; y_ax_units={'mV'};    
+        legend_string={'NB-', 'NB+'};  y_ax_label={'Vm'}; y_ax_units={'mV'};    
         path_output=['D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\',path_output];   
         a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
             if a==0;
