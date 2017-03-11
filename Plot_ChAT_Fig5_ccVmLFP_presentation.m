@@ -196,6 +196,20 @@ set(evoked_cc_On_f80_ax_copy(2),'position',evoked_cc_On_f80_pos(1,:),'xticklabel
 evoked_cc_On_f80_ax_copy(1).FontSize=11;
 evoked_cc_On_f80_ax_copy(1).LineWidth=1.5;
 
+%cc population paired plots
+cc_paired_plot_ax_copy = copyobj(cc_paired_plot_ax,F); % copy axes to new fig
+set(cc_paired_plot_ax_copy,'position',cc_paired_plot_pos(1,:))
+set(F, 'currentaxes', cc_paired_plot_ax_copy); yl=ylabel('');
+cc_paired_plot_ax_copy.FontSize=14;
+cc_paired_plot_ax_copy.XTickLabel={'Off', 'On','Off', 'On'}; 
+
+cc_paired_plot_shuff_ax_copy = copyobj(cc_paired_plot_shuff_ax,F); % copy axes to new fig
+set(cc_paired_plot_shuff_ax_copy,'position',cc_paired_plot_shuff_pos(1,:))
+cc_paired_plot_shuff_ax_copy.FontSize=14;
+cc_paired_plot_shuff_ax_copy.XTickLabel={'Off', 'On','Off', 'On'}; 
+    %   'fontname', 'arial','fontsize',13,'linewidth',1.5,'box','off'); %, 'ylim', y6limits,'ytick', y6ticks,'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
+%  set(F, 'currentaxes', Response_modulation_ax_copy); t=title(''); yl=ylabel('Spikes/Stim. train','fontsize',13);
+
 %   annotation:
 annotation('textbox', [spont_trace_Off_f80_pos(1,1) spont_trace_Off_f80_pos_top 0 0]+[0.09 0 0.5 0.05],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Spontaneous Activity', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
@@ -237,18 +251,7 @@ annotation('textbox', [spont_trace_Off_f80_pos(1,1) spont_trace_Off_f80_pos_top 
 %   annotation('textbox', [cc_paired_plot_shuff_pos(1,1) cc_paired_plot_shuff_pos_top 0 0]+[0.02 0.0 0.2 0.04],...
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Signal correlations', 'FontName','arial', 'fontsize', 12,'color', [0 0 153]/256)
 %% 
- %cc population paired plots
-cc_paired_plot_ax_copy = copyobj(cc_paired_plot_ax,F); % copy axes to new fig
-set(cc_paired_plot_ax_copy,'position',cc_paired_plot_pos(1,:))
-set(F, 'currentaxes', cc_paired_plot_ax_copy); yl=ylabel('');
-cc_paired_plot_ax_copy.FontSize=14;
-
-cc_paired_plot_shuff_ax_copy = copyobj(cc_paired_plot_shuff_ax,F); % copy axes to new fig
-set(cc_paired_plot_shuff_ax_copy,'position',cc_paired_plot_shuff_pos(1,:))
-cc_paired_plot_shuff_ax_copy.FontSize=14;
-    %   'fontname', 'arial','fontsize',13,'linewidth',1.5,'box','off'); %, 'ylim', y6limits,'ytick', y6ticks,'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
-%  set(F, 'currentaxes', Response_modulation_ax_copy); t=title(''); yl=ylabel('Spikes/Stim. train','fontsize',13);
-
+ 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
 if save_flag==1
     filename='Fig 5 ChAT ccVmLFP_v2';
