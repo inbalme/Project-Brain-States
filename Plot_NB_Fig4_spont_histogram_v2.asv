@@ -2,7 +2,7 @@
 
 close all
 clear all
-save_flag=0;
+save_flag=1;
 exp_type=1; %1- NBES, 2- ChAT
 %opening saved figures:
 switch exp_type
@@ -22,21 +22,33 @@ switch exp_type
     case 1
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Spontaneous\detection f46'
         detection_example1= open('detection example - ongoing NB-, trace 5.fig');    
-        a=findall(gca,'type','line'); delete(a(1:2));
-        b=findall(gca,'type','text'); delete(b(12));
+        a=findall(gca,'type','line'); delete(a(2));
+        b=findall(gca,'type','text'); delete(b(2));
+        c=findall(gca,'type','scatter');
+        set(c(1),'markerfacecolor',[255,153,51]./256);
+        set(c(2),'markerfacecolor',[255,178,102]./256);
         detection_example1_ax = get(gcf, 'children');
         detection_example2= open('detection example - ongoing NB+, trace 3.fig'); 
-        a=findall(gca,'type','line'); delete(a(1));
-        b=findall(gca,'type','text'); delete(b(1));
+        a=findall(gca,'type','line'); delete(a(1:2));
+        b=findall(gca,'type','text'); delete(b(1:2));
+        c=findall(gca,'type','scatter');
+       set(c(1),'markerfacecolor',[255,153,51]./256);
+        set(c(2),'markerfacecolor',[255,178,102]./256);
         detection_example2_ax = get(gcf, 'children');
          cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Spontaneous\detection f16'
         detection_example3= open('detection example - ongoing NB-, trace 6.fig');    
-        a=findall(gca,'type','line'); delete(a(2));
-        b=findall(gca,'type','text'); delete(b(2));
+        a=findall(gca,'type','line'); %delete(a(2));
+        b=findall(gca,'type','text'); %delete(b(2));
+        c=findall(gca,'type','scatter');
+        set(c(1),'markerfacecolor',[255,153,51]./256);
+        set(c(2),'markerfacecolor',[255,178,102]./256);
         detection_example3_ax = get(gcf, 'children');
         detection_example4= open('detection example - ongoing NB+, trace 3.fig');    
-        a=findall(gca,'type','line'); delete(a(1));
-        b=findall(gca,'type','text'); delete(b(1));
+        a=findall(gca,'type','line'); delete(a(1:2));
+        b=findall(gca,'type','text'); delete(b(1:2));
+        c=findall(gca,'type','scatter');
+       set(c(1),'markerfacecolor',[255,153,51]./256);
+        set(c(2),'markerfacecolor',[255,178,102]./256);
         detection_example4_ax = get(gcf, 'children');
     case 2
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Spontaneous\detection f80'
@@ -48,6 +60,10 @@ switch exp_type
     case 2
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Spontaneous'
 end
+
+eventoverlay = open('f46_events overlay.fig');    
+eventoverlay_ax = get(gcf, 'children');
+
 spont_event_freq = open('Spontaneous event frequency.fig');    
 spont_event_freq_ax = get(gcf, 'children');
 
@@ -83,18 +99,20 @@ set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
  
 %% Positions:
 
-spont_Vm_hist_pos(1,:)=[0.1, 0.75, 0.4, 0.2];
-h_dist1=spont_Vm_hist_pos(1,1)+spont_Vm_hist_pos(1,3)+0.2;
-spont_Vm_5prcentile_pos(1,:) = [h_dist1 , spont_Vm_hist_pos(1,2)-0.02 ,  0.2 ,  spont_Vm_hist_pos(1,4)];
+spont_Vm_hist_pos(1,:)=[0.1, 0.72, 0.4, 0.2];
+h_dist1=spont_Vm_hist_pos(1,1)+spont_Vm_hist_pos(1,3)+0.14;
+spont_Vm_5prcentile_pos(1,:) = [h_dist1 , spont_Vm_hist_pos(1,2) ,  0.1 ,  0.15];
+spont_Rin_pos(1,:) = [h_dist1+spont_Vm_5prcentile_pos(1,3)+0.1, spont_Vm_5prcentile_pos(1,2) ,  spont_Vm_5prcentile_pos(1,3) ,  spont_Vm_5prcentile_pos(1,4)];
 
-detection_example1_pos(1,:) = [spont_Vm_hist_pos(1,1) , 0.5 , 0.4 , 0.05]; detection_example1_pos(1,2)=spont_Vm_hist_pos(1,2)-spont_Vm_hist_pos(1,4)-0.02;
-detection_example2_pos(1,:) = [detection_example1_pos(1,1) , 0.5 , detection_example1_pos(1,3) , detection_example1_pos(1,4)]; detection_example2_pos(1,2)=detection_example1_pos(1,2)-detection_example1_pos(1,4)-0.02;
-detection_example3_pos(1,:) = [detection_example1_pos(1,1) , 0.5 , detection_example1_pos(1,3) , detection_example1_pos(1,4)]; detection_example3_pos(1,2)=detection_example2_pos(1,2)-detection_example2_pos(1,4)-0.02;
-detection_example4_pos(1,:) = [detection_example1_pos(1,1) , 0.5 , detection_example1_pos(1,3) , detection_example1_pos(1,4)]; detection_example4_pos(1,2)=detection_example3_pos(1,2)-detection_example3_pos(1,4)-0.02;
+detection_example1_pos(1,:) = [0.05 , 0.5 , 0.45 , 0.22]; detection_example1_pos(1,2)=spont_Vm_hist_pos(1,2)-spont_Vm_hist_pos(1,4)-0.1;
+hdist3=detection_example1_pos(1,1)+detection_example1_pos(1,3)+0.05;
+detection_example2_pos(1,:) = [hdist3 , detection_example1_pos(1,2) , detection_example1_pos(1,3) , detection_example1_pos(1,4)]; %detection_example2_pos(1,2)=detection_example1_pos(1,2)-detection_example1_pos(1,4)+0.05;
+detection_example3_pos(1,:) = [detection_example1_pos(1,1) , 0.5 , detection_example1_pos(1,3) , detection_example1_pos(1,4)]; detection_example3_pos(1,2)=detection_example1_pos(1,2)-detection_example3_pos(1,4)+0.1;
+detection_example4_pos(1,:) = [hdist3 , detection_example3_pos(1,2) , detection_example1_pos(1,3) , detection_example1_pos(1,4)]; %detection_example4_pos(1,2)=detection_example3_pos(1,2)-detection_example3_pos(1,4)+0.05;
 
-spont_Rin_pos(1,:) = [spont_Vm_hist_pos(1,1), detection_example4_pos(1,2)-spont_Vm_5prcentile_pos(1,4)-0.07 ,  spont_Vm_5prcentile_pos(1,3) ,  spont_Vm_5prcentile_pos(1,4)];
-h_dist2=spont_Rin_pos(1,1)+spont_Rin_pos(1,3)+0.1;
-spont_event_freq_pos(1,:) =[h_dist2,spont_Rin_pos(1,2),spont_Rin_pos(1,3),spont_Rin_pos(1,4)];
+eventoverlay_pos(1,:) = [spont_Vm_hist_pos(1,1), 0.02 ,  0.3 ,  0.3];
+h_dist2=eventoverlay_pos(1,1)+eventoverlay_pos(1,3)+0.15;
+spont_event_freq_pos(1,:) =[h_dist2,0.05, spont_Vm_5prcentile_pos(1,3),spont_Vm_5prcentile_pos(1,4)];
 spont_event_amp_pos(1,:)=[h_dist2+spont_event_freq_pos(1,3)+0.1,spont_event_freq_pos(1,2),spont_event_freq_pos(1,3),spont_event_freq_pos(1,4)];
 %top positions:
 spont_Vm_hist_pos_top = spont_Vm_hist_pos(1,2)+spont_Vm_hist_pos(1,4);
@@ -102,6 +120,12 @@ spont_Vm_5prcentile_pos_top = spont_Vm_5prcentile_pos(1,2)+spont_Vm_5prcentile_p
 spont_event_freq_pos_top = spont_event_freq_pos(1,2)+spont_event_freq_pos(1,4);
 spont_event_amp_pos_top = spont_event_amp_pos(1,2)+spont_event_amp_pos(1,4);
 spont_Rin_pos_top = spont_Rin_pos(1,2)+spont_Rin_pos(1,4);
+detection_example1_pos_top = detection_example1_pos(1,2)+detection_example1_pos(1,4);
+detection_example2_pos_top = detection_example2_pos(1,2)+detection_example2_pos(1,4);
+detection_example3_pos_top = detection_example3_pos(1,2)+detection_example3_pos(1,4);
+detection_example4_pos_top = detection_example4_pos(1,2)+detection_example4_pos(1,4);
+eventoverlay_pos_top = eventoverlay_pos(1,2)+eventoverlay_pos(1,4);
+
 % spont_event_halfwidth_pos_top = spont_event_halfwidth_pos(1,2)+spont_event_halfwidth_pos(1,4);
 % spont_event_risetime_pos_top = spont_event_risetime_pos(1,2)+spont_event_risetime_pos(1,4);
 
@@ -135,6 +159,9 @@ set(detection_example4_ax_copy,'position',detection_example4_pos(1,:))
 
 set(findall(gcf,'type','scatter'),'sizedata',20);
 
+eventoverlay_ax_copy = copyobj(eventoverlay_ax,F); % copy axes to new fig
+set(eventoverlay_ax_copy,'position',eventoverlay_pos(1,:))
+
 spont_event_freq_ax_copy = copyobj(spont_event_freq_ax,F); % copy axes to new fig
 set(spont_event_freq_ax_copy,'position',spont_event_freq_pos(1,:))
 set(F, 'currentaxes', spont_event_freq_ax_copy);  xl=xlabel('');  tl=title('');
@@ -167,20 +194,36 @@ spont_Rin_ax_copy.FontSize=12;
 % yl=ylabel('Rise-time [mS]');
 % spont_event_risetime_ax_copy.FontSize=12;
 
- a_pos1=[-0.06 0.02 0.04 0.04];
+ a_pos1=[-0.06 0 0.04 0.04];
  annotation('textbox', [spont_Vm_hist_pos(1,1),spont_Vm_hist_pos_top+0.03 0.4 0.05],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Spontaneous activity', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
-
- annotation('textbox', [spont_Vm_hist_pos(1,1),spont_Vm_hist_pos_top 0 0]+a_pos1,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
-annotation('textbox', [spont_Vm_5prcentile_pos(1,1),spont_Vm_5prcentile_pos_top 0 0]+a_pos1,...
+annotation('textbox', [detection_example1_pos(1,1)+0.09,detection_example1_pos_top-0.05, 0.1 0.05],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'NB-', 'FontName','arial', 'fontsize', 12, 'color','b');
+ annotation('textbox', [detection_example2_pos(1,1)+0.09,detection_example1_pos_top-0.05, 0.1 0.05],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'NB+', 'FontName','arial', 'fontsize', 12, 'color','b');
+ 
+an1pos=[spont_Vm_hist_pos(1,1),spont_Vm_hist_pos_top 0.04 0.04]+[-0.06, 0, 0, 0];
+annotation('textbox',an1pos ,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold');
+annotation('textbox', [spont_Vm_5prcentile_pos(1,1)-0.06, an1pos(1,2) 0.04 0.04],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- annotation('textbox', [spont_event_freq_pos(1,1) spont_event_freq_pos_top 0 0]+a_pos1,...
+annotation('textbox', [spont_Rin_pos(1,1)-0.06, an1pos(1,2) 0.04 0.04],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- annotation('textbox', [spont_event_amp_pos(1,1) spont_event_amp_pos_top 0 0]+a_pos1,...
+ annotation('textbox', [ an1pos(1,1), detection_example1_pos_top-0.04 0.04 0.04],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- annotation('textbox', [spont_Rin_pos(1,1) spont_Rin_pos_top 0 0]+a_pos1,...
+ annotation('textbox', [detection_example2_pos(1,1)-0.03 detection_example1_pos_top-0.04 0.04 0.04],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+  annotation('textbox', [ an1pos(1,1), detection_example3_pos_top-0.12 0.04 0.04],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+ annotation('textbox', [detection_example4_pos(1,1)-0.03 detection_example3_pos_top-0.12 0.04 0.04],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'G', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+ annotation('textbox', [an1pos(1,1), spont_event_freq_pos_top+0.02 0.04 0.04],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'H', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+ annotation('textbox', [spont_event_freq_pos(1,1)-0.06 spont_event_freq_pos_top+0.02 0.04 0.04],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'I', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+ annotation('textbox', [spont_event_amp_pos(1,1)-0.06 spont_event_amp_pos_top+0.02 0.04 0.04],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'J', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+ 
 %  annotation('textbox', [spont_event_halfwidth_pos(1,1) spont_event_halfwidth_pos_top 0 0]+a_pos1,...
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 %   annotation('textbox', [spont_event_risetime_pos(1,1) spont_event_risetime_pos_top 0 0]+a_pos1,...

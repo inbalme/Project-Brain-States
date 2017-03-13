@@ -2,12 +2,12 @@
 clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
-exp_type=2; %1-NBES, 2-ChAT
+exp_type=1; %1-NBES, 2-ChAT
 trace_type_input=1; %
 analyze_time_before_train=0;
 analyze_train_only_flag=1;
 save_flag= 1;
-print_flag=1;
+print_flag=0;
 norm_flag=0;
 clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 BP50HzLFP_flag=0; %removing 50Hz noise from LFP signal
@@ -214,41 +214,44 @@ clear color_table
 
    %% plotting overlayed PSPs
 % 
-%      for t=1:2
-%          row_counter=1;
-%            for tr=1:size(current_data,2)      
-%                for event=1:length(event_ampPos{t,tr})
-%                    Events_forplot{t}(row_counter,:)=current_data(event_ampPos{t,tr}(event)-200:event_ampPos{t,tr}(event)+299,tr)-mean(current_data(event_ampPos{t,tr}(event)-200:event_ampPos{t,tr}(event)+299,tr));
-%                    row_counter=row_counter+1;
-%                end
-%            end
-%        eventnum(1,t)=row_counter-1;
-%      end
-%    if exp_type==1
-%        trace_color=[[255 102 102]./256,0.4];
-%    else if exp_type==2;
-%         trace_color=[[102 102 255]./256,0.3];   
-%        end
-%    end
-%    fg1=figure;
-%         hold on
-%               l1=plot([dt:dt:(size(Events_forplot{1}(:,:),2)).*dt],Events_forplot{1}(1:min(eventnum),:)','color',[0 0 0 0.3],'linewidth',1);
-%               l2=plot([dt:dt:(size(Events_forplot{1}(:,:),2)).*dt],Events_forplot{2}(1:min(eventnum),:)','color',trace_color,'linewidth',1);
-%               l3=plot([dt:dt:(size(Events_forplot{1}(:,:),2)).*dt],mean(Events_forplot{1}',2),'color',color_table(1,:),'linewidth',2);
-%               l4=plot([dt:dt:(size(Events_forplot{1}(:,:),2)).*dt],mean(Events_forplot{2}',2),'color',color_table(2,:),'linewidth',2);
-%           hold off
-% % %plotting scale bar
-% horiz_vert=1;        lengthh=0.01;     textit=[num2str(lengthh.*1000), ' mS'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
-%         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
-%  horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=12;perc1=[]; perc2=[];
-%         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
-% set(gca, 'visible', 'off') ;
-% if save_flag==1;
-%     cd(path_output)
-%     filename1=['f' num2str(files_to_analyze(fileind)) '_events overlay'];    
-%         saveas(fg1,filename1,'fig') 
-%         print(fg1,filename1,'-dpng','-r600','-opengl') 
-% end
+     for t=1:2
+         row_counter=1;
+           for tr=1:size(current_data,2)      
+               for event=1:length(event_ampPos{t,tr})
+                   Events_forplot{t}(row_counter,:)=current_data(event_ampPos{t,tr}(event)-200:event_ampPos{t,tr}(event)+299,tr)-mean(current_data(event_ampPos{t,tr}(event)-200:event_ampPos{t,tr}(event)+299,tr));
+                   row_counter=row_counter+1;
+               end
+           end
+       eventnum(1,t)=row_counter-1;
+     end
+     if min(eventnum)>40;
+         eventnum(:)=40;
+     end
+   if exp_type==1
+       trace_color=[[255 102 102]./256,0.4];
+   else if exp_type==2;
+        trace_color=[[102 102 255]./256,0.3];   
+       end
+   end
+   fg1=figure;
+        hold on
+              l1=plot([dt:dt:(size(Events_forplot{1}(:,:),2)).*dt],Events_forplot{1}(1:min(eventnum),:)','color',[0 0 0 0.3],'linewidth',1);
+              l2=plot([dt:dt:(size(Events_forplot{1}(:,:),2)).*dt],Events_forplot{2}(1:min(eventnum),:)','color',trace_color,'linewidth',1);
+              l3=plot([dt:dt:(size(Events_forplot{1}(:,:),2)).*dt],mean(Events_forplot{1}',2),'color',color_table(1,:),'linewidth',2);
+              l4=plot([dt:dt:(size(Events_forplot{1}(:,:),2)).*dt],mean(Events_forplot{2}',2),'color',color_table(2,:),'linewidth',2);
+          hold off
+% %plotting scale bar
+horiz_vert=1;        lengthh=0.01;     textit=[num2str(lengthh.*1000), ' mS'];     c=[0,0,0];  fonsizes=12; perc1=-0.06; perc2=[];
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+ horiz_vert=0;        lengthh=2;     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=12;perc1=0.07; perc2=0.05;
+        [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+set(gca, 'visible', 'off') ;
+if save_flag==1;
+    cd(path_output)
+    filename1=['f' num2str(files_to_analyze(fileind)) '_events overlay'];    
+        saveas(fg1,filename1,'fig') 
+        print(fg1,filename1,'-dpng','-r600','-opengl') 
+end
 
    %%
         %organizing the data in structure:  
