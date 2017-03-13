@@ -22,21 +22,21 @@ switch exp_type
     case 1
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Spontaneous\detection f46'
         detection_example1= open('detection example - ongoing NB-, trace 5.fig');    
-        a=findall(gca,'type','line'); delete(a(2));
-        b=findall(gca,'type','text'); delete(b(2));
+        a=findall(gca,'type','line'); delete(a(1:2));
+        b=findall(gca,'type','text'); delete(b(12));
         detection_example1_ax = get(gcf, 'children');
         detection_example2= open('detection example - ongoing NB+, trace 3.fig'); 
-        a=findall(gca,'type','line'); delete(a(1:2));
-        b=findall(gca,'type','text'); delete(b(1:2));
+        a=findall(gca,'type','line'); delete(a(1));
+        b=findall(gca,'type','text'); delete(b(1));
         detection_example2_ax = get(gcf, 'children');
          cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Spontaneous\detection f16'
         detection_example3= open('detection example - ongoing NB-, trace 6.fig');    
-        a=findall(gca,'type','line'); %delete(a(2));
-        b=findall(gca,'type','text'); %delete(b(2));
+        a=findall(gca,'type','line'); delete(a(2));
+        b=findall(gca,'type','text'); delete(b(2));
         detection_example3_ax = get(gcf, 'children');
         detection_example4= open('detection example - ongoing NB+, trace 3.fig');    
-        a=findall(gca,'type','line'); delete(a(1:2));
-        b=findall(gca,'type','text'); delete(b(1:2));
+        a=findall(gca,'type','line'); delete(a(1));
+        b=findall(gca,'type','text'); delete(b(1));
         detection_example4_ax = get(gcf, 'children');
     case 2
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Spontaneous\detection f80'
@@ -87,10 +87,10 @@ spont_Vm_hist_pos(1,:)=[0.1, 0.75, 0.4, 0.2];
 h_dist1=spont_Vm_hist_pos(1,1)+spont_Vm_hist_pos(1,3)+0.2;
 spont_Vm_5prcentile_pos(1,:) = [h_dist1 , spont_Vm_hist_pos(1,2)-0.02 ,  0.2 ,  spont_Vm_hist_pos(1,4)];
 
-detection_example1_pos(1,:) = [spont_Vm_hist_pos(1,1) , 0.5 , 0.4 , 0.1]; detection_example1_pos(1,2)=spont_Vm_hist_pos(1,2)-spont_Vm_hist_pos(1,4)-0.02;
-detection_example2_pos(1,:) = [detection_example1_pos(1,1) , 0.5 , detection_example1_pos(1,3) , detection_example1_pos(1,4)]; detection_example2_pos(1,2)=detection_example1_pos(1,2)-detection_example1_pos(1,4)+0.05;
-detection_example3_pos(1,:) = [detection_example1_pos(1,1) , 0.5 , detection_example1_pos(1,3) , detection_example1_pos(1,4)]; detection_example3_pos(1,2)=detection_example2_pos(1,2)-detection_example2_pos(1,4)+0.05;
-detection_example4_pos(1,:) = [detection_example1_pos(1,1) , 0.5 , detection_example1_pos(1,3) , detection_example1_pos(1,4)]; detection_example4_pos(1,2)=detection_example3_pos(1,2)-detection_example3_pos(1,4)+0.05;
+detection_example1_pos(1,:) = [spont_Vm_hist_pos(1,1) , 0.5 , 0.4 , 0.05]; detection_example1_pos(1,2)=spont_Vm_hist_pos(1,2)-spont_Vm_hist_pos(1,4)-0.02;
+detection_example2_pos(1,:) = [detection_example1_pos(1,1) , 0.5 , detection_example1_pos(1,3) , detection_example1_pos(1,4)]; detection_example2_pos(1,2)=detection_example1_pos(1,2)-detection_example1_pos(1,4)-0.02;
+detection_example3_pos(1,:) = [detection_example1_pos(1,1) , 0.5 , detection_example1_pos(1,3) , detection_example1_pos(1,4)]; detection_example3_pos(1,2)=detection_example2_pos(1,2)-detection_example2_pos(1,4)-0.02;
+detection_example4_pos(1,:) = [detection_example1_pos(1,1) , 0.5 , detection_example1_pos(1,3) , detection_example1_pos(1,4)]; detection_example4_pos(1,2)=detection_example3_pos(1,2)-detection_example3_pos(1,4)-0.02;
 
 spont_Rin_pos(1,:) = [spont_Vm_hist_pos(1,1), detection_example4_pos(1,2)-spont_Vm_5prcentile_pos(1,4)-0.07 ,  spont_Vm_5prcentile_pos(1,3) ,  spont_Vm_5prcentile_pos(1,4)];
 h_dist2=spont_Rin_pos(1,1)+spont_Rin_pos(1,3)+0.1;
