@@ -9,12 +9,9 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP_50Hz+BP0.1
 % [0 0 0; [30,75,14]/256; [136 137 138]/256; [112,172,90]/256; [216 22 22]/256; [255 153 153]/256];
 color1=[30,75,14]/256;
 color2=[112,172,90]/256;
-% color3=[255,153,16]./256; %orange
-% color4=[255,178,102]./256; %light orange
-color3=[102,51,0]./256; %brown; 204 102
-% color4=[153,0,0]./256; %brown-red
-% color3=[153, 76,0]./256; %brown
-color4=[204, 102,0]./256; %light brown
+color3=[255,153,16]./256; %orange
+color4=[255,178,102]./256; %light orange
+% color4=[102,51,0]./256; %brown
 
 %spontaneous:
 spont_trace_Off_f46 = open('Vm-LFP_spont_stim1_Off_f46_t2  3  4.fig');    
@@ -251,9 +248,9 @@ annotation('textbox', [spont_trace_Off_f46_pos(1,1) spont_trace_Off_f46_pos_top 
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'J', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 
  annotation('textbox', [spont_trace_Off_f46_pos(1,1) spont_trace_Off_f46_pos_top 0 0]+[0 -0.01 0.1 0.04],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'NB-', 'FontName','arial', 'fontsize', 12, 'color', [0 0 0])
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'NB-', 'FontName','arial', 'fontsize', 12, 'color', [0 0 153]/256)
  annotation('textbox', [spont_trace_On_f46_pos(1,1) spont_trace_On_f46_pos_top 0 0]+[0 -0.01 0.1 0.04],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'NB+', 'FontName','arial', 'fontsize', 12, 'color', [0 0 0])
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'NB+', 'FontName','arial', 'fontsize', 12, 'color', [0 0 153]/256)
 %  
 %  annotation('textbox', [cc_paired_plot_pos(1,1) cc_paired_plot_pos_top 0 0]+[0.02 0.0 0.2 0.04],...
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Noise Correlations', 'FontName','arial', 'fontsize', 12,'color', [0 0 153]/256)

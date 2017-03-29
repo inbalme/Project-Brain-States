@@ -62,7 +62,7 @@ set(gcf,'color','w');
 set(gcf,'DefaultAxesFontSize',18);
 set(gcf,'DefaultAxesFontName','arial');
 set(gcf, 'PaperType', 'A4');
-set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 31 27]); %[left, bottom, width, height] 
+set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 30 29]); %[left, bottom, width, height] 
 set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 % annotation('textbox', [freq_1_zoom1_pos(1,1) freq_1_zoom1_pos_top 0 0]+[-0.06 0.01 0.04 0.04],...

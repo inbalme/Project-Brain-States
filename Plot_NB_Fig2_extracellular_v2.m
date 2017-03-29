@@ -63,24 +63,24 @@ evoked_trace_On_f33_pos(2,:) = [h_dist , spont_trace_On_f33_pos(2,2) ,  evoked_t
 evoked_trace_On_f33_pos_top = evoked_trace_On_f33_pos(1,2)+evoked_trace_On_f33_pos(1,4);
 
 %population parameters:
-h_dist=evoked_trace_Off_f23_pos(1,1)+evoked_trace_Off_f23_pos(1,3)+ 0.14;
+h_dist=evoked_trace_Off_f23_pos(1,1)+evoked_trace_Off_f23_pos(1,3)+ 0.12;
 vert_dim=0.18;
 %SNR Index
 SNR = open('SNR.fig');    
 SNR_ax = get(gcf, 'children');
-SNR_pos(1,:) = [h_dist , evoked_trace_On_f33_pos(2,2)+0.02, 0.12 , vert_dim];
+SNR_pos(1,:) = [h_dist , evoked_trace_On_f33_pos(2,2)+0.02, 0.13 , vert_dim];
 SNR_pos_top = SNR_pos(1,2)+SNR_pos(1,4);
 
 % Modulation Index
 Modulation_index = open('Modulation index.fig');    
 Modulation_index_ax = get(gcf, 'children');
-Modulation_index_pos(1,:) = [h_dist , SNR_pos(1,2)+vert_dim+0.08 , 0.12 , vert_dim];
+Modulation_index_pos(1,:) = [h_dist , SNR_pos(1,2)+vert_dim+0.08 , 0.13 , vert_dim];
 Modulation_index_pos_top = Modulation_index_pos(1,2)+Modulation_index_pos(1,4);
 
 %Response Modulation
 Response_modulation = open('Response_modulation.fig');    
 Response_modulation_ax = get(gcf, 'children');
-Response_modulation_pos(1,:) = [h_dist , Modulation_index_pos(1,2)+vert_dim+0.1 , 0.12 , vert_dim];
+Response_modulation_pos(1,:) = [h_dist , Modulation_index_pos(1,2)+vert_dim+0.1 , 0.13 , vert_dim];
 Response_modulation_pos_top = Response_modulation_pos(1,2)+Response_modulation_pos(1,4);
 
 %open a new figure:
@@ -89,7 +89,7 @@ set(gcf,'color','w');
 set(gcf,'DefaultAxesFontSize',18);
 set(gcf,'DefaultAxesFontName','arial');
 set(gcf, 'PaperType', 'A4');
-set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 29 29.7]); %[left, bottom, width, height] 
+set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 18 25]); %[left, bottom, width, height] 
 set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 %% xlimits, y limits, ticks etc.
@@ -128,7 +128,7 @@ y4ticks(1,:) = [0 15 30];  y4ticks(2,:) = [0 20 40];
             y6ticks = [-0.5 0 0.5];
             %%
 %Placing plots in the figure:
-ax_fontsize=14;
+ax_fontsize=12;
 %Cell 23 - spont
 spont_trace_Off_f23_ax_copy = copyobj(spont_trace_Off_f23_ax,F); % copy axes to new fig
 set(spont_trace_Off_f23_ax_copy(2),'position',spont_trace_Off_f23_pos(1,:),...

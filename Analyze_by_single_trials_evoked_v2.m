@@ -2,7 +2,7 @@
 clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
-exp_type=1; %1-NBES, 2-ChAT, 3-NBES VC
+exp_type=2; %1-NBES, 2-ChAT, 3-NBES VC
 trace_type_input=2; %
 analyze_time_before_train=0.1;
 analyze_train_only_flag=0;
@@ -1323,7 +1323,8 @@ end
         title(['Mean Response Amplitude, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);     
         %%
         data_vec=[];
-        nbin=20;
+        nbin=30;
+        stimz=size(amplitude_m_mat{2}(:,:),2);
         for stim=1:stimz
            data_vec=[data_vec,event_evoked_stat.stim_num(stim).change_amplitude_m'];
         end
@@ -1331,14 +1332,22 @@ end
             hold on
             [ncounts,nbins]=hist(data_vec,nbin);
 %             ncounts(2,:)=ncounts(2,:)./length(data_vec(:,2));
-            b1=bar(nbins,ncounts);
+            b1=bar(nbins,ncounts./sum(ncounts),'FaceColor',[51,102,0]./256);
             
-%             obj = gmdistribution.fit(data_vec(:,1),2);
-%             set(h2,'FaceColor',[0 0 1],'EdgeColor','w')
+          obj=gmdistribution.fit(data_vec',1);
+%             set(b1,'FaceColor',[0 0 1],'EdgeColor','w')
 %             set(h1,'FaceColor',[0 0 0],'EdgeColor','w','faceAlpha', 0.3)
             ylim1=get(gca,'ylim');
+            xlabel('Norm. Amp. Difference');
+            ylabel('Probability');
+            title('Normalized amplitude change for all train stim. pooled');
        hold off
-      %%  amplitude std
+       if save_flag==1;
+            cd(path_output)
+            saveas(Fig1,'Amp_Diff_Hist','fig') 
+            print(Fig1,'Amp_Diff_Hist','-dpng','-r600','-opengl')
+       end
+       %%  amplitude std
       h6=figure; 
       stimz=size(amplitude_std_mat{2}(:,:),2);
 for stim=1:stimz

@@ -16,6 +16,7 @@ cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Vm Histograms and Powerspec\Powersp
 PSD_depth1 = open('f74_Vm_power_spectrum.fig');   
 PSD_depth1_ax = get(gcf, 'children');
 
+cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Vm Histograms and Powerspec\Powerspec Vm\Not Normalized';
 %normalized power
 total_power = open('Total_Power.fig');
 total_power_ax = get(gcf, 'children');
@@ -42,20 +43,20 @@ set(gcf,'color','w');
 set(gcf,'DefaultAxesFontSize',18);
 set(gcf,'DefaultAxesFontName','arial');
 set(gcf, 'PaperType', 'A4');
-set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 27 14]); %[left, bottom, width, height] 
+set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 20 14]); %[left, bottom, width, height] 
 set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 
 
 %% Positions:
 dist1=0.09;
-dist2=0.07;
+dist2=0.08;
 traces_depth1_pos(1,:) = [0.05 , 0.5 , 0.6 , 0.35];
 h_dist1=traces_depth1_pos(1,1)+traces_depth1_pos(1,3)+dist1;
 PSD_depth1_pos(1,:) = [h_dist1 , traces_depth1_pos(1,2)+0.04 ,  1-(2*traces_depth1_pos(1,1)+traces_depth1_pos(1,3)+dist1) ,  traces_depth1_pos(1,4)-0.04];
 
-total_power_pos(1,:) = [0.1 , 0.5 , 0.12 , 0.22]; total_power_pos(1,2)=traces_depth1_pos(1,2)-total_power_pos(1,4)-0.18;
-delta_pos(1,:) = [total_power_pos(1,1)+total_power_pos(1,3)+dist2+0.05 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
+total_power_pos(1,:) = [0.14 , 0.5 , 0.12 , 0.22]; total_power_pos(1,2)=traces_depth1_pos(1,2)-total_power_pos(1,4)-0.18;
+delta_pos(1,:) = [total_power_pos(1,1)+total_power_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 % theta_pos(1,:) =[delta_pos(1,1)+delta_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 % alpha_pos(1,:) =[theta_pos(1,1)+theta_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 % beta_pos(1,:) = [alpha_pos(1,1)+alpha_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
@@ -99,8 +100,8 @@ delta_ax_copy = copyobj(delta_ax,F); % copy axes to new fig
 set(delta_ax_copy,'position',delta_pos(1,:))
 delta_ax_copy.FontSize=ax_fontsize;
 set(F, 'currentaxes', delta_ax_copy); 
- tl=title({'1-10 Hz'; ''},'fontweight','normal','fontsize',12);
-yl=ylabel('Normalized PSD');
+ tl=title({'1-10 Hz'; ''},'fontweight','normal','fontsize',12); yl=ylabel(''); 
+% yl=ylabel('PSD [mV^2/Hz]');
 
 % theta_ax_copy = copyobj(theta_ax,F); % copy axes to new fig
 % set(theta_ax_copy,'position',theta_pos(1,:))
@@ -133,27 +134,27 @@ yl=ylabel('');  tl=title({'30-50 Hz'; ''},'fontweight','normal','fontsize',12);
 annotation('textbox', [traces_depth1_pos(1,1) traces_depth1_pos_top 0 0]+[0.17 0.07 0.5 0.05],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Barrel cortex Vm traces', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
 %  
- a_pos1=[0 -0.01 0.04 0.04];
+ a_pos1=[0 0 0.04 0.04];
  a_pos2=[-0.06 0 0.04 0.04];
- a_pos3=[0.3*traces_depth1_pos(1,3), 0.01, 0.5, 0.05];
+ a_pos3=[-0.03, 0.02, 0.04, 0.04];
 
 annotation('textbox', [traces_depth1_pos(1,1) traces_depth1_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
  annotation('textbox', [PSD_depth1_pos(1,1) traces_depth1_pos_top+a_pos1(1,2) 0 0]+a_pos2,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
-annotation('textbox', [total_power_pos(1,1) total_power_pos_top 0 0]+a_pos1,...
+annotation('textbox', [total_power_pos(1,1) total_power_pos_top 0 0]+a_pos3,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
-annotation('textbox', [delta_pos(1,1) delta_pos_top 0 0]+a_pos1,...
+annotation('textbox', [delta_pos(1,1) total_power_pos_top 0 0]+a_pos3,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')  
- annotation('textbox', [beta_pos(1,1) beta_pos_top 0 0]+a_pos1,...
+ annotation('textbox', [beta_pos(1,1) total_power_pos_top 0 0]+a_pos3,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
-  annotation('textbox', [total_power_pos(1,1) gamma_pos_top 0 0]+a_pos1,...
+  annotation('textbox', [gamma_pos(1,1) total_power_pos_top 0 0]+a_pos3,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
 %% 
 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
 if save_flag==1;
-filename='Fig 3a ChAT Vm traces+PSD_1-100Hz';
+filename='Fig 3a ChAT Vm traces+PSD_1-100Hz_not_normalized';
 saveas(F,filename,'fig'); 
 print(F,filename,'-dpng','-r600','-opengl') 
 print(F, '-depsc2', filename);

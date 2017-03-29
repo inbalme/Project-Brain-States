@@ -50,11 +50,11 @@ set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 %% Positions:
 dist1=0.09;
 dist2=0.05;
-traces_depth1_pos(1,:) = [0.05 , 0.45 , 0.6 , 0.5];
+traces_depth1_pos(1,:) = [0.05 , 0. , 0.6 , 0.35];
 h_dist1=traces_depth1_pos(1,1)+traces_depth1_pos(1,3)+dist1;
-PSD_depth1_pos(1,:) = [h_dist1 , traces_depth1_pos(1,2)+0.1 ,  1-(2*traces_depth1_pos(1,1)+traces_depth1_pos(1,3)+dist1) ,  traces_depth1_pos(1,4)-0.14];
+PSD_depth1_pos(1,:) = [h_dist1 , traces_depth1_pos(1,2)+0.04 ,  1-(2*traces_depth1_pos(1,1)+traces_depth1_pos(1,3)+dist1) ,  traces_depth1_pos(1,4)-0.04];
 
-total_power_pos(1,:) = [0.07 , 0.5 , 0.1 , 0.22]; total_power_pos(1,2)=traces_depth1_pos(1,2)-total_power_pos(1,4)-0.16;
+total_power_pos(1,:) = [0.07 , 0.5 , 0.1 , 0.22]; total_power_pos(1,2)=traces_depth1_pos(1,2)-total_power_pos(1,4)-0.18;
 delta_pos(1,:) = [total_power_pos(1,1)+total_power_pos(1,3)+dist2+0.05 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 theta_pos(1,:) =[delta_pos(1,1)+delta_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 alpha_pos(1,:) =[theta_pos(1,1)+theta_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];

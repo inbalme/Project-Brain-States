@@ -43,7 +43,7 @@ set(gcf,'color','w');
 set(gcf,'DefaultAxesFontSize',18);
 set(gcf,'DefaultAxesFontName','arial');
 set(gcf, 'PaperType', 'A4');
-set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 27 14]); %[left, bottom, width, height] 
+set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 20 14]); %[left, bottom, width, height] 
 set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 
@@ -134,13 +134,13 @@ yl=ylabel('');  tl=title({'30-50 Hz'; ''},'fontweight','normal','fontsize',12);
 annotation('textbox', [traces_depth1_pos(1,1) traces_depth1_pos_top 0 0]+[0.17 0.07 0.5 0.05],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Barrel cortex Vm traces', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
 %  
- a_pos1=[0 -0.01 0.04 0.04];
- a_pos2=[-0.06 0 0.04 0.04];
+ a_pos1=[0 0.02 0.04 0.04];
+ a_pos2=[-0.06 0.02 0.04 0.04];
  a_pos3=[-0.03, 0.02, 0.04, 0.04];
 
 annotation('textbox', [traces_depth1_pos(1,1) traces_depth1_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
- annotation('textbox', [PSD_depth1_pos(1,1) traces_depth1_pos_top+a_pos1(1,2) 0 0]+a_pos2,...
+ annotation('textbox', [PSD_depth1_pos(1,1) traces_depth1_pos_top 0 0]+a_pos2,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 annotation('textbox', [total_power_pos(1,1) total_power_pos_top 0 0]+a_pos3,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 

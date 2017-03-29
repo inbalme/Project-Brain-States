@@ -236,9 +236,9 @@ annotation('textbox', [spont_trace_Off_f80_pos(1,1) spont_trace_Off_f80_pos_top 
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'J', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 
  annotation('textbox', [spont_trace_Off_f80_pos(1,1) spont_trace_Off_f80_pos_top 0 0]+[0 -0.01 0.1 0.04],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Light Off', 'FontName','arial', 'fontsize', 12, 'color', [0 0 153]/256)
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Light Off', 'FontName','arial', 'fontsize', 12, 'color',[0 0 0] ) %[0 0 153]/256
  annotation('textbox', [spont_trace_On_f80_pos(1,1) spont_trace_On_f80_pos_top 0 0]+[0 -0.01 0.1 0.04],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Light On', 'FontName','arial', 'fontsize', 12, 'color', [0 0 153]/256)
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Light On', 'FontName','arial', 'fontsize', 12, 'color', [0 0 0])
 %  
 %  annotation('textbox', [cc_paired_plot_pos(1,1) cc_paired_plot_pos_top 0 0]+[0.02 0.0 0.2 0.04],...
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Noise Correlations', 'FontName','arial', 'fontsize', 12,'color', [0 0 153]/256)

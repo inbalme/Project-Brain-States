@@ -2,13 +2,13 @@
 clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
-exp_type=1; %1-NBES, 2-ChAT, 3-NBES VC
+exp_type=2; %1-NBES, 2-ChAT, 3-NBES VC
 trace_type_input=2; %
 analyze_time_before_train=0.1;
 analyze_train_only_flag=0;
 save_flag= 0;
 print_flag=0;
-paired_plot_flag=1; 
+paired_plot_flag=0; 
 norm_flag=0;
 clamp_flag=3; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 BP50HzLFP_flag=0; %removing 50Hz noise from LFP signal
@@ -24,7 +24,7 @@ switch exp_type
         files_to_analyze =[8,10,12,14,15,16,22,36,37,40,1,44,46,48,52,56,58,62,72,75,82,84];  %[16,22,36,37,40,44,46,48,52,56,58,62,72,75,82,84]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
-        legend_string={'NB+', 'NB-'};  y_ax_label={'Vm'}; y_ax_units={'mV'};   
+        legend_string={'NB-', 'NB+'};  y_ax_label={'Vm'}; y_ax_units={'mV'};   
         path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Evoked';
         if paired_plot_flag==1; 
             path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Evoked paired plots';
@@ -38,7 +38,7 @@ switch exp_type
         files_to_analyze =[74,76,77,80,82,84,87]; %
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
-        legend_string={'Light On', 'Light Off'};  y_ax_label={'Vm'}; y_ax_units={'mV'};   
+        legend_string={'Light Off', 'Light On'};  y_ax_label={'Vm'}; y_ax_units={'mV'};   
         path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Evoked';
          if paired_plot_flag==1; 
              path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Evoked paired plots';
@@ -51,7 +51,7 @@ switch exp_type
         files_to_analyze =[31,38,42,51,69,71,74]; %[31,38,42,51,61,64,67,69,71,74,77];
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
-        legend_string={'NB+', 'NB-'};    y_ax_label={'Im'}; y_ax_units={'pA'};    
+        legend_string={'NB-', 'NB+'};    y_ax_label={'Im'}; y_ax_units={'pA'};    
         path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis_VC\Evoked';   
         if paired_plot_flag==1; 
             path_output='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis_VC\Evoked paired plots';   
@@ -1323,21 +1323,29 @@ end
         title(['Mean Response Amplitude, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);     
         %%
         data_vec=[];
-        nbin=20;
-        for stim=1:stimz
+        nbin=30;
+        stimz=size(amplitude_m_mat{2}(:,:),2);
+        for stim=4; %1:stimz
            data_vec=[data_vec,event_evoked_stat.stim_num(stim).change_amplitude_m'];
         end
          Fig1=figure;
             hold on
             [ncounts,nbins]=hist(data_vec,nbin);
 %             ncounts(2,:)=ncounts(2,:)./length(data_vec(:,2));
-            b1=bar(nbins,ncounts);
+            b1=bar(nbins,ncounts./sum(ncounts),'FaceColor',[51,102,0]./256);
             
-%             obj = gmdistribution.fit(data_vec(:,1),2);
-%             set(h2,'FaceColor',[0 0 1],'EdgeColor','w')
+          obj=gmdistribution.fit(data_vec',1);
+%             set(b1,'FaceColor',[0 0 1],'EdgeColor','w')
 %             set(h1,'FaceColor',[0 0 0],'EdgeColor','w','faceAlpha', 0.3)
             ylim1=get(gca,'ylim');
+            xlabel('Norm. Amp. Difference');
+            ylabel('Probability');
+            title('Normalized amplitude change for all train stim. pooled');
        hold off
+       cd(path_output)
+saveas(Fig1,'Amp_Diff_Hist','fig') 
+print(Fig1,'Amp_Diff_Hist','-dpng','-r600','-opengl')
+      
       %%  amplitude std
       h6=figure; 
       stimz=size(amplitude_std_mat{2}(:,:),2);
@@ -1813,8 +1821,8 @@ end
         ylim_data=[get(gca,'ylim')]';
         my=max(ylim_data)-1;
         for stim=1:stimz
-            if strcmp('n.s.',asterisk_peak10prcntTime{stim,1})==0          
-             text(stim,my,asterisk_peak10prcntTime{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            if strcmp('n.s.',asterisk_peak10prcntTime_std{stim,1})==0          
+             text(stim,my,asterisk_peak10prcntTime_std{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
             end
         end
         hold off
@@ -1917,8 +1925,8 @@ end
         ylim_data=[get(gca,'ylim')]';
         my=max(ylim_data)-1;
         for stim=1:stimz
-            if strcmp('n.s.',asterisk_peak90prcntTime{stim,1})==0          
-             text(stim,my,asterisk_peak90prcntTime{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            if strcmp('n.s.',asterisk_peak90prcntTime_std{stim,1})==0          
+             text(stim,my,asterisk_peak90prcntTime_std{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
             end
         end
         hold off
@@ -2021,8 +2029,8 @@ end
         ylim_data=[get(gca,'ylim')]';
         my=max(ylim_data)-1;
         for stim=1:stimz
-            if strcmp('n.s.',asterisk_peak10to90Time{stim,1})==0          
-             text(stim,my,asterisk_peak10to90Time{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            if strcmp('n.s.',asterisk_peak10to90Time_std{stim,1})==0          
+             text(stim,my,asterisk_peak10to90Time_std{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
             end
         end
         hold off
@@ -2551,7 +2559,7 @@ else if event_evoked_stat.stim_num(stim_num).wilcoxon_p_adapt_amp<0.05 && event_
         end
     end
 end
-my=max(max(event_evoked_stat.stim_num(stim_num).adapt_amp_m))*1.1; 
+my=max(max(event_evoked_stat.stim_num(stim_num).adapt_amp_m))*1; 
 g1=figure;
 hold on
 line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
@@ -2599,10 +2607,17 @@ saveas(h11,'Evoked Half-Width','fig')
 print(h12,'Evoked Half-Width STD','-dpng','-r600','-opengl')
 saveas(h12,'Evoked Half-Width STD','fig') 
 saveas(h13,'Peak 10% Latency','fig') 
-print(h14,'Peak 10% Latency','-dpng','-r600','-opengl')
-saveas(h15,'Peak 10% Latency STD','fig') 
-print(h16,'Peak 10% Latency STD','-dpng','-r600','-opengl')
-
+print(h13,'Peak 10% Latency','-dpng','-r600','-opengl')
+saveas(h14,'Peak 10% Latency STD','fig') 
+print(h14,'Peak 10% Latency STD','-dpng','-r600','-opengl')
+saveas(h15,'Peak 90% Latency','fig') 
+print(h15,'Peak 90% Latency','-dpng','-r600','-opengl')
+saveas(h16,'Peak 90% Latency STD','fig') 
+print(h16,'Peak 90% Latency STD','-dpng','-r600','-opengl')
+saveas(h17,'Rise Time 10-90% Peak','fig') 
+print(h17,'Rise Time 10-90% Peak','-dpng','-r600','-opengl')
+saveas(h18,'Rise Time 10-90% Peak STD','fig') 
+print(h18,'Rise Time 10-90% Peak STD','-dpng','-r600','-opengl')
 
 
 print(g1,'Evoked Adaptation Amplitude Ratio_paired plot','-dpng','-r600','-opengl')
@@ -2610,5 +2625,6 @@ saveas(g1,'Evoked Adaptation Amplitude Ratio_paired_plot','fig')
 
 filename='Evoked activity event detection'; 
 save(filename, 'files_to_analyze', 'event_evoked', 'event_evoked_stat','stat_failures','stat_nonspecific_count','stat_onset',...
-    'stat_onset_std','stat_amp','stat_amp_std','stat_ampVal','stat_onVal','stat_ampDel','stat_ampDel_std','stat_halfWidth','stat_halfWidth_std')
+    'stat_onset_std','stat_amp','stat_amp_std','stat_ampVal','stat_onVal','stat_ampDel','stat_ampDel_std','stat_halfWidth','stat_halfWidth_std',...
+    'stat_peak10prcntTime', 'stat_peak10prcntTime_std', 'stat_peak90prcntTime', 'stat_peak90prcntTime_std','stat_peak10to90Time', 'stat_peak10to90Time_std')
 end

@@ -56,7 +56,7 @@ set(gcf,'color','w');
 set(gcf,'DefaultAxesFontSize',18);
 set(gcf,'DefaultAxesFontName','arial');
 set(gcf, 'PaperType', 'A4');
-set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 27 29]); %[left, bottom, width, height] 
+set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 27 29]); %[left, bottom, width, height] [1.2 1.2 18 20]
 set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 

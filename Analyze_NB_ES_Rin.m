@@ -40,13 +40,13 @@ switch exp_type
         files_to_analyze =[62,72,75,82,84]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
-        legend_string={'NB+', 'NB-'};       
+        legend_string={'NB-', 'NB+'};       
 
     case 2
         files_to_analyze = [74,76,80,82,84,87]; %[78,81,83,79];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
-        legend_string={'Light On', 'Light Off'};
+        legend_string={'Light Off', 'Light On'};
 end
         
 % for fileind=1;
@@ -151,19 +151,19 @@ tmp_X(1,:)=ones(1,size(tmp_Y,2));
 tmp_X(2,:)=2*ones(1,size(tmp_Y,2));
 E = std(tmp_Y');
 if cell_props.R_cell_wilcoxon_p >0.05 
-    asterisk_sp='n.s.';
+    asterisk_sp='n.s.'; a1_fontsize=13;
 else if cell_props.R_cell_wilcoxon_p<0.05 && cell_props.R_cell_wilcoxon_p>0.01
-    asterisk_sp='*';
+    asterisk_sp='*'; a1_fontsize=17;
     else if cell_props.R_cell_wilcoxon_p<0.01 && cell_props.R_cell_wilcoxon_p>0.001
-            asterisk_sp='**';
+            asterisk_sp='**'; a1_fontsize=17;
     else if cell_props.R_cell_wilcoxon_p<0.001
-             asterisk_sp='***';
+             asterisk_sp='***'; a1_fontsize=17;
         end
         end
     end
 end
 linex=[1;2];
-my=max(max(cell_props.R_cell))*1.1-2; 
+my=max(max(tmp_Y)).*1.05; 
 liney=[my ;my ];
 
 g1=figure;
@@ -171,14 +171,14 @@ hold on
 line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(tmp_X(:,1), nanmean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
 % line(linex,liney,'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-text(1.5,my,asterisk_sp,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)
+text(1.5,my,asterisk_sp,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',a1_fontsize)
 hold off
         x1limits = [0.75 2.25];
         x1ticks = [1,2];
         y1limits=get(gca,'ylim');
 %         y1limits = [0 1.1];
 %         y1ticks = [0,0.5,1];
-        set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
+        set( gca, 'xlim', x1limits,'ylim',[0 250], 'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('Rin [MOhm]', 'FontSize', 28,'fontname', 'arial');
         title(['Rin,  p=' num2str(cell_props.R_cell_wilcoxon_p)] ,'FontSize', 20,'fontname', 'arial');   
