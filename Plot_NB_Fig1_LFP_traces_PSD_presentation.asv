@@ -9,23 +9,25 @@ save_flag=1;
 
 %spontaneous:
 % add header 34
-traces_depth1 = open('2016-10-20-001_LFP_traces_h33_t2  3  4  5  6.fig');    
+traces_depth1 = open('20150323-002_LFP_traces_h1_t3  6  7_2500um.fig');    
+% traces_depth1 = open('2016-10-20-001_LFP_traces_h33_t2  3  4  5  6v2.fig');    
 traces_depth1_ax = get(gcf, 'children');
 
-traces_depth2 = open('2016-10-20-001_LFP_traces_h30_t2  3  4  5  6.fig');    
+traces_depth2 = open('20150323-002_LFP_traces_h3_t2  4  8_3500um.fig');    
+% traces_depth2 = open('2016-10-20-001_LFP_traces_h30_t2  3  4  5  6v2.fig');    
 traces_depth2_ax = get(gcf, 'children');
 
-traces_depth3 = open('2016-10-20-001_LFP_traces_h28_t2  3  4  5  6.fig');    
+traces_depth3 = open('2016-10-20-001_LFP_traces_h28_t2  3  4  5  6v2.fig');    
 traces_depth3_ax = get(gcf, 'children');
 
 %evoked
-PSD_depth1 = open('2016-10-20-001_LFP_PSD_1-100Hz_h33.fig');   
+PSD_depth1 = open('2016-10-20-001_LFP_PSD_1-100Hz_h33v2.fig');   
 PSD_depth1_ax = get(gcf, 'children');
 
-PSD_depth2 = open('2016-10-20-001_LFP_PSD_1-100Hz_h30.fig');    
+PSD_depth2 = open('2016-10-20-001_LFP_PSD_1-100Hz_h30v2.fig');    
 PSD_depth2_ax = get(gcf, 'children');
 
-PSD_depth3 = open('2016-10-20-001_LFP_PSD_1-100Hz_h28.fig');    
+PSD_depth3 = open('2016-10-20-001_LFP_PSD_1-100Hz_h28v2.fig');    
 PSD_depth3_ax = get(gcf, 'children');
 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm Histograms and Powerspec\Powerspec LFP\Not Normalized';
@@ -56,7 +58,7 @@ set(gcf,'color','w');
 set(gcf,'DefaultAxesFontSize',18);
 set(gcf,'DefaultAxesFontName','arial');
 set(gcf, 'PaperType', 'A4');
-set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 27 29]); %[left, bottom, width, height] 
+set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 27 29]); %[left, bottom, width, height] [1.2 1.2 18 20]
 set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 
@@ -67,14 +69,14 @@ traces_depth2_pos(1,:) = [0.05 , 0.6 , traces_depth1_pos(1,3) , traces_depth1_po
 traces_depth3_pos(1,:) = [0.05 , traces_depth2_pos(1,2)-traces_depth2_pos(1,4)-0.03 , traces_depth1_pos(1,3) , traces_depth1_pos(1,4)];
 
 dist1=0.12;
-dist2=0.07;
+dist2=0.08;
 h_dist1=traces_depth1_pos(1,1)+traces_depth1_pos(1,3)+dist1;
 PSD_depth1_pos(1,:) = [h_dist1 , traces_depth1_pos(1,2)+0.04 ,  1-(2*traces_depth1_pos(1,1)+traces_depth1_pos(1,3)+dist1) ,  traces_depth1_pos(1,4)-0.04];
 PSD_depth2_pos(1,:) = [h_dist1, traces_depth2_pos(1,2)+0.04 ,  PSD_depth1_pos(1,3) ,  traces_depth2_pos(1,4)-0.04];
 PSD_depth3_pos(1,:) = [h_dist1 , traces_depth3_pos(1,2)+0.04 ,  PSD_depth1_pos(1,3) ,  traces_depth3_pos(1,4)-0.04];
 
-total_power_pos(1,:) = [0.12 , 0.5 , 0.12 , 0.14]; total_power_pos(1,2)=traces_depth3_pos(1,2)-total_power_pos(1,4)-0.06;
-delta_pos(1,:) = [total_power_pos(1,1)+total_power_pos(1,3)+dist2+0.05 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
+total_power_pos(1,:) = [0.14 , 0.5 , 0.12 , 0.14]; total_power_pos(1,2)=traces_depth3_pos(1,2)-total_power_pos(1,4)-0.08;
+delta_pos(1,:) = [total_power_pos(1,1)+total_power_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 % theta_pos(1,:) =[delta_pos(1,1)+delta_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 % alpha_pos(1,:) =[theta_pos(1,1)+theta_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 % beta_pos(1,:) = [alpha_pos(1,1)+alpha_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
@@ -142,8 +144,8 @@ set(delta_ax_copy,'position',delta_pos(1,:))
 delta_ax_copy.FontSize=ax_fontsize;
 set(F, 'currentaxes', delta_ax_copy); 
 %  tl=title({'Delta Power'; ''},'fontweight','normal','fontsize',12);
- tl=title({'1-10 Hz'; ''},'fontweight','normal','fontsize',12);
-yl=ylabel('Normalized PSD');
+ tl=title({'1-10 Hz'; ''},'fontweight','normal','fontsize',12); yl=ylabel('');
+% yl=ylabel('Normalized PSD');
 
 % theta_ax_copy = copyobj(theta_ax,F); % copy axes to new fig
 % set(theta_ax_copy,'position',theta_pos(1,:))
@@ -213,7 +215,7 @@ annotation('textbox', [delta_pos(1,1) total_power_pos_top 0 0]+a_pos4,...
 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
 if save_flag==1;
-filename='Fig 1 LFP traces+PSD_1-100Hz_v3';
+filename='Fig 1 LFP traces+PSD_1-100Hz_v3_not_normalized';
 saveas(F,filename,'fig'); 
 print(F,filename,'-dpng','-r600','-opengl') 
 print(F, '-depsc2', filename);

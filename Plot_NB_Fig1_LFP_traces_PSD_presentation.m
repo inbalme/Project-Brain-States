@@ -9,23 +9,29 @@ save_flag=1;
 
 %spontaneous:
 % add header 34
-traces_depth1 = open('2016-10-20-001_LFP_traces_h33_t2  3  4  5  6.fig');    
+traces_depth1 = open('20150323-002_LFP_traces_h1_t3  6  7_2500um.fig');    
+% traces_depth1 = open('2016-10-20-001_LFP_traces_h33_t2  3  4  5  6v2.fig');    
 traces_depth1_ax = get(gcf, 'children');
 
-traces_depth2 = open('2016-10-20-001_LFP_traces_h30_t2  3  4  5  6.fig');    
+traces_depth2 = open('20150323-002_LFP_traces_h3_t2  4  8_3500um.fig');    
+% traces_depth2 = open('2016-10-20-001_LFP_traces_h30_t2  3  4  5  6v2.fig');    
 traces_depth2_ax = get(gcf, 'children');
 
-traces_depth3 = open('2016-10-20-001_LFP_traces_h28_t2  3  4  5  6.fig');    
+traces_depth3 = open('20150323-002_LFP_traces_h6_t3  6  7_4600um.fig');    
+% traces_depth3 = open('2016-10-20-001_LFP_traces_h28_t2  3  4  5  6v2.fig');    
 traces_depth3_ax = get(gcf, 'children');
 
 %evoked
-PSD_depth1 = open('2016-10-20-001_LFP_PSD_1-100Hz_h33.fig');   
+PSD_depth1 = open('20150323-002_LFP_PSD_1-100Hz_h1_2500um.fig');   
+% PSD_depth1 = open('2016-10-20-001_LFP_PSD_1-100Hz_h33v2.fig');   
 PSD_depth1_ax = get(gcf, 'children');
 
-PSD_depth2 = open('2016-10-20-001_LFP_PSD_1-100Hz_h30.fig');    
+PSD_depth2 = open('20150323-002_LFP_PSD_1-100Hz_h3_3500um.fig');    
+% PSD_depth2 = open('2016-10-20-001_LFP_PSD_1-100Hz_h30v2.fig');    
 PSD_depth2_ax = get(gcf, 'children');
 
-PSD_depth3 = open('2016-10-20-001_LFP_PSD_1-100Hz_h28.fig');    
+PSD_depth3 = open('20150323-002_LFP_PSD_1-100Hz_h6_4600um.fig');    
+% PSD_depth3 = open('2016-10-20-001_LFP_PSD_1-100Hz_h28v2.fig');    
 PSD_depth3_ax = get(gcf, 'children');
 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm Histograms and Powerspec\Powerspec LFP\Not Normalized';
@@ -213,7 +219,7 @@ annotation('textbox', [delta_pos(1,1) total_power_pos_top 0 0]+a_pos4,...
 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
 if save_flag==1;
-filename='Fig 1 LFP traces+PSD_1-100Hz_v3_not_normalized';
+filename='Fig 1 LFP traces+PSD_1-100Hz_v4_not_normalized';
 saveas(F,filename,'fig'); 
 print(F,filename,'-dpng','-r600','-opengl') 
 print(F, '-depsc2', filename);

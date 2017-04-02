@@ -6,7 +6,7 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
 %different ES depth. same LFP location in barrel cortex:
 % load Set2-2015-03-23-002_h1-7 %data1, different depths
 %  load Set2-2015-04-02-001_h3-12 %different depths
-%  load 2016-10-20-001_h2-34 %different depths data1
+ load 2016-10-20-001_h2-34 %different depths data1; [27,28,29,30,31,33,34]
 %Atropine+Mecamylamine:
 % load 2015-12-28-006_h1-6 %data2
 % load 2015-07-29-002_h1-6 %data2 ESdel7sec, trace 15sec
@@ -38,17 +38,17 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
 % load Set2-2015-06-29-001_h3-4
 % load Set2-2015-07-07-001_h2+3
 % load Set2-2015-07-09-001_h1+2
- load 2016-10-24-001_h1-8 
+%  load 2016-10-24-001_h1-8 
 
 
 %%
- orig_header=6; %[27,28,29,30,31,33,34];
- save_flag=0;
+ orig_header=34; %[27,28,29,30,31,33,34];
+ save_flag=1;
  galvano_flag=0;
  ES_del=10;
  dataCh=1;
  gain=10; %20;
- DC_int=1;
+ DC_int=0.5;
  trace_ind = [2,3,4,5,6]; %1:size(plot_data,2);  %trace_ind is the numbers of traces to be plotted
  header=find(headers==orig_header);
  stim2_X=[];
@@ -60,7 +60,7 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
 stim1_X=[ES_del*sf, (ES_del+0.5)*sf];           
 
  start_time=[ES_del-3, ES_del+2];
-duration = 2; %[sec]
+duration = 2.5; %[sec]
 x_value = 1;
  for t=1:length(start_time);
 start_sample(:,t) = start_time(t).*sf;
