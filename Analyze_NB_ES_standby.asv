@@ -6,7 +6,7 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
 %different ES depth. same LFP location in barrel cortex:
 % load Set2-2015-03-23-002_h1-7 %data1, different depths
 %  load Set2-2015-04-02-001_h3-12 %different depths
- load 2016-10-20-001_h2-34 %different depths data1
+%  load 2016-10-20-001_h2-34 %different depths data1; [27,28,29,30,31,33,34]
 %Atropine+Mecamylamine:
 % load 2015-12-28-006_h1-6 %data2
 % load 2015-07-29-002_h1-6 %data2 ESdel7sec, trace 15sec
@@ -41,15 +41,15 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
 %  load 2016-10-24-001_h1-8 
 
 
-%%
- orig_header=27; %[27,28,29,30,31,33,34];
+%% 2015-05-06-001_LFP_traces_h2_t2  3  4  5  7; 2015-07-29-001_LFP_traces_h2_t2  3  4  5  7
+ orig_header=2; %[27,28,29,30,31,33,34] [1,2,3,4,5,6,7];
  save_flag=0;
  galvano_flag=0;
  ES_del=10;
  dataCh=1;
- gain=10; %20;
+ gain=20; %20;
  DC_int=1;
- trace_ind = [2,3,4,5,6]; %1:size(plot_data,2);  %trace_ind is the numbers of traces to be plotted
+ trace_ind = [2,3,4,5,7]; %1:size(plot_data,2);  %trace_ind is the numbers of traces to be plotted [2,3,4,5,6];
  header=find(headers==orig_header);
  stim2_X=[];
  sf = 4000;
@@ -80,16 +80,16 @@ interval(:,t) = start_sample(:,t):end_sample(:,t);
  data_mat=data_mat./gain;
 %bandpass filtering to remove 50Hznoise from LFP channel, and then low pass 200 Hz
 %filtering before and after ES separately because the high frequencies insert artifacts when filtered.
-f1=[-1];
+f1=1; %[-1];
     for trace= 1:size(data_mat,2)    
             jl=data_mat(:,trace);
             data_mat_filt1(1:stim1_X(1)-1,trace)=bandPass_fft_IL_NEW2016(jl(1:stim1_X(1)-1),dt,49,51,1,0); %filtering out 50Hz noise from LFP and Vm           
             data_mat_filt1(stim1_X(1):stim1_X(2),trace)=data_mat(stim1_X(1):stim1_X(2),trace);
             data_mat_filt1(stim1_X(2)+1:length(jl),trace)=bandPass_fft_IL_NEW2016(jl(stim1_X(2)+1:end),dt,49,51,1,0); %filtering out 50Hz noise from LFP and Vm            
             km=data_mat_filt1(:,trace);
-             data_mat_filt2(1:stim1_X(1)-1,trace)=bandPass_fft_IL_NEW2016(km(1:stim1_X(1)-1),dt,f1,300,0,0); %low-pass 300Hz
+             data_mat_filt2(1:stim1_X(1)-1,trace)=bandPass_fft_IL_NEW2016(km(1:stim1_X(1)-1),dt,f1,200,0,0); %low-pass 300Hz
             data_mat_filt2(stim1_X(1):stim1_X(2),trace)=data_mat(stim1_X(1):stim1_X(2),trace);
-            data_mat_filt2(stim1_X(2)+1:length(km),trace)=bandPass_fft_IL_NEW2016(km(stim1_X(2)+1:end),dt,f1,300,0,0); %low-pass 300Hz
+            data_mat_filt2(stim1_X(2)+1:length(km),trace)=bandPass_fft_IL_NEW2016(km(stim1_X(2)+1:end),dt,f1,200,0,0); %low-pass 300Hz
     end
     
  if galvano_flag==1;
@@ -319,13 +319,13 @@ l.FontSize=12;
 if save_flag==1;
     %for different depths:
 % depth=[2500,3000,3500,4000,4300,4600,4100];
-% filename = ['20150506-003_LFP_PSD_h',num2str(orig_header)];
+% % filename = ['20150506-003_LFP_PSD_h',num2str(orig_header)];
 % filename_PSD = ['20150323-002_LFP_PSD_1-100Hz_h',num2str(orig_header),'_',num2str(depth(header)),'um'];
 % filename_traces = ['20150323-002_LFP_traces_h',num2str(orig_header),'_t',num2str(trace_ind),'_',num2str(depth(header)),'um'];
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\LFP depth';
 %for Blockers:
-filename_PSD = ['2016-10-20-001_LFP_PSD_1-100Hz_h',num2str(orig_header)];
-filename_traces = ['2016-10-20-001_LFP_traces_h',num2str(orig_header),'_t',num2str(trace_ind)];
+filename_PSD = [' 2016-10-20-001_LFP_PSD_1-100Hz_h',num2str(orig_header)];
+filename_traces = [' 2016-10-20-001_LFP_traces_h',num2str(orig_header),'_t',num2str(trace_ind)];
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\LFP+Blockers';
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\LFP+Blockers\GABA Blockers';
 

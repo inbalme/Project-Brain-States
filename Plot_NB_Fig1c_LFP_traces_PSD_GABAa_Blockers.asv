@@ -171,6 +171,6 @@ annotation('textbox', [traces_11_pos(1,1) traces_11_pos_top 0 0]+a_pos1,...
 % 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
 filename='Fig 1c LFP traces+PSD_1-100Hz+GABA Blockers_v2';
-saveas(F,filename,'fig'); 
+saveas(F,filenamefig'); 
 print(F,filename,'-dpng','-r600','-opengl') 
 print(F, '-depsc2', filename);
