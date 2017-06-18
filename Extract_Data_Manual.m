@@ -13,7 +13,7 @@ EXPGLOBALS;
 global Exp;
 
 protocol_type = 2; %protocol_type is 1 if each header is a whole protocol and 2 if each header is a single repeat of the protocol or standby
-headers=[1,4,5,6,8]; %headers to extract
+headers=[1:2]; %headers to extract
 switch set
     case 1
         ch_Data1=1;
@@ -205,7 +205,7 @@ end
 
 path='D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
 fname = Exp.namepath.name;
- name = [fname(1:(findstr(fname,'.')-1)) '_h1-8'];
+ name = [fname(1:(findstr(fname,'.')-1)) '_h1-2'];
  cd(path);
  save( name, 'data', 'headers');
 cd(Exp.namepath.path);

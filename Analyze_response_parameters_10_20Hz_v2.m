@@ -15,12 +15,12 @@ clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
  channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
-exp_type=1; %1-NBES, 2-ChAT
+exp_type=2; %1-NBES, 2-ChAT
 trace_type_input=[2]; %for exp_type=2||3 use [1,2], for exp_type=1 use [3,2]
 trace_type=trace_type_input;
 analyze_time_before_train=0;
 analyze_train_only_flag=1;
-save_flag=1;
+save_flag=0;
 print_flag=1;
 norm_flag=0;
 clamp_flag=3; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
@@ -61,7 +61,7 @@ switch exp_type
                 mkdir(path_output);
             end
     case 2
-        files_to_analyze =[74,76,77,80,82,84,87];
+        files_to_analyze = [74,76,77,80,82,84,87,90,92,112,114,115]; %[94,96,98,101,102];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light Off', 'Light On'};  y_ax_label={'Vm'}; y_ax_units={'mV'};    
@@ -773,6 +773,7 @@ end
         [peaks_stat(stim_num).wilcoxon_p_change_F1, peaks_stat(stim_num).wilcoxon_h_change_F1]= signrank(peaks_stat(stim_num).change_F1);
                         
         %peak adaptation amplitude ratio - absolute values + relative change
+        
         peaks_stat(stim_num).adapt_amp=[peak_adapt_amp{1}(:,stim_num),  peak_adapt_amp{2}(:,stim_num)];
 %         if exp_type==1
 %             peaks_stat(stim_num).adapt_amp([1,3,5,6,8,9],:)=[];
@@ -2007,7 +2008,7 @@ text(1,my,asterisk_before,'HorizontalAlignment', 'center','verticalAlignment','m
 text(2,my,asterisk_during,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a2_fontsize)
 % line([2-0.15;2+0.15],[my;my],'color',[0 0 0],'linewidth',1.5,'markersize',10,'markerfacecolor','b')
 if exp_type==2
-    text(3,my,asterisk_after,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',a3_fontsize)
+    text(3,my,asterisk_after,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a3_fontsize)
 else
     text(3,my,asterisk_after,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a3_fontsize)
 end

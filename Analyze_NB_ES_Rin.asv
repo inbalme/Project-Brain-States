@@ -8,7 +8,7 @@ global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data curr
  channel = 1;    % V1 - 1, I1 - 2, V2 - 3, I2 - 4
 exp_type=2; %1-NBES, 2-ChAT
 % trace_type_input=[3,2]; %1:3
-save_flag= 0;
+save_flag= 1;
 print_flag=0;
 norm_flag=0;
 BP50HzLFP_flag=0; %removing 50Hz noise from LFP signal

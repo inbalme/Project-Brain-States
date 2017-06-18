@@ -3,13 +3,16 @@
 close all
 clear all
 ax_fontsize=12;
+no_numbering_flag=1;
+
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\LFP+Blockers\GABA Blockers'
 
 %opening saved figures:
 
 %spontaneous:
 % traces_11 = open('2015-12-31-009_LFP_traces_h2_t2  3  4  8  9.fig');    
-traces_11 = open('2015-12-31-009_LFP_traces_h2_t2  4  6  7  8.fig');    
+% traces_11 = open('2015-12-31-009_LFP_traces_h2_t2  4  6  7  8.fig');   
+traces_11 = open('2015-31-12-002_LFP_traces_h1_t2  3  4  5  7.fig');    
 traces_11_ax = get(gcf, 'children');
 
 % traces_12 = open('2015-12-31-009_LFP_traces_h4_t2  3  4  8  9_packed.fig');    
@@ -23,7 +26,8 @@ traces_12_ax = get(gcf, 'children');
 % traces_22_ax = get(gcf, 'children');
 
 %evoked
-PSD_11 = open('2015-12-31-009_LFP_PSD_1-100Hz_h2.fig');    
+% PSD_11 = open('2015-12-31-009_LFP_PSD_1-100Hz_h2.fig');    
+PSD_11 = open('2015-31-12-002_LFP_PSD_1-100Hz_h1.fig');    
 PSD_11_ax = get(gcf, 'children');
 
 PSD_12 = open('2015-12-31-009_LFP_PSD_1-100Hz_h4.fig');    
@@ -136,7 +140,7 @@ annotation('textbox', [traces_11_pos(1,1) traces_11_pos_top 0 0]+[0.17 0.07 0.8 
  a_pos4=[0.2*traces_11_pos(1,3)-0.06, -0.01, 0.5, 0.05];
  a_pos5=[0.5*traces_11_pos(1,3)-0.035, 0.02, 0.5, 0.05];
 
-
+if no_numbering_flag==0;
 %   annotation('textbox', [traces_11_pos(1,1) traces_11_pos_top 0 0]+a_pos4,...
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Exp#1', 'FontName','arial', 'fontsize', 12,'color', [0 0 153]/256)
  annotation('textbox', [traces_11_pos(1,1) traces_11_pos_top 0 0]+a_pos3,...
@@ -166,11 +170,15 @@ annotation('textbox', [traces_11_pos(1,1) traces_11_pos_top 0 0]+a_pos1,...
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'G', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 %  annotation('textbox', [PSD_22_pos(1,1) PSD_22_pos_top 0 0]+a_pos2,...
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'H', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- 
+end
 %% 
 % 
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
-filename='Fig 1c LFP traces+PSD_1-100Hz+GABA Blockers_v2';
+if no_numbering_flag==1;
+    cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures\No Numbering'
+else
+    cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+end
+filename='Fig 1c LFP traces+PSD_1-100Hz+GABA Blockers_v3';
 saveas(F,filename,'fig'); 
 print(F,filename,'-dpng','-r600','-opengl') 
 print(F, '-depsc2', filename);

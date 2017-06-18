@@ -3,6 +3,7 @@
 close all
 clear all
 save_flag=1;
+no_numbering_flag=1;
 exp_type=1; %1- NBES, 2- ChAT
 %opening saved figures:
 switch exp_type
@@ -205,6 +206,7 @@ annotation('textbox', [detection_example1_pos(1,1)+0.09,detection_example1_pos_t
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'NB+', 'FontName','arial', 'fontsize', 12, 'color',color_text);
  
 an1pos=[spont_Vm_hist_pos(1,1),spont_Vm_hist_pos_top 0.04 0.04]+[-0.06, 0, 0, 0];
+if no_numbering_flag==0;
 annotation('textbox',an1pos ,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold');
 annotation('textbox', [spont_Vm_5prcentile_pos(1,1)-0.06, an1pos(1,2) 0.04 0.04],...
@@ -225,14 +227,17 @@ annotation('textbox', [spont_Rin_pos(1,1)-0.06, an1pos(1,2) 0.04 0.04],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'I', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
  annotation('textbox', [spont_event_amp_pos(1,1)-0.06 spont_event_amp_pos_top+0.02 0.04 0.04],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'J', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- 
+end 
 %  annotation('textbox', [spont_event_halfwidth_pos(1,1) spont_event_halfwidth_pos_top 0 0]+a_pos1,...
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 %   annotation('textbox', [spont_event_risetime_pos(1,1) spont_event_risetime_pos_top 0 0]+a_pos1,...
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'G', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 
-
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+if no_numbering_flag==1;
+    cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures\No Numbering'
+else
+    cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+end
 if save_flag==1
     switch exp_type
         case 1

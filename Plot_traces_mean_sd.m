@@ -4,10 +4,11 @@ clear all
 
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data
  global exp_type
-exp_type=1; %1-NBES, 2-ChAT
-data_type='LFP'; %'LFP', 'Vm'
-save_flag= 0;
+exp_type=2; %1-NBES, 2-ChAT
+data_type='Vm'; %'LFP', 'Vm'
+save_flag= 1;
 print_flag=1;
+choose_traces=[]; %if choose_traces is empty the script takes all traces for analysis. If it is not empty the script takes the specified traces.
 clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 % short_flag=0; %1- short trace, 0- long trace
 baseline_flag=0; %adding dashed line under traces
@@ -19,9 +20,9 @@ BPLFP_flag=1; %filtering LFP. the default filter is the one used to filter LFP i
 bp_manual_LFP=[1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
 bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
-lengthh_vert=[0.1,0.1,0.5]; %[0.1,0.1,0.5];%[1,2,5]; %[1,2,10]; %lengthh_vert(1) is for STD, lengthh_vert(2) is for mean and (3) is for traces
-trace_ind =[2,3,4,5,6];%[2,3,4,5,6]; %if trace_ind is empty, the default would be to take all traces
-DC_factor =1; %12; %sets the spacing between plotted traces. set DC_factor=1 for LFP
+lengthh_vert=[1,2,5]; %[0.1,0.1,0.5];%[1,2,5]; %[1,2,10]; %lengthh_vert(1) is for STD, lengthh_vert(2) is for mean and (3) is for traces
+trace_ind =[]; %[2,3,4,5,6];%[2,3,4,5,6]; %if trace_ind is empty, the default would be to take all traces
+DC_factor =12; %12; %sets the spacing between plotted traces. set DC_factor=1 for LFP
  %% set the path for saving figures and variables
 % if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1 && BPLFP_flag==1
 %     path_output=['LFP_50Hz+BP Vm_ 50Hz+BP\BP',num2str(bp_manual_Vm(1)),'-',num2str(bp_manual_Vm(2))];
@@ -74,7 +75,7 @@ switch exp_type
       end 
 
     case 2
-        files_to_analyze =76; %[74,76,77,80,82,84,87];
+        files_to_analyze =115; %[74,76,77,80,82,84,87,90,92,112,114,115]; [94,96,98,101]
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light Off', 'Light On'};    y_ax_label={'Vm'}; y_ax_units={'mV'}; 
@@ -159,6 +160,12 @@ if exp_type==1 && files_to_analyze(fileind)==16;
 end
 if exp_type==3 && files_to_analyze(fileind)==31;
     current_data_filt(:,2,:)=[];
+end
+
+if ~isempty(choose_traces)
+    temp=current_data_filt;
+    current_data_filt=[];
+    current_data_filt=temp(:,choose_traces,:);
 end
                 %% Subtract mean trace from data with or without spikes
                 meansubtract_start_time = 0; %[sec]

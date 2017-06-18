@@ -5,6 +5,7 @@ clear all
 ax_fontsize=12;
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean\Long Trace Presentation'
 save_flag=1;
+ no_numbering_flag=1;
 %opening saved figures:
 
 %traces:
@@ -133,7 +134,8 @@ annotation('textbox', [traces_depth1_pos(1,1) traces_depth1_pos_top 0 0]+[0.17 0
  a_pos1=[-0.02 0.02 0.04 0.04];
  a_pos2=[-0.06 0.02 0.04 0.04];
  a_pos3=[-0.03, 0.02, 0.04, 0.04];
-
+ 
+  if no_numbering_flag==0;
 annotation('textbox', [traces_depth1_pos(1,1) traces_depth1_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
  annotation('textbox', [PSD_depth1_pos(1,1) traces_depth1_pos_top 0 0]+a_pos2,...
@@ -146,10 +148,13 @@ annotation('textbox', [delta_pos(1,1) total_power_pos_top 0 0]+a_pos3,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
   annotation('textbox', [gamma_pos(1,1) total_power_pos_top 0 0]+a_pos3,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
- 
+  end 
 %% 
-
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+  if no_numbering_flag==1;
+    cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures\No Numbering'
+  else
+    cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+  end
 if save_flag==1;
 filename='Fig 3a NB f46 Vm traces+PSD_1-100Hz_not_normalized';
 saveas(F,filename,'fig'); 

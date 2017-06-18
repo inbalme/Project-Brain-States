@@ -3,13 +3,15 @@
 close all
 clear all
 ax_fontsize=12;
+
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\LFP+Blockers\GABA Blockers'
 
 %opening saved figures:
 
 %spontaneous:
 % traces_11 = open('2015-12-31-009_LFP_traces_h2_t2  3  4  8  9.fig');    
-traces_11 = open('2015-12-31-009_LFP_traces_h2_t2  4  6  7  8.fig');    
+% traces_11 = open('2015-12-31-009_LFP_traces_h2_t2  4  6  7  8.fig');   
+traces_11 = open('2015-31-12-002_LFP_traces_h1_t2  3  4  5  7.fig');    
 traces_11_ax = get(gcf, 'children');
 
 % traces_12 = open('2015-12-31-009_LFP_traces_h4_t2  3  4  8  9_packed.fig');    
@@ -23,7 +25,8 @@ traces_12_ax = get(gcf, 'children');
 % traces_22_ax = get(gcf, 'children');
 
 %evoked
-PSD_11 = open('2015-12-31-009_LFP_PSD_1-100Hz_h2.fig');    
+% PSD_11 = open('2015-12-31-009_LFP_PSD_1-100Hz_h2.fig');    
+PSD_11 = open('2015-31-12-002_LFP_PSD_1-100Hz_h1.fig');    
 PSD_11_ax = get(gcf, 'children');
 
 PSD_12 = open('2015-12-31-009_LFP_PSD_1-100Hz_h4.fig');    
@@ -170,7 +173,7 @@ annotation('textbox', [traces_11_pos(1,1) traces_11_pos_top 0 0]+a_pos1,...
 %% 
 % 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
-filename='Fig 1c LFP traces+PSD_1-100Hz+GABA Blockers_v2';
-saveas(F,filenamefig'); 
+filename='Fig 1c LFP traces+PSD_1-100Hz+GABA Blockers_v3';
+saveas(F,filename,'fig'); 
 print(F,filename,'-dpng','-r600','-opengl') 
 print(F, '-depsc2', filename);

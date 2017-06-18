@@ -3,8 +3,10 @@
 close all
 clear all
 save_flag=1;
+no_numbering_flag=1;
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz Presentation'
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP_50Hz+BP0.1-200 Vm_50Hz';
+% cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP_50Hz+BP0.1-200 Vm_50Hz';
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP_50Hz+BP1-200 Vm_50Hz';
 %opening saved figures:
 % [0 0 0; [30,75,14]/256; [136 137 138]/256; [112,172,90]/256; [216 22 22]/256; [255 153 153]/256];
 color1=[30,75,14]/256;
@@ -17,7 +19,7 @@ color3=[102,51,0]./256; %brown; 204 102
 color4=[204, 102,0]./256; %light brown
 
 %spontaneous:
-spont_trace_Off_f46 = open('Vm-LFP_spont_stim1_Off_f46_t2  3  4.fig');    
+spont_trace_Off_f46 = open('Vm-LFP_spont_stim1_Off_f46_t3  4  6.fig');    
 spont_trace_Off_f46_ax = get(gcf, 'children');
         c1=findall(gcf,'color',color1);
         set(c1,'color',color3);
@@ -229,6 +231,7 @@ annotation('textbox', [evoked_trace_Off_f46_pos(1,1) evoked_trace_Off_f46_pos_to
 %  a_pos2=[-0.03 0 0.04 0.04];
  a_pos3=[-0.04 -0.01 0.04 0.04];
  a_pos4=[-0.04 0.01 0.04 0.04];
+ if no_numbering_flag==0;
 annotation('textbox', [spont_trace_Off_f46_pos(1,1) spont_trace_Off_f46_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
  annotation('textbox', [spont_trace_On_f46_pos(1,1) spont_trace_On_f46_pos_top 0 0]+a_pos1,...
@@ -249,7 +252,7 @@ annotation('textbox', [spont_trace_Off_f46_pos(1,1) spont_trace_Off_f46_pos_top 
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'I', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 %   annotation('textbox', [cc_paired_plot_pos(1,1) cc_paired_plot_pos_top 0 0]+a_pos4,...
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'J', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
-
+ end
  annotation('textbox', [spont_trace_Off_f46_pos(1,1) spont_trace_Off_f46_pos_top 0 0]+[0 -0.01 0.1 0.04],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'NB-', 'FontName','arial', 'fontsize', 12, 'color', [0 0 0])
  annotation('textbox', [spont_trace_On_f46_pos(1,1) spont_trace_On_f46_pos_top 0 0]+[0 -0.01 0.1 0.04],...
@@ -260,10 +263,13 @@ annotation('textbox', [spont_trace_Off_f46_pos(1,1) spont_trace_Off_f46_pos_top 
 %   annotation('textbox', [cc_paired_plot_shuff_pos(1,1) cc_paired_plot_shuff_pos_top 0 0]+[0.02 0.0 0.2 0.04],...
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Signal correlations', 'FontName','arial', 'fontsize', 12,'color', [0 0 153]/256)
 %% 
- 
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+if no_numbering_flag==1;
+    cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures\No Numbering'
+else
+    cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+end
 if save_flag==1
-    filename='Fig 5a ccVmLFP';
+    filename='Fig 5a ccVmLFP lag0';
     saveas(F,filename,'fig'); 
     print(F,filename,'-dpng','-r600','-opengl') 
     print(F, '-depsc2', filename);

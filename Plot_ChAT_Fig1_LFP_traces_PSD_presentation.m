@@ -5,6 +5,7 @@ clear all
 ax_fontsize=12;
 cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean\Long Trace Presentation'
 save_flag=1;
+ no_numbering_flag=1;
 %opening saved figures:
 
 %traces:
@@ -42,7 +43,7 @@ set(gcf,'color','w');
 set(gcf,'DefaultAxesFontSize',18);
 set(gcf,'DefaultAxesFontName','arial');
 set(gcf, 'PaperType', 'A4');
-set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 20 14]); %[left, bottom, width, height] 
+set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 20 9]); %[left, bottom, width, height] 
 set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 
@@ -50,9 +51,9 @@ set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 %% Positions:
 dist1=0.09;
 dist2=0.05;
-traces_depth1_pos(1,:) = [0.05 , 0.45 , 0.6 , 0.5];
+traces_depth1_pos(1,:) = [0.05 , 0.05 , 0.6 , 0.9];
 h_dist1=traces_depth1_pos(1,1)+traces_depth1_pos(1,3)+dist1;
-PSD_depth1_pos(1,:) = [h_dist1 , traces_depth1_pos(1,2)+0.1 ,  1-(2*traces_depth1_pos(1,1)+traces_depth1_pos(1,3)+dist1) ,  traces_depth1_pos(1,4)-0.14];
+PSD_depth1_pos(1,:) = [h_dist1 , traces_depth1_pos(1,2)+0.15 ,  1-(2*traces_depth1_pos(1,1)+traces_depth1_pos(1,3)+dist1) ,  traces_depth1_pos(1,4)-0.25];
 
 total_power_pos(1,:) = [0.07 , 0.5 , 0.1 , 0.22]; total_power_pos(1,2)=traces_depth1_pos(1,2)-total_power_pos(1,4)-0.16;
 delta_pos(1,:) = [total_power_pos(1,1)+total_power_pos(1,3)+dist2+0.05 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
@@ -132,16 +133,19 @@ PSD_depth1_ax_copy(1).LineWidth=1.5;
  a_pos2=[-0.05 0 0.04 0.04];
  a_pos3=[0.3*traces_depth1_pos(1,3), 0.01, 0.5, 0.05];
 an1pos=[traces_depth1_pos(1,1) traces_depth1_pos_top 0 0]+a_pos1;
+ if no_numbering_flag==0;
 annotation('textbox', an1pos,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- 
  annotation('textbox', [PSD_depth1_pos(1,1) an1pos(1,2) 0 0]+a_pos2,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- 
+ end 
  
 %% 
-
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+ if no_numbering_flag==1;
+     cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures\No Numbering'
+ else
+      cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+ end
 if save_flag==1;
 filename='Fig 1 ChAT LFP traces+PSD_1-100Hz';
 saveas(F,filename,'fig'); 

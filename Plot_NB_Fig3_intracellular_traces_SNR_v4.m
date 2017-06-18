@@ -2,6 +2,7 @@
 close all
 clear all
 save_flag=1;
+ no_numbering_flag=1;
 %opening saved figures:
 %Long traces:
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean\Long Trace Presentation'
@@ -217,7 +218,7 @@ VmM_ax_copy(1).FontSize=10;
 %   annotation:
 annotation('textbox', [evoked_trace_Off_f16_zoom_pos(1,1) evoked_trace_Off_f16_zoom_pos_top 0 0]+[0.03 0.01 0.5 0.05],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Sensory-evoked Responses', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
-annotation('textbox', [spont_trace_f16_pos(1,1), evoked_trace_Off_f16_zoom_pos_top 0 0]+[0.06 0 0.5 0.05],...
+annotation('textbox', [spont_trace_f16_pos(1,1), evoked_trace_Off_f16_zoom_pos_top 0 0]+[0.06 0.01 0.5 0.05],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Spontaneous Activity', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
  
  a_pos1=[-0.03 -0.01 0.04 0.04];
@@ -242,6 +243,7 @@ annotation('textbox', [Amplitude_Signal_pos(1,1) Amplitude_Signal_pos_top+0.005 
 annotation('textbox', [Amplitude_Noise_pos(1,1) Amplitude_Noise_pos_top+0.005 0.16 0.04],...
     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Noise Amp.', 'FontName','arial', 'fontsize', 12)
 
+ if no_numbering_flag==0;
 annotation('textbox', [spont_trace_f16_pos(1,1) spont_trace_f16_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 annotation('textbox', [spont_mean_f16_pos(1,1) spont_mean_f16_pos_top 0 0]+a_pos1,...
@@ -272,8 +274,12 @@ annotation('textbox', [Peak_amp_pos(1,1)-0.06 Peak_amp_pos_top 0.04 0.04],...
     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'M', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 annotation('textbox', [Hist_amp_pos(1,1)-0.06 Peak_amp_pos_top 0.04 0.04],...
     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'N', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
-
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+ end
+  if no_numbering_flag==1;
+    cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures\No Numbering'
+  else
+      cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+  end
 if save_flag==1
     filename='Fig 3 intracellular traces+SNR_f16_v4';
     saveas(F,filename,'fig'); 

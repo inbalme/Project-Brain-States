@@ -23,27 +23,27 @@ trace_type_input=[1,2]; %[3,2] for exp_type=1; %for exp_type=2 or 3 use [1,2]
 analyze_time_before_train=0;
 analyze_train_only_flag=1; %use analyze_train_only_flag=1
 add_to_plot=0.08; %seconds from each side of the trace. use 0.1 for NBES and 0.080 for ChAT
-save_flag=0;
-print_flag=1;
+save_flag=1;
+print_flag=0;
 norm_flag=0;
 clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 BPLFP_flag=1; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
-bp_manual_LFP=[0.1,200];%[0.1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
+bp_manual_LFP=[1,200];%[0.1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 BPVm_flag=0; %filtering LFP and Vm same as LFP was filtered in the multiclamp
 bp_manual_Vm=[0,300];%[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
     
 switch exp_type
     case 1
-        files_to_analyze =46; %[44,46,48,52,56,58,62,72,75,82,84]; %[44,46,48,50,52,56,58,62,72,75]; 
+        files_to_analyze =[44,46,48,52,56,58,62,72,75,82,84]; %[44,46,48,50,52,56,58,62,72,75]; 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB-', 'NB+'}; y_ax_label={'Vm'}; y_ax_units={'mV'};   
         legend_string_shuff={'NB- shuffled', 'NB+ shuffled'};       
 
     case 2
-        files_to_analyze =80; %[76,77,80,82,84,87];
+        files_to_analyze =[76,77,80,82,84,87,90,92,115]; %[92,94,96,98,101]
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={ 'Light Off','Light On'}; y_ax_label={'Vm'}; y_ax_units={'mV'};   
@@ -214,7 +214,7 @@ scalebar_fontsize=11;
 
     if print_flag==1;
 % plotting one trace of data and LFP against each other -
- trace=[2,3,4];%1:size(current_data,2); %5;
+ trace=[2,3,4];%1:size(current_data,2); %5;[2,3,4]
 lengthh_vert=[5,10,5]; %[1,2,10]; %lengthh_vert(1) is for spontaneous, lengthh_vert(2) is for evoked
 
 %          interval_plot(:,1)=[interval(1,1)-add_to_plot*sf{1}:interval(end,1)+add_to_plot*sf{1}];  
@@ -234,7 +234,7 @@ yrangeLFP=ceil(max(ydiffLFP));
 for tr_ind=1:length(trace)
 subplot(2*length(trace),1,2*tr_ind)
     hold on
-        p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot{1}(:,tr_ind), 'color',color_table(1,:),'LineWidth',1.5);
+        p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot{1}(:,trace(tr_ind)), 'color',color_table(1,:),'LineWidth',1.5);
                            
         axis tight
      ylim_data=[get(gca,'ylim')]';
@@ -245,7 +245,7 @@ subplot(2*length(trace),1,2*tr_ind)
           if trace_type==2;   
 %             delete(p1)
 %             p1=plot([interval_plot(1,1):end_sample(1)].*dt*1000,data_Vm_plot{1}(1:end_sample(1)-interval_plot(1,1)+1,tr_ind),'color',color_table(1,:),'LineWidth',1.2);
-            fn_plot_sensory_stim(dt, stim2{1}(:,1:10),whisker_stim_color)
+            fn_plot_sensory_stim(dt, stim2{1}(:,1:size(stim2{1},2)-1),whisker_stim_color)
           end
             
         %plotting scale bar
@@ -262,7 +262,7 @@ horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0
     
   subplot(2*length(trace),1,2*tr_ind-1)     
  	hold on
-        p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot{1}(:,tr_ind),'color',color_table(2,:),'LineWidth',1.5);
+        p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot{1}(:,trace(tr_ind)),'color',color_table(2,:),'LineWidth',1.5);
 %         text(interval_plot(1,1).*dt*1000,data_Vm_plot{1}(1),[num2str(floor(data_Vm_plot{1}(1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')  
 
         axis tight            
@@ -272,7 +272,7 @@ horiz_vert=1;        lengthh=200;     textit=[num2str(lengthh), ' mS'];     c=[0
      set(gca,'ylim',ylim_data, 'xlim',xlim_data)  
      
   if trace_type==2;
-            fn_plot_sensory_stim(dt, stim2{1}(:,1:10),whisker_stim_color)
+            fn_plot_sensory_stim(dt, stim2{1}(:,1:size(stim2{1},2)-1),whisker_stim_color)
 %             delete(p2)
 %             p2=plot([interval_plot(1,1):end_sample(1)].*dt*1000,data_LFP_plot{1}(1:end_sample(1)-interval_plot(1,1)+1,tr_ind),'color',color_table(2,:),'LineWidth',1.2);
   end
@@ -319,7 +319,7 @@ Fig{fileind}(trace_type+3)=figure;
 for tr_ind=1:length(trace)
 subplot(2*length(trace),1,2*tr_ind)
     hold on
-        p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot{2}(:,tr_ind),'color',color_table(5,:),'LineWidth',1.5);
+        p1=plot(interval_plot(:,1).*dt*1000,data_Vm_plot{2}(:,trace(tr_ind)),'color',color_table(5,:),'LineWidth',1.5);
                            
         axis tight
     ylim_data=[get(gca,'ylim')]';
@@ -328,7 +328,7 @@ subplot(2*length(trace),1,2*tr_ind)
   set(gca,'ylim',ylim_data, 'xlim',xlim_data)  
   
    if trace_type==2;
-            fn_plot_sensory_stim(dt, stim2{1}(:,1:10),whisker_stim_color)
+            fn_plot_sensory_stim(dt, stim2{1}(:,1:size(stim2{1},2)-1),whisker_stim_color)
 %             delete(p1)
 %             p1=plot([interval_plot(1,1):end_sample(1)].*dt*1000,data_Vm_plot{2}(1:end_sample(1)-interval_plot(1,1)+1,tr_ind),'color',color_table(5,:),'LineWidth',1.2);
    end
@@ -347,7 +347,7 @@ subplot(2*length(trace),1,2*tr_ind)
     
   subplot(2*length(trace),1,2*tr_ind-1)
  	hold on
-       p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot{2}(:,tr_ind),'color',color_table(4,:),'LineWidth',1.5);
+       p2=plot(interval_plot(:,1).*dt*1000,data_LFP_plot{2}(:,trace(tr_ind)),'color',color_table(4,:),'LineWidth',1.5);
 %         text(interval_plot(1,1).*dt*1000,data_Vm_plot{2}(1),[num2str(floor(data_Vm_plot{2}(1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')  
 
         axis tight            
@@ -357,7 +357,7 @@ subplot(2*length(trace),1,2*tr_ind)
      set(gca,'ylim',ylim_data, 'xlim',xlim_data)  
 
        if trace_type==2;          
-            fn_plot_sensory_stim(dt, stim2{1}(:,1:10),whisker_stim_color)
+            fn_plot_sensory_stim(dt, stim2{1}(:,1:size(stim2{1},2)-1),whisker_stim_color)
 %             delete(p2)
 %             p2=plot([interval_plot(1,1):end_sample(1)].*dt*1000,data_LFP_plot{2}(1:end_sample(1)-interval_plot(1,1)+1,tr_ind),'color',color_table(4,:),'LineWidth',1.2);
        end
@@ -1026,11 +1026,13 @@ mv_shuff_stat.rmANOVA_p=max_val_rmANOVA_p;
 mv_shuff_stat.evoked_p=max_val_shuff_p_evoked;
 mv_shuff_stat.spont_p=max_val_shuff_p_spont;
          %% Paired plot of spont+evoked non-normalized max peak absolute values
-CC_Y_max_val_sp=cc_stat.spont.max_val';
+% CC_Y_max_val_sp=cc_stat.spont.max_val';
+CC_Y_max_val_sp=cc_stat.spont.lag0';
 CC_X_sp(1,:)=ones(1,size(CC_Y_max_val_sp,2));
 CC_X_sp(2,:)=2*ones(1,size(CC_Y_max_val_sp,2));
 E_sp = std(CC_Y_max_val_sp,0,2);
-CC_Y_max_val_ev=cc_stat.evoked.max_val';
+% CC_Y_max_val_ev=cc_stat.evoked.max_val';
+CC_Y_max_val_ev=cc_stat.evoked.lag0';
 CC_X_ev(1,:)=3*ones(1,size(CC_Y_max_val_ev,2));
 CC_X_ev(2,:)=4*ones(1,size(CC_Y_max_val_ev,2));
 E_ev = std(CC_Y_max_val_ev,0,2);
@@ -1041,29 +1043,31 @@ liney=[my my;my my];
 x1limits = [0.75 4.25];
 x1ticks = [1,2,3,4];
  y1limits = [-0.1 1];
-y1ticks = [0,0.5,1];
-max_val_p_spont=mv_stat.spont_p;
-max_val_p_evoked=mv_stat.evoked_p;
-if max_val_p_spont{1,1} >0.05 
+y1ticks = [0,0.5,1]; 
+% p_spont=mv_stat.spont_p;
+% p_evoked=mv_stat.evoked_p;
+p_spont=lag0_stat.spont_p;
+p_evoked=lag0_stat.evoked_p;
+if p_spont{1,1} >0.05 
     asterisk_sp='n.s.';
-else if max_val_p_spont{1,1}<0.05 && max_val_p_spont{1,1}>0.01
+else if p_spont{1,1}<0.05 && p_spont{1,1}>0.01
     asterisk_sp='*';
-    else if max_val_p_spont{1,1}<0.01 && max_val_p_spont{1,1}>0.001
+    else if p_spont{1,1}<0.01 && p_spont{1,1}>0.001
             asterisk_sp='**';
-    else if max_val_p_spont{1,1}<0.001
+    else if p_spont{1,1}<0.001
              asterisk_sp='***';
         end
         end
     end
 end
 
-if max_val_p_evoked{1,1} >0.05 
+if p_evoked{1,1} >0.05 
     asterisk_ev='n.s.';
-else if max_val_p_evoked{1,1}<0.05 && max_val_p_evoked{1,1}>0.01
+else if p_evoked{1,1}<0.05 && p_evoked{1,1}>0.01
     asterisk_ev='*';
-    else if max_val_p_evoked{1,1}<0.01 && max_val_p_evoked{1,1}>0.001
+    else if p_evoked{1,1}<0.01 && p_evoked{1,1}>0.001
             asterisk_ev='**';
-    else if max_val_p_evoked{1,1}<0.001
+    else if p_evoked{1,1}<0.001
              asterisk_ev='***';
         end
         end
@@ -1086,19 +1090,23 @@ hold off
 
 set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',22,'linewidth',1, 'ytick', y1ticks,...
         'ticklength', [0.0001 0.0001],'fontname', 'arial','xticklabel',[legend_string, legend_string] ,'box', 'off'); %'fontweight', 'bold',  
-         ylabel('Peak CC', 'FontSize', 20,'fontname', 'arial');
+         ylabel('CC', 'FontSize', 20,'fontname', 'arial');
 %            title(['Spontaneous and Sensory-evoked Max-Peak Cross-Correlation, n=' num2str(length(files_to_analyze))] ,'fontname', 'arial','FontSize', 20);   
  if save_flag==1;
  cd(path_output)
-saveas(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population','fig') 
-print(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population','-dpng','-r600','-opengl') 
+%  filename1='Vm-LFPcc_spont+evoked_max-peak_paired_population';
+filename1='Vm-LFPcc_spont+evoked_lag0_paired_population';
+saveas(gcf,filename1,'fig') 
+print(gcf,filename1,'-r600','-opengl') 
  end
          %% Paired plot of shuffled spont+evoked non-normalized max peak absolute values
-CC_Y_max_val_sp_shuff=cc_stat.spont.max_val_shuff';
+% CC_Y_max_val_sp_shuff=cc_stat.spont.max_val_shuff';
+CC_Y_max_val_sp_shuff=cc_stat.spont.lag0_shuff';
 CC_X_sp_shuff(1,:)=ones(1,size(CC_Y_max_val_sp_shuff,2));
 CC_X_sp_shuff(2,:)=2*ones(1,size(CC_Y_max_val_sp_shuff,2));
 E_sp_shuff = std(CC_Y_max_val_sp_shuff,0,2);
-CC_Y_max_val_ev_shuff=cc_stat.evoked.max_val_shuff';
+% CC_Y_max_val_ev_shuff=cc_stat.evoked.max_val_shuff';
+CC_Y_max_val_ev_shuff=cc_stat.evoked.lag0_shuff';
 CC_X_ev_shuff(1,:)=3*ones(1,size(CC_Y_max_val_ev_shuff,2));
 CC_X_ev_shuff(2,:)=4*ones(1,size(CC_Y_max_val_ev_shuff,2));
 E_ev_shuff = std(CC_Y_max_val_ev_shuff,0,2);
@@ -1109,28 +1117,30 @@ x1limits = [0.75 4.25];
 x1ticks = [1,2,3,4];
  y1limits = [-0.1 1];
 y1ticks = [0,0.5,1];
-max_val_shuff_p_spont=mv_shuff_stat.spont_p;
-max_val_shuff_p_evoked=mv_shuff_stat.evoked_p;
-if max_val_shuff_p_spont{1,1} >0.05 
+% shuff_p_spont=mv_shuff_stat.spont_p;
+% shuff_p_evoked=mv_shuff_stat.evoked_p;
+shuff_p_spont=lag0_shuff_stat.spont_p;
+shuff_p_evoked=lag0_shuff_stat.evoked_p;
+if shuff_p_spont{1,1} >0.05 
     asterisk_sp='n.s.';
-else if max_val_shuff_p_spont{1,1}<0.05 && max_val_shuff_p_spont{1,1}>0.01
+else if shuff_p_spont{1,1}<0.05 && shuff_p_spont{1,1}>0.01
     asterisk_sp='*';
-    else if max_val_shuff_p_spont{1,1}<0.01 && max_val_shuff_p_spont{1,1}>0.001
+    else if shuff_p_spont{1,1}<0.01 && shuff_p_spont{1,1}>0.001
             asterisk_sp='**';
-    else if max_val_shuff_p_spont{1,1}<0.001
+    else if shuff_p_spont{1,1}<0.001
              asterisk_sp='***';
         end
         end
     end
 end
 
-if max_val_shuff_p_evoked{1,1} >0.05 
+if shuff_p_evoked{1,1} >0.05 
     asterisk_ev='n.s.';
-else if max_val_shuff_p_evoked{1,1}<0.05 && max_val_shuff_p_evoked{1,1}>0.01
+else if shuff_p_evoked{1,1}<0.05 && shuff_p_evoked{1,1}>0.01
     asterisk_ev='*';
-    else if max_val_shuff_p_evoked{1,1}<0.01 && max_val_shuff_p_evoked{1,1}>0.001
+    else if shuff_p_evoked{1,1}<0.01 && shuff_p_evoked{1,1}>0.001
             asterisk_ev='**';
-    else if max_val_shuff_p_evoked{1,1}<0.001
+    else if shuff_p_evoked{1,1}<0.001
              asterisk_ev='***';
         end
         end
@@ -1153,12 +1163,14 @@ hold off
 
 set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',22,'linewidth',1, 'ytick', y1ticks,...
         'ticklength', [0.0001 0.0001],'fontname', 'arial','xticklabel',[legend_string, legend_string] ,'box', 'off'); %'fontweight', 'bold',  
-         ylabel('Peak CC', 'FontSize', 20,'fontname', 'arial');
+         ylabel('CC', 'FontSize', 20,'fontname', 'arial');
 %            title(['Spontaneous and Sensory-evoked Max-Peak Cross-Correlation, n=' num2str(length(files_to_analyze))] ,'fontname', 'arial','FontSize', 20);   
  if save_flag==1;
  cd(path_output)
-saveas(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population_shuff','fig') 
-print(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population_shuff','-dpng','-r600','-opengl') 
+%  filename1='Vm-LFPcc_spont+evoked_max-peak_paired_population_shuff';
+filename2='Vm-LFPcc_spont+evoked_lag0_paired_population_shuff';
+saveas(gcf,filename2,'fig') 
+print(gcf,filename2,'-dpng','-r600','-opengl') 
  end
           %% Paired plot of spont+evoked non-normalized max peak real values
 CC_Y_max_val_sp=(cc_stat.spont.max_val.*cc_stat.spont.max_val_sign)';
@@ -1244,5 +1256,5 @@ print(gcf,'Vm-LFPcc_spont+evoked_max-peak_paired_population_shuff_real_value','-
  if save_flag==1;
     cd(path_output)
      filename='cc_analysis'; 
-    save(filename, 'files_to_analyze', 'cc_spont', 'cc_evoked', 'cc_stat','mv_stat','mv_shuff_stat')
+    save(filename, 'files_to_analyze', 'cc_spont', 'cc_evoked', 'cc_stat','mv_stat','mv_shuff_stat','lag0_stat','lag0_shuff_stat')
  end

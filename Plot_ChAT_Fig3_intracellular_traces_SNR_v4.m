@@ -2,6 +2,7 @@
 close all
 clear all
 save_flag=1;
+no_numbering_flag=1;
 %opening saved figures:
 %Long traces:
 cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean\Long Trace Presentation'
@@ -189,7 +190,7 @@ Peak_amp_ax_copy.XTickLabel(11,:)=[]; Peak_amp_ax_copy.XTickLabel(11,1)='R';
 
 Hist_amp_ax_copy = copyobj(Hist_amp_ax,F); % copy axes to new fig
 set(Hist_amp_ax_copy,'position',Hist_amp_pos(1,:))
-set(F, 'currentaxes', Hist_amp_ax_copy); tl=title('');
+set(F, 'currentaxes', Hist_amp_ax_copy); tl=title(''); yl=ylabel('Probability'); xl=xlabel('Norm. Amp. Difference');
 % Hist_amp_ax_copy.FontSize=12;
 
 SNR_ax_copy = copyobj(SNR_ax,F); % copy axes to new fig
@@ -218,7 +219,7 @@ VmM_ax_copy(1).FontSize=10;
 %   annotation:
 annotation('textbox', [evoked_trace_Off_f80_zoom_pos(1,1) evoked_trace_Off_f80_zoom_pos_top 0 0]+[0.03 0.01 0.5 0.05],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Sensory-evoked Responses', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
-annotation('textbox', [spont_trace_f80_pos(1,1), evoked_trace_Off_f80_zoom_pos_top 0 0]+[0.06 0 0.5 0.05],...
+annotation('textbox', [spont_trace_f80_pos(1,1), evoked_trace_Off_f80_zoom_pos_top 0 0]+[0.06 0.01 0.5 0.05],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Spontaneous Activity', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
  
  a_pos1=[-0.03 -0.01 0.04 0.04];
@@ -226,6 +227,7 @@ annotation('textbox', [spont_trace_f80_pos(1,1), evoked_trace_Off_f80_zoom_pos_t
  a_pos2=[-0.02 -0.01 0.04 0.04];
  a_pos3=[-0.035 0 0.04 0.04];
  
+ if no_numbering_flag==0;
  annotation('textbox', [spont_trace_f80_pos(1,1) spont_trace_f80_pos_top 0 0]+a_pos4,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Vm Traces', 'FontName','arial', 'fontsize', 12) %'fontweight', 'bold'
 annotation('textbox', [spont_mean_f80_pos(1,1) spont_mean_f80_pos_top 0 0]+a_pos4,...
@@ -249,7 +251,6 @@ annotation('textbox', [spont_mean_f80_pos(1,1) spont_mean_f80_pos_top 0 0]+a_pos
     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 annotation('textbox', [spont_std_f80_pos(1,1) spont_std_f80_pos_top 0 0]+a_pos1,...
     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
-
 annotation('textbox', [evoked_trace_Off_f80_zoom_pos(1,1) evoked_trace_Off_f80_zoom_pos_top 0 0]+a_pos2,...
     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 annotation('textbox', [evoked_trace_On_f80_zoom_pos(1,1) evoked_trace_On_f80_zoom_pos_top 0 0]+a_pos2,...
@@ -273,8 +274,12 @@ annotation('textbox', [Peak_amp_pos(1,1)-0.06 Peak_amp_pos_top 0.04 0.04],...
     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'M', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 annotation('textbox', [Hist_amp_pos(1,1)-0.06 Peak_amp_pos_top 0.04 0.04],...
     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'N', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
-
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+ end
+ if no_numbering_flag==1;
+    cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures\No Numbering'
+ else
+    cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+ end
 if save_flag==1
     filename='Fig 3 ChAT intracellular traces+SNR_f80_v4';
     saveas(F,filename,'fig'); 

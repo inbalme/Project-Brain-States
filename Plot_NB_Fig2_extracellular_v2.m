@@ -3,6 +3,8 @@
 close all
 clear all
 save_flag=1;
+no_numbering_flag=1;
+
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH'
 
 %opening saved figures:
@@ -226,7 +228,7 @@ annotation('textbox', [evoked_trace_Off_f23_pos(1,1) evoked_trace_Off_f23_pos_to
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Sensory-evoked Responses', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
  
  a_pos1=[-0.03 0 0.04 0.04];
- 
+if no_numbering_flag==0; 
 annotation('textbox', [spont_trace_Off_f23_pos(1,1) spont_trace_Off_f23_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 annotation('textbox', [spont_trace_On_f23_pos(1,1) spont_trace_On_f23_pos_top 0 0]+a_pos1,...
@@ -249,9 +251,13 @@ annotation('textbox', [spont_trace_On_f23_pos(1,1) spont_trace_On_f23_pos_top 0 
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'J', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
   annotation('textbox', [SNR_pos(1,1) SNR_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'K', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- 
+end 
 %%
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+if no_numbering_flag==1;
+    cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures\No Numbering'
+else
+    cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+end
 if save_flag==1  
     filename='Fig 2 Extracellular_v2';
     saveas(F,filename,'fig'); 

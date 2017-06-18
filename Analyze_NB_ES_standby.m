@@ -9,7 +9,7 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
 %  load 2016-10-20-001_h2-34 %different depths data1; [27,28,29,30,31,33,34]
 %Atropine+Mecamylamine:
 % load 2015-12-28-006_h1-6 %data2
-load 2015-07-29-002_h1-6 %data2 ESdel7sec, trace 15sec
+% load 2015-07-29-002_h1-6 %data2 ESdel7sec, trace 15sec, cut 1500samples from both sides of the trace
 %  load Set2-2015-05-06-003_h2-7 %data1 ESdel10sec, trace 20sec
 %  load Set2-2015-06-01-003_h1-6 %data1 ESdel10sec
 %GABA blockers:
@@ -17,7 +17,8 @@ load 2015-07-29-002_h1-6 %data2 ESdel7sec, trace 15sec
 % load 2016-05-23-001_h3-9 %ch1-V1, ch2-S1
 % load 2016-05-23-002_h1-4 %ch1-V1,ch2-S1+GABAb inhibitor
 %regular traces:
-% load 2015-07-29-001_h2 %data2 ESdel7sec, trace 15sec
+load 2015-12-31-002_h1-2 %data2
+% load 2015-07-29-001_h2 %data2 ESdel7sec, trace 15sec, cut 1500samples from both sides of the trace
 %  load Set2-2015-05-06-001_h2 %data1 ESdel10sec, trace 20sec, multiply DC by 2
 % load 2015-12-17-001_h1-2 %data2
 % load 2015-12-21-001_h2-3 %data2
@@ -42,13 +43,13 @@ load 2015-07-29-002_h1-6 %data2 ESdel7sec, trace 15sec
 
 
 %% 2015-05-06-001_LFP_traces_h2_t2  3  4  5  7; 
- orig_header=6; %[27,28,29,30,31,33,34] [1,2,3,4,5,6,7];
+ orig_header=1; %[27,28,29,30,31,33,34] [1,2,3,4,5,6,7];
  save_flag=1;
  galvano_flag=0;
- ES_del=7; %10
+ ES_del=10; %10
  dataCh=2;
  gain=20; %20;
- DC_int=0.8;
+ DC_int=0.7;
  trace_ind = [2,3,4,5,7]; %1:size(plot_data,2);  %trace_ind is the numbers of traces to be plotted [2,3,4,5,6];
  header=find(headers==orig_header);
  stim2_X=[];
@@ -158,8 +159,8 @@ plot_data_std =  nanstd(plot_data,0,2);
         hold on
         rec1=rectangle('Position',[x_axis_long(1,1)*dt,trace_to_plot(x_axis_long(1,1),1),0.1,0.1]);
         rec2=rectangle('Position',[x_axis_long(1,1)*dt,trace_to_plot(x_axis_long(1,1),1),0.1,0.1]);
-htrace1=plot(x_axis_long(1:ES_del*sf)*dt,trace_to_plot(x_axis_long(1:ES_del*sf),:,:), 'LineWidth',1.2,'color', color_table(1,:));
-htrace2=plot(x_axis_long((ES_del+0.5)*sf:end)*dt,trace_to_plot(x_axis_long((ES_del+0.5)*sf:end),:,:), 'LineWidth',1.2,'color', color_table(2,:));
+htrace1=plot(x_axis_long(1500:ES_del*sf)*dt,trace_to_plot(x_axis_long(1500:ES_del*sf),:,:), 'LineWidth',1.2,'color', color_table(1,:));
+htrace2=plot(x_axis_long((ES_del+0.5)*sf:(end-1500))*dt,trace_to_plot(x_axis_long((ES_del+0.5)*sf:(end-1500)),:,:), 'LineWidth',1.2,'color', color_table(2,:));
 
 % for i=1:length(trace_ind);
 %     text(x_axis_long(1)*dt,trace_to_plot(x_axis_long(1),i),[num2str(floor(plot_data(x_axis_long(1),i,1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
@@ -245,7 +246,7 @@ Y_30to50_norm_std(:,t)=std(Y_30to50_norm(:,t));
  xlim([1 100]); ylim([0 0.1])
         set(gca,'xscale','log');
         set(gca,'yscale','log');
-        set(gca,'fontsize',20, 'fontname', 'arial', 'box', 'off','linewidth',2, 'xtick',[1, 10,100],'ytick', [10e-7,10e-6, 10e-5, 10e-4, 10e-3, 10e-2],'yminortick','on') 
+        set(gca,'fontsize',20, 'fontname', 'arial', 'box', 'off','linewidth',2, 'xtick',[1, 10,100],'ytick', [10e-7,10e-6, 10e-5, 10e-4, 10e-3],'yminortick','on') 
          xlabel('Frequency [Hz]','fontsize',20, 'fontname', 'arial')
         ylabel('PSD [mV^2/Hz]','fontsize',20, 'fontname', 'arial'); %Power spectral density
 l=legend([d1(1).mainLine d1(2).mainLine ],{'NB-','NB+'},'Location','northeast', 'box', 'off');
@@ -324,10 +325,10 @@ if save_flag==1;
 % filename_traces = ['20150323-002_LFP_traces_h',num2str(orig_header),'_t',num2str(trace_ind),'_',num2str(depth(header)),'um'];
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\LFP depth';
 %for Blockers:
-filename_PSD = ['2015-07-29-001_LFP_PSD_1-100Hz_h',num2str(orig_header)];
-filename_traces = ['2015-07-29-001_LFP_traces_h',num2str(orig_header),'_t',num2str(trace_ind)];
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\LFP+Blockers';
-% cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\LFP+Blockers\GABA Blockers';
+filename_PSD = ['2015-31-12-002_LFP_PSD_1-100Hz_h',num2str(orig_header)];
+filename_traces = ['2015-31-12-002_LFP_traces_h',num2str(orig_header),'_t',num2str(trace_ind)];
+% cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\LFP+Blockers';
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\LFP+Blockers\GABA Blockers';
 
 
 savefig(f1,filename_PSD)

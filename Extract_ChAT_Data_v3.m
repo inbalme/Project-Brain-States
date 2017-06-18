@@ -11,7 +11,7 @@ global Exp
 
 files = Get_ChAT_Files_v3();
 
-for fileind =87; 
+for fileind =93; 
     clearvars -except  files fileind Exp
 no_spikes_flag=1;
     fname = files(fileind).name;
@@ -303,12 +303,13 @@ end
                 time_axis{ii}(:,x_value) = (1:size(raw_data{ii}(:,:,x_value),1))*dt{ii};
               
                 if (strcmp(Param.recording_type,'cell attached') | strcmp(Param.recording_type,'LFP') | strcmp(Param.recording_type,'cell attached-LFP')) %skip this part for extracellular recordings
-                    code=[]; data_no_spikes=[];
+                    code=[]; data_no_spikes=[]; spike_positions=[];
                     else
                     %Removing spikes
                     if no_spikes_flag==1;
                         for traces=1:size(raw_data{1}(:,:,x_value),2)
-                            [code{1}(:,traces,x_value), data_no_spikes{1}(:,traces,x_value), spike_positions{traces,x_value}(:,1)] = fn_RemoveSpikesMO2(raw_data{1}(:,traces,x_value)', dt{1});
+                            [code{1}(:,traces,x_value), data_no_spikes{1}(:,traces,x_value), spike_positions{traces,x_value}(:,:)] = fn_RemoveSpikesMO2(raw_data{1}(:,traces,x_value)', dt{1});
+%                 [a{1}(:,traces,x_value), b{1}(:,traces,x_value), c{traces,x_value}(:,:)] = fn_RemoveSpikesMO2(raw_data{1}(:,traces,x_value)', dt{1});
                         end
                     end
                 end   

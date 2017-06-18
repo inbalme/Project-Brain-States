@@ -6,12 +6,12 @@ clear all
  global exp_type
 exp_type=1; %1-NBES, 2-ChAT
 channel = 1;
-save_flag= 1;
+save_flag= 0;
 print_flag=1;
 
 switch exp_type
     case 1
-        files_to_analyze =17; %[1,8,17,22,23,26,27,28,33,55,60];
+        files_to_analyze =10; %[1,8,17,22,23,26,27,28,33,55,60];
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB-', 'NB+'};
@@ -20,10 +20,10 @@ switch exp_type
         if a==0;
             mkdir(path_output);
         end
-        spike_det_threshold = [1 6 nan; 8 6 nan; 17 5 nan; 22 6 nan; 23 2.5 nan; 26 3 nan; 27 1.5 nan; 28 1.5 nan; 33 2 nan; 55 5 nan; 60 2 nan]; %35 2 nan; %29 2 nan; 
+        spike_det_threshold = [1 6 nan; 8 6 nan; 10 5 nan; 17 5 nan; 22 6 nan; 23 2.5 nan; 26 3 nan; 27 1.5 nan; 28 1.5 nan; 33 2 nan; 55 5 nan; 60 2 nan]; %35 2 nan; %29 2 nan; 
 
     case 2
-        files_to_analyze =[74,77];
+        files_to_analyze =108; %[74,77];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light Off', 'Light On'};
@@ -32,7 +32,7 @@ switch exp_type
         if a==0;
             mkdir(path_output);
         end
-         spike_det_threshold = [74 10 nan; 77 10 nan];
+         spike_det_threshold = [108 10 nan] ; %[74 10 nan; 77 10 nan];
 end
 
     for fileind=1:length(files_to_analyze);
@@ -212,7 +212,7 @@ for x_value = 2:3; %size(data.x_value,2)
 
         %Raster plot axes:
 %             x1limits = [3.5 size(A,2).*dt];
-            x1limits = [4, 6]; %[5.3 6.8]; [6, 7.5];
+            x1limits = [4.5, 6]; %[5.5,8]; %[4, 6]; %[5.3 6.8]; [6, 7.5];
             x1ticks = [];
             y1limits = [0 size(A,1)+8];
             y1ticks = [];
