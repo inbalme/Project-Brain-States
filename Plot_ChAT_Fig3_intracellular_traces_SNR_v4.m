@@ -144,7 +144,7 @@ Amplitude_Signal_pos_top = Amplitude_Signal_pos(1,2)+Amplitude_Signal_pos(1,4);
 Amplitude_Noise_pos_top = Amplitude_Noise_pos(1,2)+Amplitude_Noise_pos(1,4);
 %%
 %Placing plots in the figure:
-%Cell 16 - spont
+%Cell 80 - spont
 
 spont_trace_f80_ax_copy = copyobj(spont_trace_f80_ax,F); % copy axes to new fig
 set(spont_trace_f80_ax_copy,'position',spont_trace_f80_pos(1,:))

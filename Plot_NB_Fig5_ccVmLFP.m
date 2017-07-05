@@ -206,8 +206,8 @@ cc_paired_plot_shuff_ax_copy.FontSize=14;
     %   'fontname', 'arial','fontsize',13,'linewidth',1.5,'box','off'); %, 'ylim', y6limits,'ytick', y6ticks,'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
 %  set(F, 'currentaxes', Response_modulation_ax_copy); t=title(''); yl=ylabel('Spikes/Stim. train','fontsize',13);
 
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
-filename='Fig 5 ccVmLFP';
-saveas(F,'Fig 5 ccVmLFP.fig'); 
-print(F,filename,'-dpng','-r600','-opengl') 
-print(F, '-depsc2', filename);
+% cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures'
+% filename='Fig 5 ccVmLFP';
+% saveas(F,'Fig 5 ccVmLFP.fig'); 
+% print(F,filename,'-dpng','-r600','-opengl') 
+% print(F, '-depsc2', filename);

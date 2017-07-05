@@ -369,6 +369,7 @@ clear onset_mat onVal_mat   amplitude_mat    ampDel_mat  ampVal_mat  halfWidth_m
 onset_mat=cell2mat(event_on); 
 onVal_mat=cell2mat(event_onVal); 
 amplitude_mat=cell2mat(event_amplitude); 
+tmp_mat=nanmean(amplitude_mat,3); amplitude_mat_norm=tmp_mat./tmp_mat(1,1);
 ampDel_mat=cell2mat(event_ampDel); 
 ampVal_mat=cell2mat(event_ampVal); 
 halfWidth_mat=cell2mat(event_halfWidth); 
@@ -489,6 +490,23 @@ tmp=[];
 
         clear  tmp
 
+        %normalized amplitude
+        tmp(:,:) = amplitude_mat_norm(1:2,stim_num,:);        
+        event_evoked_stat.fileind(fileind).stim_num(stim_num).amplitude_norm=tmp';
+        event_evoked_stat.fileind(fileind).stim_num(stim_num).amplitude_norm_m=nanmean(event_evoked_stat.fileind(fileind).stim_num(stim_num).amplitude_norm,1);
+        event_evoked_stat.fileind(fileind).stim_num(stim_num).amplitude_norm_std=nanstd(event_evoked_stat.fileind(fileind).stim_num(stim_num).amplitude_norm,0,1);  
+        event_evoked_stat.stim_num(stim_num).amplitude_norm_m(fileind,:)= event_evoked_stat.fileind(fileind).stim_num(stim_num).amplitude_norm_m;
+        event_evoked_stat.stim_num(stim_num).amplitude_norm_std(fileind,:)= event_evoked_stat.fileind(fileind).stim_num(stim_num).amplitude_norm_std;
+        %testing for normal distribution
+        if (nnz(diff(tmp))-sum(sum(isnan(diff(tmp)))))>4; %if there are at least 5 values that are non-zero and not NaNs
+            [event_evoked_stat.fileind(fileind).stim_num(stim_num).lillietest_h_amplitude_norm, event_evoked_stat.fileind(fileind).stim_num(stim_num).lillietest_p_amplitude_norm] = lillietest(diff(tmp));        
+            [event_evoked_stat.fileind(fileind).stim_num(stim_num).wilcoxon_p_amplitude_norm, event_evoked_stat.fileind(fileind).stim_num(stim_num).wilcoxon_h_amplitude_norm]= signrank(event_evoked_stat.fileind(fileind).stim_num(stim_num).amplitude_norm(:,1),event_evoked_stat.fileind(fileind).stim_num(stim_num).amplitude_norm(:,2));
+       end
+        %paired ttest 
+        [event_evoked_stat.fileind(fileind).stim_num(stim_num).ttest_h_amplitude_norm, event_evoked_stat.fileind(fileind).stim_num(stim_num).ttest_p_amplitude_norm]= ttest(event_evoked_stat.fileind(fileind).stim_num(stim_num).amplitude_norm(:,1),event_evoked_stat.fileind(fileind).stim_num(stim_num).amplitude_norm(:,2));
+
+        clear  tmp
+
     %peak value
         tmp(:,:) = ampVal_mat(1:2,stim_num,:);        
         event_evoked_stat.fileind(fileind).stim_num(stim_num).ampVal=tmp';
@@ -603,7 +621,7 @@ tmp=[];
  %% population statistics
  clear tmp
  
-     h_failures_m=[];     h_onset_m=[];     h_onset_std=[];     h_amplitude_m=[];
+     h_failures_m=[];     h_onset_m=[];     h_onset_std=[];     h_amplitude_m=[]; h_amplitude_norm_m=[];
      h_amplitude_std=[];     h_onVal_m=[];     h_ampVal_m=[];     h_ampDel_m=[];     h_ampDel_std=[];
      h_halfWidth_m=[];    h_halfWidth_std=[];     h_adapt_amp=[];     h_nonspecific_count_m=[];
     
@@ -740,7 +758,29 @@ tmp=[];
         [event_evoked_stat.stim_num(stim_num).ttest_h_amplitude_m, event_evoked_stat.stim_num(stim_num).ttest_p_amplitude_m]= ttest(event_evoked_stat.stim_num(stim_num).amplitude_m(:,1),event_evoked_stat.stim_num(stim_num).amplitude_m(:,2));
 
         clear  diff_amplitude_m tmp
-        
+
+        % normalized amplitude mean
+         tmp(:,:) = event_evoked_stat.stim_num(stim_num).amplitude_norm_m;           
+%         event_evoked_stat.stim_num(stim_num).change_amplitude_m = (tmp(:,2)-tmp(:,1))./abs(tmp(:,1)) ;
+        event_evoked_stat.stim_num(stim_num).amplitude_norm_m_m= nanmean(tmp,1);
+        event_evoked_stat.stim_num(stim_num).amplitude_norm_m_std= nanstd(tmp,0,1);
+%          event_evoked_stat.stim_num(stim_num).change_amplitude_m_m= nanmean(event_evoked_stat.stim_num(stim_num).change_amplitude_m,1);
+%         event_evoked_stat.stim_num(stim_num).change_amplitude_m_std= nanstd(event_evoked_stat.stim_num(stim_num).change_amplitude_m,0,1);
+%        change_amplitude_m_mat(:,stim_num)= event_evoked_stat.stim_num(stim_num).change_amplitude_m;
+        %testing for normal distribution
+        diff_amplitude_norm_m= tmp(:,2)- tmp(:,1);
+        if (nnz(diff_amplitude_norm_m)-sum(sum(isnan(diff_amplitude_norm_m))))>4;
+            [event_evoked_stat.stim_num(stim_num).lillietest_h_amplitude_norm_m, event_evoked_stat.stim_num(stim_num).lillietest_p_amplitude_norm_m] = lillietest(diff_amplitude_norm_m);
+%             [event_evoked_stat.stim_num(stim_num).lillietest_h_change_amplitude_m, event_evoked_stat.stim_num(stim_num).lillietest_p_change_amplitude_m] = lillietest(event_evoked_stat.stim_num(stim_num).change_amplitude_m);
+        %paired ttest
+%             [event_evoked_stat.stim_num(stim_num).wilcoxon_p_change_amplitude_m, event_evoked_stat.stim_num(stim_num).wilcoxon_h_change_amplitude_m]= signrank(event_evoked_stat.stim_num(stim_num).change_amplitude_m);
+            [event_evoked_stat.stim_num(stim_num).wilcoxon_p_amplitude_norm_m, event_evoked_stat.stim_num(stim_num).wilcoxon_h_amplitude_norm_m]= signrank(event_evoked_stat.stim_num(stim_num).amplitude_norm_m(:,1),event_evoked_stat.stim_num(stim_num).amplitude_norm_m(:,2));
+        end
+%         [event_evoked_stat.stim_num(stim_num).ttest_h_change_amplitude_m, event_evoked_stat.stim_num(stim_num).ttest_p_change_amplitude_m]= ttest(event_evoked_stat.stim_num(stim_num).change_amplitude_m);
+        [event_evoked_stat.stim_num(stim_num).ttest_h_amplitude_norm_m, event_evoked_stat.stim_num(stim_num).ttest_p_amplitude_norm_m]= ttest(event_evoked_stat.stim_num(stim_num).amplitude_norm_m(:,1),event_evoked_stat.stim_num(stim_num).amplitude_norm_m(:,2));
+
+        clear  diff_amplitude_norm_m tmp
+
     % amplitude std
          tmp(:,:) = event_evoked_stat.stim_num(stim_num).amplitude_std;           
         event_evoked_stat.stim_num(stim_num).change_amplitude_std = (tmp(:,2)-tmp(:,1))./abs(tmp(:,1)) ;
@@ -981,7 +1021,11 @@ end
    if event_evoked_stat.stim_num(stim_num).lillietest_h_change_amplitude_m==0      
             h_amplitude_m(1,stim_num)=event_evoked_stat.stim_num(stim_num).ttest_h_change_amplitude_m; 
   else h_amplitude_m(1,stim_num)=event_evoked_stat.stim_num(stim_num).wilcoxon_h_change_amplitude_m; 
-   end
+   end 
+   if event_evoked_stat.stim_num(stim_num).lillietest_h_amplitude_norm_m==0      
+            h_amplitude_norm_m(1,stim_num)=event_evoked_stat.stim_num(stim_num).ttest_h_amplitude_norm_m; 
+  else h_amplitude_norm_m(1,stim_num)=event_evoked_stat.stim_num(stim_num).wilcoxon_h_amplitude_norm_m; 
+   end 
    if event_evoked_stat.stim_num(stim_num).lillietest_h_change_amplitude_std==0      
             h_amplitude_std(1,stim_num)=event_evoked_stat.stim_num(stim_num).ttest_h_change_amplitude_std; 
   else h_amplitude_std(1,stim_num)=event_evoked_stat.stim_num(stim_num).wilcoxon_h_change_amplitude_std; 
@@ -1026,6 +1070,7 @@ end
      s_onset_m=find(h_onset_m==1);
      s_onset_std=find(h_onset_std==1); 
      s_amplitude_m=find(h_amplitude_m==1);
+     s_amplitude_norm_m=find(h_amplitude_norm_m==1);
      s_amplitude_std=find(h_amplitude_std==1);
      s_onVal_m=find(h_onVal_m==1);
      s_ampVal_m=find(h_ampVal_m==1);
@@ -1050,6 +1095,8 @@ end
      onset_std_mat{2}(:,stim_num)= event_evoked_stat.stim_num(stim_num).onset_std(:,2);
      amplitude_m_mat{1}(:,stim_num)= event_evoked_stat.stim_num(stim_num).amplitude_m(:,1);
      amplitude_m_mat{2}(:,stim_num)= event_evoked_stat.stim_num(stim_num).amplitude_m(:,2);
+     amplitude_norm_m_mat{1}(:,stim_num)= event_evoked_stat.stim_num(stim_num).amplitude_norm_m(:,1);
+     amplitude_norm_m_mat{2}(:,stim_num)= event_evoked_stat.stim_num(stim_num).amplitude_norm_m(:,2);
      amplitude_std_mat{1}(:,stim_num)= event_evoked_stat.stim_num(stim_num).amplitude_std(:,1);
      amplitude_std_mat{2}(:,stim_num)= event_evoked_stat.stim_num(stim_num).amplitude_std(:,2);
      ampVal_m_mat{1}(:,stim_num)= event_evoked_stat.stim_num(stim_num).ampVal_m(:,1);
@@ -1325,7 +1372,59 @@ end
         xlabel('Stim. serial number' ,'FontSize', 16);
        ylabel(['Amplitude [', y_ax_units{1},']'],'FontSize', 16);    
         title(['Mean Response Amplitude, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);     
-        %%
+        %%  amplitude Normalized
+      h19=figure; 
+      stimz=size(amplitude_norm_m_mat{2}(:,:),2);
+for stim=1:stimz
+        if event_evoked_stat.stim_num(stim).ttest_p_amplitude_norm_m>0.05
+            asterisk_amp{stim,1}='n.s.';
+        else if event_evoked_stat.stim_num(stim).ttest_p_amplitude_norm_m<0.05 && event_evoked_stat.stim_num(stim).ttest_p_amplitude_norm_m>0.01
+            asterisk_amp{stim,1}='*';
+            else if event_evoked_stat.stim_num(stim).ttest_p_amplitude_norm_m<0.01 && event_evoked_stat.stim_num(stim).ttest_p_amplitude_norm_m>0.001
+                    asterisk_amp{stim,1}='**';
+            else if event_evoked_stat.stim_num(stim).ttest_p_amplitude_norm_m<0.001
+                     asterisk_amp{stim,1}='***';
+                end
+                end
+            end
+        end
+end
+   
+hold on      
+        errbar_h=errorbar([1:size(amplitude_norm_m_mat{1}(:,:),2)]-0.3,nanmean(amplitude_norm_m_mat{1}(:,:),1),zeros(1,size(amplitude_norm_m_mat{1}(:,:),2)), nanstd(amplitude_norm_m_mat{1}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        errbar_h=errorbar([1:size(amplitude_norm_m_mat{2}(:,:),2)],nanmean(amplitude_norm_m_mat{2}(:,:),1),zeros(1,size(amplitude_norm_m_mat{2}(:,:),2)), nanstd(amplitude_norm_m_mat{2}(:,:),0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+        bar([1:size(amplitude_norm_m_mat{1}(:,:),2)]-0.3, nanmean(amplitude_norm_m_mat{1}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:))
+        bar([1:size(amplitude_norm_m_mat{2}(:,:),2)], nanmean(amplitude_norm_m_mat{2}(:,:),1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:))       
+%for line pair-plots:
+if paired_plot_flag==1; 
+   for stim=1:stimz
+        F1_Y{stim}(:,:)=event_evoked_stat.stim_num(stim).amplitude_m;
+        F1_X{stim}(:,1)=(stim-0.3)*ones(size(F1_Y,1),1);
+        F1_X{stim}(:,2)=stim*ones(size(F1_Y,1),1);
+   end
+        for cell=1:length(files_to_analyze)
+            for stim=1:stimz
+                 if isnan(F1_Y{stim}(cell,:))
+                    else
+                        plot(F1_X{stim}(1,:),F1_Y{stim}(cell,:),'color',color_table_lines(cell,:),'linewidth',1.5); %,'markersize',10,'markerfacecolor','k')
+%                         pause
+                 end
+            end
+        end
+end
+        ylim_data=[get(gca,'ylim')]';
+        my=max(ylim_data)-0.07;
+        for stim=1:stimz
+            if strcmp('n.s.',asterisk_amp{stim,1})==0          
+             text(stim,my,asterisk_amp{stim,1},'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',17)      
+            end
+        end
+        hold off
+        set(gca,'xlim',[0,size(amplitude_norm_m_mat{2}(:,:),2)+0.5], 'xtick',[1:1:11],'xticklabel',[1:1:11])
+        xlabel('Stim. serial number' ,'FontSize', 16);
+       ylabel(['Norm Amplitude'],'FontSize', 16);    
+        title(['Mean Response Amplitude Norm, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);     
+        %% amplitudes histogram
         data_vec=[]; data_mat=[];
         nbin=30;
         stimz=1:11; %1:size(amplitude_m_mat{2}(:,:),2);
@@ -2639,7 +2738,8 @@ saveas(h17,'Rise Time 10-90% Peak','fig')
 print(h17,'Rise Time 10-90% Peak','-dpng','-r600','-opengl')
 saveas(h18,'Rise Time 10-90% Peak STD','fig') 
 print(h18,'Rise Time 10-90% Peak STD','-dpng','-r600','-opengl')
-
+print(h19,'Evoked Amplitude Normalized','-dpng','-r600','-opengl')
+saveas(h19,'Evoked Amplitude Normalized','fig') 
 
 print(g1,'Evoked Adaptation Amplitude Ratio_paired plot','-dpng','-r600','-opengl')
 saveas(g1,'Evoked Adaptation Amplitude Ratio_paired_plot','fig') 

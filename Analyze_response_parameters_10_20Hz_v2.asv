@@ -2098,11 +2098,13 @@ else if VmM_stat.p_during{1,1}<0.05 && VmM_stat.p_during{1,1}>0.01
     end
 end
 
-my=max(max(peaks_stat(stim_num).Vm_res_M_meanstim))+5; %+5; +10
+text(1,my,asterisk_during,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a1_fontsize)
+my=max(max(peaks_stat(stim_num).Vm_res_M_meanstim))+3; %+5; 
+g6=figure;
 hold on
 line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
 errorbar(tmp_X(:,1), nanmean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-text(1.5,my,asterisk_during,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a1_fontsize);
+text(1,my,asterisk_during,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a1_fontsize);
 hold off
         x1limits = [0.75 2.25];
         x1ticks = [1,2];
@@ -2116,9 +2118,9 @@ hold off
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold',  'ylim', y1limits,
         ylabel('Vm mean [mV]', 'FontSize', 28,'fontname', 'arial');
-        title(['VmM,  p=' num2str(VmM_stat.p_during{1})] ,'FontSize', 20,'fontname', 'arial');
+        title(['VmM,  p=' num2str(event_ongoing_stat.wilcoxon_p_VmM)] ,'FontSize', 20,'fontname', 'arial');
 
-    %% option 2: bar-plot
+    %option 2: bar-plot
     nstim=1;
     hold on
         errbar_h1=errorbar(1-0.15,nanmean([peaks_stat(stim_num).Vm_res_M_meanstim(:,1)],1), nanstd([peaks_stat(stim_num).Vm_res_M_meanstim(:,1)],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
@@ -2264,50 +2266,6 @@ text(1,my,asterisk_before,'HorizontalAlignment', 'center','verticalAlignment','m
 
         %% plot VmSTD during sensory stimulation
     j7=figure;     
-    %option 1: paired-plot (lines)
-    stim_num=1;
-    tmp_Y= peaks_stat(stim_num).Vm_res_STD_meanstim';
-tmp_X(1,:)=ones(1,size(tmp_Y,2));
-tmp_X(2,:)=2*ones(1,size(tmp_Y,2));
-E = peaks_stat(stim_num).Vm_res_STD_meanstim_std;
- if VmSTD_stat.p_during{1,1} >0.05 
-    asterisk_during='n.s.';
-    a1_fontsize=13;
-else if VmSTD_stat.p_during{1,1}<0.05 && VmSTD_stat.p_during{1,1}>0.01
-    asterisk_during='*';
-    a1_fontsize=17;
-    else if VmSTD_stat.p_during{1,1}<0.01 && VmSTD_stat.p_during{1,1}>0.001
-            asterisk_during='**';
-            a1_fontsize=17;
-    else if VmSTD_stat.p_during{1,1}<0.001
-             asterisk_during='***';
-             a1_fontsize=17;
-        end
-        end
-    end
-end
-
-my=max(max(peaks_stat(stim_num).Vm_res_STD_meanstim))+1; %+2; 
-hold on
-line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-errorbar(tmp_X(:,1), nanmean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
-text(1.5,my,asterisk_during,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a1_fontsize);
-hold off
-        x1limits = [0.75 2.25];
-        x1ticks = [1,2];
-        switch exp_type
-            case 1
-                y1limits = [0 10];
-            case 2
-                y1limits = [0 6];
-        end
-        y1ticks = [0,0.5,1];
-        set( gca, 'xlim', x1limits,'xtick', x1ticks, 'ylim', y1limits,'fontsize',28,'linewidth',1,...
-        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
-        ylabel('Vm std [mV]', 'FontSize', 28,'fontname', 'arial');
-        title(['VmSTD,  p=' num2str(VmSTD_stat.p_during{1})] ,'FontSize', 20,'fontname', 'arial');
-
-    %% option 2: bar-plot
     nstim=1;
     hold on
         errbar_h1=errorbar(1-0.15,nanmean([peaks_stat(stim_num).Vm_res_STD_meanstim(:,1)],1), nanstd([peaks_stat(stim_num).Vm_res_STD_meanstim(:,1)],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'

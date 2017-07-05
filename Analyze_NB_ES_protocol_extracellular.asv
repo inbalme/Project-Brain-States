@@ -854,22 +854,22 @@ saveas(gcf,filename,'fig');
 print(gcf,filename,'-dpng','-r600','-opengl') 
 %% background nspikes
 nspikes_background_Y= spikes_stat(stim_num).nspikes_background';
-nspikes_background_X(1,:)=ones(1,size(nspikes_background_Y,2));
-nspikes_background_X(2,:)=2*ones(1,size(nspikes_background_Y,2));
-E = std(nspikes_background_Y,0,2);
+nspikes_background_X(1,:)=ones(1,size(nspikes_signal_Y,2));
+nspikes_signal_X(2,:)=2*ones(1,size(nspikes_signal_Y,2));
+E = std(nspikes_signal_Y,0,2);
 linex=[1;2];
-my=max(max(nspikes_background_Y))*1.1; 
+my=max(max(nspikes_signal_Y))*1.1; 
 liney=[my;my];
-if spikes_stat.wilcoxon_p_nspikes_background>0.05 
+if spikes_stat.wilcoxon_p_nspikes_signal>0.05 
     asterisk='n.s.';
     a_fontsize=13;
-else if spikes_stat.wilcoxon_p_nspikes_background<0.05 && spikes_stat.wilcoxon_p_nspikes_background>0.01
+else if spikes_stat.wilcoxon_p_nspikes_signal<0.05 && spikes_stat.wilcoxon_p_nspikes_signal>0.01
     asterisk='*';
     a_fontsize=17;
-    else if spikes_stat.wilcoxon_p_nspikes_background<0.01 && spikes_stat.wilcoxon_p_nspikes_background>0.001
+    else if spikes_stat.wilcoxon_p_nspikes_signal<0.01 && spikes_stat.wilcoxon_p_nspikes_signal>0.001
             asterisk='**';
             a_fontsize=17;
-    else if spikes_stat.wilcoxon_p_nspikes_background<0.001
+    else if spikes_stat.wilcoxon_p_nspikes_signal<0.001
              asterisk='***';
              a_fontsize=17;
         end
@@ -878,24 +878,24 @@ else if spikes_stat.wilcoxon_p_nspikes_background<0.05 && spikes_stat.wilcoxon_p
 end
 figure
 hold on
-line(nspikes_background_X,nspikes_background_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
-errorbar(nspikes_background_X(:,1), mean(nspikes_background_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
+line(nspikes_signal_X,nspikes_signal_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
+errorbar(nspikes_signal_X(:,1), mean(nspikes_signal_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
 % line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
 text(1.5,my,asterisk,'HorizontalAlignment', 'center','fontsize',a_fontsize) %'verticalAlignment','bottom',
 hold off
 
         x1limits = [0.75 2.25];
         x1ticks = [1,2];
-        y1limits = [-5 25];
+        y1limits = [-5 35];
         y1ticks = [0,0.5,1];
         set( gca, 'xlim', x1limits, 'ylim', y1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'NB-','NB+'} ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('#Spikes/Train', 'FontSize', 28,'fontname', 'arial');
-        title(['Background #Spikes, n=', num2str(size(nspikes_background_Y,2)), ', p=', num2str(spikes_stat.wilcoxon_p_nspikes_background)])
+        title(['Background #Spikes, n=', num2str(size(nspikes_signal_Y,2)), ', p=', num2str(spikes_stat.wilcoxon_p_nspikes_signal)])
         
         %save figure  
 cd(path_output)
-filename='Background Spikes';
+filename='background Spikes';
 saveas(gcf,filename,'fig'); 
 print(gcf,filename,'-dpng','-r600','-opengl') 
 %% Latency (only for cells which faithfully responded to the 1st stim in the train)
