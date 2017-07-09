@@ -5,7 +5,7 @@ save_flag=1;
  no_numbering_flag=1;
 %opening saved figures:
 %Long traces NB:
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean\Long Trace Presentation'
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean\Long Trace Presentation\style2'
 %spontaneous:
 spont_trace_f46 = open('f46_traces_x1_v2.fig');    
 b1=findall(gcf,'type','line');
@@ -26,7 +26,7 @@ spont_std_f46_ax = get(gcf, 'children');
 
 %% long traces ChAT
 
-cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean\Long Trace Presentation'
+cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean\Long Trace Presentation\style2'
 %spontaneous:
 spont_trace_f80 = open('f80_traces_x1_v2.fig');    
 b1=findall(gcf,'type','line');
@@ -53,16 +53,7 @@ VmM_NB_ax = get(gcf, 'children');
 
  
 VmSTD_NB = open('Spontaneous VmSTD.fig');   
-VmSTD_NB_ax = get(gcf, 'children');
-
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\LFP_50Hz Vm_50Hz'
-legend_NB = open('Vm M_Before Sensory stim.fig');   
-legend_NB_ax = get(gcf, 'children');
-% VmSTD_NB = open('Vm STD_Before Sensory stim.fig'); 
-cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean+summary\LFP_50Hz Vm_50Hz'
-legend_ChAT = open('Vm M_Before Sensory stim.fig');   
-legend_ChAT_ax = get(gcf, 'children');
-% VmSTD_ChAT = open('Vm STD_Before Sensory stim.fig');    
+VmSTD_NB_ax = get(gcf, 'children');  
 
 cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Spontaneous';
 VmM_ChAT = open('Spontaneous VmM.fig');    

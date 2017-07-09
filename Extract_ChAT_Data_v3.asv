@@ -214,10 +214,6 @@ else
         case 2   
              laser_flag(1,:) = [1];
              galvano_flag(1,:) = [0]; 
-             laser_del = 4; %Param.facade(22);
-             laser_ondur = 4; %Param.facade(23);
-             laser_nstim = 1; %Param.facade(24);
-             laser_freq = 1; %Param.facade(25);
         case 5
              laser_flag(1,:) = [1 0 1 0 1];
              galvano_flag(1,:) = [0 1 1 1 1];

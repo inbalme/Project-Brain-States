@@ -20,7 +20,7 @@ BPLFP_flag=1; %filtering LFP. the default filter is the one used to filter LFP i
 bp_manual_LFP=[1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
 bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
-lengthh_vert=[1,2,10; 1,5,10]; %[0.1,0.1,0.5];%[1,2,5]; %[1,2,10]; %lengthh_vert(1) is for STD, lengthh_vert(2) is for mean and (3) is for traces. row 1 spont. row 2 evoked
+lengthh_vert=[2,5,10; 2,5,10]; %[0.1,0.1,0.5];%f46:[2,5,10; 2,5,10]; f80:[1,2,10; 1,2,10] %lengthh_vert(1) is for STD, lengthh_vert(2) is for mean and (3) is for traces. row 1 spont. row 2 evoked
 trace_ind =[2,3,4,5,6];%[2,3,4,5,6]; %if trace_ind is empty, the default would be to take all traces
 DC_factor =16; %12; %sets the spacing between plotted traces. set DC_factor=1 for LFP [f44 13; f46 16] [f80 9; f74 12] 
  %% set the path for saving figures and variables
@@ -63,8 +63,8 @@ switch exp_type
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB-', 'NB+'};   y_ax_label={'Vm'}; y_ax_units={'mV'};   
-         path_output1='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean\Long Trace Presentation';  
-        path_output2='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean\Zoom-in Trace Presentation';  
+         path_output1='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean\Long Trace Presentation\style2';  
+        path_output2='D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean\Zoom-in Trace Presentation\style2';  
         a = exist(path_output1,'dir'); %a will be 7 if a folder "name" exists and 0 otherwise
         b = exist(path_output2,'dir'); %b will be 7 if a folder "name" exists and 0 otherwise
         if a==0;
@@ -75,12 +75,12 @@ switch exp_type
       end 
 
     case 2
-        files_to_analyze =74; %[74,76,77,80,82,84,87,90,92,112,114,115]; [94,96,98,101]
+        files_to_analyze =80; %[74,76,77,80,82,84,87,90,92,112,114,115]; [94,96,98,101]
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light Off', 'Light On'};    y_ax_label={'Vm'}; y_ax_units={'mV'}; 
-         path_output1='D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean\Long Trace Presentation';  
-        path_output2='D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean\Zoom-in Trace Presentation';  
+         path_output1='D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean\Long Trace Presentation\style2';  
+        path_output2='D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean\Zoom-in Trace Presentation\style2';  
         a = exist(path_output1,'dir'); %a will be 7 if a folder "name" exists and 0 otherwise
         b = exist(path_output2,'dir'); %b will be 7 if a folder "name" exists and 0 otherwise
         if a==0;
@@ -211,9 +211,11 @@ switch exp_type
         else
             x_axis_Slong=0.4*sf{1}:8*sf{1}-1;
             x_axis_Elong=round((stim1_X{1}(2,1)+10):10*sf{1}-1);
-        end
-        x_axis_Sshort(1,:)=0.4*sf{1}:2.9*sf{1};
-        x_axis_Sshort(2,:)=round(stim2{1}(1,1)-0.5*sf{1}:stim2{1}(1,1)+2*sf{1});
+         end
+             x_axis_Sshort(1,:)=0.4*sf{1}:1.4*sf{1};
+            x_axis_Sshort(2,:)=round(stim2{1}(1,1)-0.5*sf{1}:stim2{1}(1,1)+0.5*sf{1});
+%         x_axis_Sshort(1,:)=0.4*sf{1}:2.9*sf{1};
+%         x_axis_Sshort(2,:)=round(stim2{1}(1,1)-0.5*sf{1}:stim2{1}(1,1)+2*sf{1});
         
 %         x_axis_Eshort(1,:)=round(stim2{1}(1,1)-0.5*sf{1}:stim2{1}(1,1)+2*sf{1});
 %         x_axis_Eshort(2,:)=round(stim2{1}(1,1)-0.5*sf{1}:stim2{1}(1,1)+2*sf{1});
@@ -235,9 +237,11 @@ switch exp_type
         curr_inj_1_end=curr_inj_1+curr_inj_dur+0.1;
         curr_inj_2_end=curr_inj_2+curr_inj_dur+0.1;
         x_axis_Slong=round(1:12*sf{1}-1);
-        x_axis_Sshort(1,:)=round(0.4*sf{1}:2.9*sf{1});
-        x_axis_Sshort(2,:)=stim1_X{1}(1,1)+0.4*sf{1}:stim1_X{1}(1,1)+2.9*sf{1};
-%         x_axis_Sshort(2,:)=round(stim2{1}(1,1)-0.05*sf{1}:stim2{1}(1,1)+2.45*sf{1});
+        x_axis_Sshort(1,:)=round(0.4*sf{1}:1.4*sf{1});
+        x_axis_Sshort(2,:)=stim1_X{1}(1,1)+0.4*sf{1}:stim1_X{1}(1,1)+1.4*sf{1};
+%         x_axis_Sshort(1,:)=round(0.4*sf{1}:2.9*sf{1});
+%         x_axis_Sshort(2,:)=stim1_X{1}(1,1)+0.4*sf{1}:stim1_X{1}(1,1)+2.9*sf{1};
+
         x_axis_Elong=round(1*sf{1}:12*sf{1}-1);
 %         x_axis_Eshort(1,:)=round(stim2{1}(1,1)-0.05*sf{1}:stim2{1}(1,1)+2.45*sf{1});
 %         x_axis_Eshort(2,:)=round(stim2{1}(1,1)-0.05*sf{1}:stim2{1}(1,1)+2.45*sf{1});
@@ -807,13 +811,19 @@ set(rec1,'Position',[x_axis_Eshort(1,1)*dt,ylim_data(1),(x_axis_Eshort(1,end)-x_
 % end
 % plotting stim_2:
 if plot_stim_2(2);
-patch_xdata=[stim2{1}; flipud(stim2{1})];
-yex=wextend('1D','sym',ylim_data,1);
-l=ceil((size(patch_xdata,2)-1)/2);        %if the number of stim is odd
-temp_y=wextend('ac','sym',yex,l);
-patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
-patch_cdata=ones(size(patch_xdata));
-patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
+    %dashed lines:
+    yline=ones(size(stim2{2})); 
+    yline(1,:)=yline(1,:)*ylim_data(1);
+    yline(2,:)=yline(2,:)*ylim_data(2);
+    line(stim2{2}.*dt,yline,'linestyle','--','LineWidth',1,'Color',[0 0 0 0.5])
+    %transparent bars:
+% patch_xdata=[stim2{1}; flipud(stim2{1})];
+% yex=wextend('1D','sym',ylim_data,1);
+% l=ceil((size(patch_xdata,2)-1)/2);        %if the number of stim is odd
+% temp_y=wextend('ac','sym',yex,l);
+% patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
+% patch_cdata=ones(size(patch_xdata));
+% patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
@@ -825,7 +835,11 @@ horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,
 hold off
 ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
 set(gca, 'visible', 'off') ;
-
+xlim_data=get(gca,'xlim');
+%% plot whisker stimulation
+e9=figure;
+set(gca,'xlim',xlim_data,'ylim',[0.7,1.3]);
+ line(stim2{2}.*dt,ones(size(stim2{2})),'LineWidth',6,'Color','k')
 %%
 %plot evoked traces with ES:
 trace_to_plot = bsxfun(@plus,plot_data(:,trace_ind,3),DC); %DC is added just to make space between the traces 
@@ -858,13 +872,19 @@ end
 
 %plotting stim_2:
 if plot_stim_2(3);
-patch_xdata=[stim2{2}; flipud(stim2{2})];
-yex=wextend('1D','sym',ylim_data,1);
-l=ceil((size(patch_xdata,2)-1)/2);        %if the number of stim is odd
-temp_y=wextend('ac','sym',yex,l);
-patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
-patch_cdata=ones(size(patch_xdata));
-patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
+    %dashed lines:
+    yline=ones(size(stim2{2})); 
+    yline(1,:)=yline(1,:)*ylim_data(1);
+    yline(2,:)=yline(2,:)*ylim_data(2);
+    line(stim2{2}.*dt,yline,'linestyle','--','LineWidth',1,'Color',[0 0 0 0.6])
+    %transparent bars:
+% patch_xdata=[stim2{2}; flipud(stim2{2})];
+% yex=wextend('1D','sym',ylim_data,1);
+% l=ceil((size(patch_xdata,2)-1)/2);        %if the number of stim is odd
+% temp_y=wextend('ac','sym',yex,l);
+% patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
+% patch_cdata=ones(size(patch_xdata));
+% patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
@@ -901,13 +921,19 @@ end
 
 %for plotting stim_2:
 if plot_stim_2(3);
-patch_xdata=[stim2{1}; flipud(stim2{1})];
-yex=wextend('1D','sym',ylim_data,1);
-l=ceil((size(patch_xdata,2)-1)/2);        %if the number of stim is odd
-temp_y=wextend('ac','sym',yex,l);
-patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
-patch_cdata=ones(size(patch_xdata));
-patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
+    %dashed lines:
+    yline=ones(size(stim2{2})); 
+    yline(1,:)=yline(1,:)*ylim_data(1);
+    yline(2,:)=yline(2,:)*ylim_data(2);
+    line(stim2{2}.*dt,yline,'linestyle','--','LineWidth',1,'Color',[0 0 0 0.6])
+    %transparent bars:
+% patch_xdata=[stim2{1}; flipud(stim2{1})];
+% yex=wextend('1D','sym',ylim_data,1);
+% l=ceil((size(patch_xdata,2)-1)/2);        %if the number of stim is odd
+% temp_y=wextend('ac','sym',yex,l);
+% patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
+% patch_cdata=ones(size(patch_xdata));
+% patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
@@ -952,13 +978,19 @@ end
 
 %for plotting stim_2:
 if plot_stim_2(3);
-patch_xdata=[stim2{1}; flipud(stim2{1})];
-yex=wextend('1D','sym',ylim_data,1);
-l=ceil((size(patch_xdata,2)-1)/2);        %if the number of stim is odd
-temp_y=wextend('ac','sym',yex,l);
-patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
-patch_cdata=ones(size(patch_xdata));
-patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
+    %dashed lines:
+    yline=ones(size(stim2{2})); 
+    yline(1,:)=yline(1,:)*ylim_data(1);
+    yline(2,:)=yline(2,:)*ylim_data(2);
+    line(stim2{2}.*dt,yline,'linestyle','--','LineWidth',1,'Color',[0 0 0 0.6])
+    %transparent bars:
+% patch_xdata=[stim2{1}; flipud(stim2{1})];
+% yex=wextend('1D','sym',ylim_data,1);
+% l=ceil((size(patch_xdata,2)-1)/2);        %if the number of stim is odd
+% temp_y=wextend('ac','sym',yex,l);
+% patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
+% patch_cdata=ones(size(patch_xdata));
+% patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
@@ -982,4 +1014,6 @@ if save_flag==1;
         print(e7,['f' num2str(files_to_analyze(fileind)) '_mean_x2+3_v2'],'-dpng','-r600','-opengl') 
         saveas(e8,['f' num2str(files_to_analyze(fileind)) '_std_x2+3_mean-subt_v2'],'fig') 
         print(e8,['f' num2str(files_to_analyze(fileind)) '_std_x2+3_mean-subt_v2'],'-dpng','-r600','-opengl') 
+        saveas(e9,['f' num2str(files_to_analyze(fileind)) '_WS alone'],'fig') 
+        print(e9,['f' num2str(files_to_analyze(fileind)) '_WS alone'],'-dpng','-r600','-opengl') 
 end

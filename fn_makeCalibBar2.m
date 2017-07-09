@@ -57,7 +57,7 @@ else %for vertical bar
     set(gca,'xlim',[xl(1),barXend+x_units]);  %setting new xlim for the axes to contain the scale bar
     set(gca,'ylim',[barYstart-y_units, yl(2)]) %setting new ylim for the axes to contain the scale bar
    p1 = plot([barXstart, barXend],[barYstart, barYend],'linewidth',2,'color',c);
-    p2 = text(barXstart+x_units,barYstart+lengthh/2,textit,'HorizontalAlignment', 'center','VerticalAlignment', 'bottom', 'rotation',90,'fontsize',fonsizes);
+    p2 = text(barXstart+x_units,barYstart+lengthh/2,textit,'HorizontalAlignment', 'center','VerticalAlignment', 'middle', 'fontsize',fonsizes); %'rotation',90,
 end;
 
 

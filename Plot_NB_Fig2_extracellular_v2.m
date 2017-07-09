@@ -65,17 +65,23 @@ evoked_trace_On_f33_pos_top = evoked_trace_On_f33_pos(1,2)+evoked_trace_On_f33_p
 
 %population parameters:
 h_dist=evoked_trace_Off_f23_pos(1,1)+evoked_trace_Off_f23_pos(1,3)+ 0.12;
-vert_dim=0.18;
+vert_dim=0.12;
 %SNR Index
 SNR = open('SNR.fig');    
 SNR_ax = get(gcf, 'children');
-SNR_pos(1,:) = [h_dist , evoked_trace_On_f33_pos(2,2)+0.02, 0.13 , vert_dim];
+SNR_pos(1,:) = [h_dist , evoked_trace_On_f33_pos(2,2), 0.13 , vert_dim];
 SNR_pos_top = SNR_pos(1,2)+SNR_pos(1,4);
+
+%Background spikes
+Background_spikes = open('Background Spikes.fig');    
+Background_spikes_ax = get(gcf, 'children');
+Background_spikes_pos(1,:) = [h_dist , SNR_pos(1,2)+vert_dim+0.1 , 0.13 , vert_dim];
+Background_spikes_pos_top = Background_spikes_pos(1,2)+Background_spikes_pos(1,4);
 
 % Modulation Index
 Modulation_index = open('Modulation index.fig');    
 Modulation_index_ax = get(gcf, 'children');
-Modulation_index_pos(1,:) = [h_dist , SNR_pos(1,2)+vert_dim+0.08 , 0.13 , vert_dim];
+Modulation_index_pos(1,:) = [h_dist , Background_spikes_pos(1,2)+vert_dim+0.08 , 0.13 , vert_dim];
 Modulation_index_pos_top = Modulation_index_pos(1,2)+Modulation_index_pos(1,4);
 
 %Response Modulation
@@ -83,12 +89,6 @@ Response_modulation = open('Response_modulation.fig');
 Response_modulation_ax = get(gcf, 'children');
 Response_modulation_pos(1,:) = [h_dist , Modulation_index_pos(1,2)+vert_dim+0.1 , 0.13 , vert_dim];
 Response_modulation_pos_top = Response_modulation_pos(1,2)+Response_modulation_pos(1,4);
-
-%Background spikes
-Background_spikes = open('Response_modulation.fig');    
-Background_spikes_ax = get(gcf, 'children');
-Background_spikes_pos(1,:) = [h_dist , Modulation_index_pos(1,2)+vert_dim+0.1 , 0.13 , vert_dim];
-Background_spikes_pos_top = Background_spikes_pos(1,2)+Background_spikes_pos(1,4);
 
 %open a new figure:
 F = figure;
@@ -219,6 +219,13 @@ set(Response_modulation_ax_copy,'position',Response_modulation_pos(1,:),'ylim',[
 set(Modulation_index_ax_copy,'position',Modulation_index_pos(1,:),'ylim',[-1 1] ,'ytick', [-1 0 1],...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'box','off'); %, 'ylim', y6limits,'ytick', y6ticks,'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
  set(F, 'currentaxes', Modulation_index_ax_copy); t=title(''); yl=ylabel('Modulation Index','fontsize',13);
+ 
+ %Background Spikes
+Background_spikes_ax_copy = copyobj(Background_spikes_ax,F); % copy axes to new fig
+set(Background_spikes_ax_copy,'position',Background_spikes_pos(1,:),'ylim',[-5 20] ,...
+       'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'box','off'); %, 'ylim',[-5 30] ,'ytick', [0 10 20],'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
+ set(F, 'currentaxes', Background_spikes_ax_copy); t=title(''); yl=ylabel('#Spikes','fontsize',13);
+
  %SNR
 SNR_ax_copy = copyobj(SNR_ax,F); % copy axes to new fig
 set(SNR_ax_copy,'position',SNR_pos(1,:),'ylim',[-0.1 1.1] ,'ytick', [0 0.5 1],...
@@ -254,8 +261,10 @@ annotation('textbox', [spont_trace_On_f23_pos(1,1) spont_trace_On_f23_pos_top 0 
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'I', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
  annotation('textbox', [Modulation_index_pos(1,1) Modulation_index_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'J', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
-  annotation('textbox', [SNR_pos(1,1) SNR_pos_top 0 0]+a_pos1,...
+ annotation('textbox', [Background_spikes_pos(1,1) Background_spikes_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'K', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
+  annotation('textbox', [SNR_pos(1,1) SNR_pos_top 0 0]+a_pos1,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'L', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 end 
 %%
 if no_numbering_flag==1;
