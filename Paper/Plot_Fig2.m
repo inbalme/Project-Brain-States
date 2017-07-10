@@ -1,7 +1,7 @@
 %% plotting a figure 
 close all
 clear all
-save_flag=1;
+save_flag=0;
  no_numbering_flag=1;
 %opening saved figures:
 %Long traces NB:
@@ -66,7 +66,7 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Illustrations+Histology'
 
 ChAT_illustration = imread('ChAT_Schematic_Illustration_tight','TIF');
 
-ChAT_histology = imread('ChAT_Histology_tight','TIF');
+% ChAT_histology = imread('ChAT_Histology_tight','TIF');
 
 
 %%
@@ -93,7 +93,7 @@ set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 %% Positions:
     
 v_dist=0.01;
-spont_trace_f46_pos(1,:) = [0.04 , 0.73 ,  0.6 ,  0.2];
+spont_trace_f46_pos(1,:) = [0.15 , 0.73 ,  0.6 ,  0.2];
 spont_mean_f46_pos(1,:) = [spont_trace_f46_pos(1,1), spont_trace_f46_pos(1,2)-0.10-v_dist, spont_trace_f46_pos(1,3), 0.10];
 spont_std_f46_pos(1,:) = [spont_trace_f46_pos(1,1), spont_mean_f46_pos(1,2)-spont_mean_f46_pos(1,4)-v_dist, spont_trace_f46_pos(1,3), spont_mean_f46_pos(1,4)];
 
@@ -104,10 +104,10 @@ spont_std_f80_pos(1,:) =[spont_trace_f80_pos(1,1), spont_mean_f80_pos(1,2)-spont
 h_dist1=spont_trace_f46_pos(1,1)+spont_trace_f46_pos(1,3)+0.07;
 
 v_dist2=0.05;
-VmM_NB_pos(1,:)=[h_dist1+0.03, spont_trace_f46_pos(1,2)+0.02, 0.07, 0.13]; 
-VmSTD_NB_pos(1,:)= VmM_NB_pos; VmSTD_NB_pos(1,1)=VmM_NB_pos(1,1)+VmM_NB_pos(1,3)+0.06;
-VmM_ChAT_pos(1,:)=[h_dist1+0.03, spont_std_f80_pos(1,2)+0.02, VmM_NB_pos(1,3), VmM_NB_pos(1,4)]; 
-VmSTD_ChAT_pos(1,:)= VmM_ChAT_pos; VmSTD_ChAT_pos(1,1)=VmM_ChAT_pos(1,1)+VmM_ChAT_pos(1,3)+0.06;
+VmM_NB_pos(1,:)=[h_dist1+0.03, spont_trace_f46_pos(1,2)+0.05, 0.12, 0.13]; 
+VmSTD_NB_pos(1,:)= VmM_NB_pos; VmSTD_NB_pos(1,2)=VmM_NB_pos(1,2)-VmM_NB_pos(1,4)-0.1;
+VmM_ChAT_pos(1,:)=[h_dist1+0.03, spont_trace_f80_pos(1,2)+0.05, VmM_NB_pos(1,3), VmM_NB_pos(1,4)]; 
+VmSTD_ChAT_pos(1,:)= VmM_ChAT_pos; VmSTD_ChAT_pos(1,2)=VmM_ChAT_pos(1,2)-VmM_ChAT_pos(1,4)-0.1;
 
 ChAT_illustration_pos(1,:)=[h_dist1+0.03,VmM_NB_pos(1,2)-0.2, 0.15, 0.15];
 ChAT_histology_pos(1,:)=[h_dist1-0.04,ChAT_illustration_pos(1,2)-0.21, 0.3, 0.2];
@@ -171,11 +171,11 @@ set(F, 'currentaxes', VmSTD_ChAT_ax_copy);  tl=title('');yl=ylabel('mV','fontsiz
 VmSTD_ChAT_ax_copy.FontSize=11;
 VmSTD_ChAT_ax_copy.XTickLabel={'Off','On'};
 
-ChAT_illustration_ax = axes('position',ChAT_illustration_pos);
-imshow(ChAT_illustration, 'parent', ChAT_illustration_ax) 
+% ChAT_illustration_ax = axes('position',ChAT_illustration_pos);
+% imshow(ChAT_illustration, 'parent', ChAT_illustration_ax) 
 
-ChAT_histology_ax = axes('position',ChAT_histology_pos);
-imshow(ChAT_histology, 'parent', ChAT_histology_ax) 
+% ChAT_histology_ax = axes('position',ChAT_histology_pos);
+% imshow(ChAT_histology, 'parent', ChAT_histology_ax) 
 
 %position legend:
 set(spont_mean_f46_ax_copy(1),'position',[0.5 spont_trace_f46_pos_top+0.02 0.08 0.005])
@@ -231,7 +231,7 @@ annotation('textbox', [VmSTD_NB_pos(1,1) VmM_NB_pos_top 0 0]+a_pos3,...
       cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures\Neuron'
   
 if save_flag==1
-    filename='Fig 2 intracellular traces spont_f46_f80';
+    filename='Fig 2 intracellular traces spont_f46_f80_v2';
     saveas(F,filename,'fig'); 
     print(F,filename,'-dpng','-r600','-opengl') 
     print(F, '-depsc2', filename);

@@ -6,7 +6,7 @@ exp_type=2; %1-NBES, 2-ChAT
 trace_type_input=1; %
 analyze_time_before_train=0;
 analyze_train_only_flag=1;
-save_flag= 1;
+save_flag= 0;
 print_flag=0;
 norm_flag=0;
 manual_validation_flag=1;
@@ -32,7 +32,7 @@ switch exp_type
         end        
 
     case 2
-        files_to_analyze =80; %[74,76,77,80,82,84,87,90,92,112,114,115]; %[74,76,77,80,82,84,87]; %,84,87];
+        files_to_analyze =[74,76,77,80,82,84,87,90,92,112,114,115]; %[74,76,77,80,82,84,87]; %,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light Off', 'Light On'};  y_ax_label={'Vm'}; y_ax_units={'mV'};  

@@ -152,7 +152,6 @@ end
 %     for fileind=1; %temp
 %% Variance plots - two x_values on each plot, for flexible data
 % x_value = 2:3;
-
 plot_data=current_data; %data_no_spikes %raw_data %data_no_spike_no_DC %data_no_DC
 plot_data_mean = mean(plot_data,2);
 plot_data_std =  std(plot_data,0,2);
@@ -235,7 +234,7 @@ plot_data_var=var(plot_data,0,2);
         baseline_local_std baseline_global baseline_global_resid baseline_global_STD baseline_global_average...
         data_pre_response data_pre_response_resid data_train_response data_train_response_resid data_post_train_response data_post_train_response_resid...
         data_response data_response_resid train_interval signal signal_noDC signal_noDC_squared noise1 noise1_noDC noise1_noDC_squared noise2 noise2_noDC noise2_noDC_squared...
-        post_train_interval baseline_global_interval 
+        post_train_interval baseline_global_interval Vm_spont
    
 % t=0; 
     int_time=50; %[ms]
@@ -250,7 +249,25 @@ data_mean = mean(current_data(:,:,x_value(t)),2); %data_no_spikes %raw_data %dat
 %     data_deriv1=diff(data_mean_smooth);
 %     data_deriv2=diff(data_mean_smooth,2);
   
-    
+%% calculating the spontaneous VmM and VmSTD from x_value=1 and not from x_value=2+3
+switch exp_type             
+    case 1
+         start_time = [0.4,5.6]; %[sec] %[0,5]
+         duration = 1; %[sec]                
+    case 2
+        start_time=[0.4, stim1_X{x_value(1)}(1,1).*dt+0.4];
+        duration =1;                                                
+end
+
+         start_sample(:,t) = ceil(start_time(t).*sf{1}); 
+         end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1})-1;
+         interval(:,t) = start_sample(:,t):end_sample(:,t);    
+% from intervals to analyze
+                Vm_spont(:,:,t) = current_data(interval(:,t),:,1);
+                VmM(:,t) =mean(mean(Vm_spont(:,:,t),2));
+                VmSTD(:,t) = mean(std(Vm_spont(:,:,t),0,2)); %mean std across traces (trial-to-trial)
+               
+%%
     %taking the 50 ms prior to the first stim:
                 data_pre_response(:,:,t) = current_data(stim2{t}(1,1)-int_time.*sf{1}./1000:stim2{t}(1,1)-1,:,x_value(t));
                 data_pre_response_resid(:,:,t) = fn_Subtract_Mean(data_pre_response(:,:,t));
@@ -503,6 +520,8 @@ peaks(fileind).baseline_local(:,t)=baseline_local_M;
 peaks(fileind).baseline_global(:,t)=baseline_global_M; 
 peaks(fileind).baseline_global_std(:,t)=baseline_global_STD;
 peaks(fileind).baseline_global_VAR_time(:,t)=baseline_global_VAR_time;
+peaks(fileind).VmM(:,t) = VmM(:,t); %spontaneous
+peaks(fileind).VmSTD(:,t) = VmSTD(:,t); %spontaneous
 peaks(fileind).pre_response_M(:,t) = pre_response_M(:,1); 
 peaks(fileind).pre_response_STD(:,t) = pre_response_STD(:,1); %mean std across traces (trial-to-trial) of 50ms prior to train
 peaks(fileind).pre_response_VAR(:,t) = pre_response_VAR(:,1); %mean var across traces (trial-to-trial) of 50ms prior to train
@@ -563,6 +582,8 @@ peaks(fileind).F1(:,t)=F1(1,t);
             peak_per10_lat{t}(fileind,stim_num)=peaks(fileind).per10_lat(stim_num,t);
             peak_per90_lat{t}(fileind,stim_num)=peaks(fileind).per90_lat(stim_num,t);
             peak_baseline_local{t}(fileind,stim_num)=peaks(fileind).baseline_local(stim_num,t);
+            peak_VmM{t}(fileind,stim_num)=peaks(fileind).VmM(:,t); %mean across traces (trial-to-trial) of spontaneous activity
+            peak_VmSTD{t}(fileind,stim_num)=peaks(fileind).VmSTD(:,t); %mean std across traces (trial-to-trial) of spontaneous activity
             peak_pre_response_STD{t}(fileind,stim_num)=peaks(fileind).pre_response_STD(:,t); %mean std across traces (trial-to-trial) of 50ms prior to train
             peak_pre_response_VAR{t}(fileind,stim_num)=peaks(fileind).pre_response_VAR(:,t); % mean variance across traces
             peak_pre_response_VAR_time{t}(fileind,stim_num)=peaks(fileind).pre_response_VAR_time(:,t); 
@@ -810,6 +831,26 @@ end
         [peaks_stat(stim_num).wilcoxon_p_baseline_global_std, peaks_stat(stim_num).wilcoxon_h_baseline_global_std]= signrank(peaks_stat(stim_num).baseline_global_std(:,1),peaks_stat(stim_num).baseline_global_std(:,2));
         [peaks_stat(stim_num).ttest_h_change_baseline_global_std, peaks_stat(stim_num).ttest_p_change_baseline_global_std]= ttest(peaks_stat(stim_num).change_baseline_global_std);
         [peaks_stat(stim_num).wilcoxon_p_change_baseline_global_std, peaks_stat(stim_num).wilcoxon_h_change_baseline_global_std]= signrank(peaks_stat(stim_num).change_baseline_global_std);
+
+        %spontaneous M - absolute values 
+        peaks_stat(stim_num).VmM=[peak_VmM{1}(:,stim_num),  peak_VmM{2}(:,stim_num)];
+        peaks_stat(stim_num).VmM_m=nanmean(peaks_stat(stim_num).VmM,1);
+        peaks_stat(stim_num).VmM_std=nanstd(peaks_stat(stim_num).VmM,0,1);
+        %testing for normal distribution       
+        [peaks_stat(stim_num).lillietest_h_VmM, peaks_stat(stim_num).lillietest_p_VmM] = lillietest(peaks_stat(stim_num).VmM(:,2)- peaks_stat(stim_num).VmM(:,1));
+        %paired ttest 
+        [peaks_stat(stim_num).ttest_h_VmM, peaks_stat(stim_num).ttest_p_VmM]= ttest(peaks_stat(stim_num).VmM(:,1),peaks_stat(stim_num).VmM(:,2));   
+        [peaks_stat(stim_num).wilcoxon_p_VmM, peaks_stat(stim_num).wilcoxon_h_VmM]= signrank(peaks_stat(stim_num).VmM(:,1),peaks_stat(stim_num).VmM(:,2));
+
+        %spontaneous STD - absolute values 
+        peaks_stat(stim_num).VmSTD=[peak_VmSTD{1}(:,stim_num),  peak_VmSTD{2}(:,stim_num)];
+        peaks_stat(stim_num).VmSTD_m=nanmean(peaks_stat(stim_num).VmSTD,1);
+        peaks_stat(stim_num).VmSTD_std=nanstd(peaks_stat(stim_num).VmSTD,0,1);
+        %testing for normal distribution       
+        [peaks_stat(stim_num).lillietest_h_VmSTD, peaks_stat(stim_num).lillietest_p_VmSTD] = lillietest(peaks_stat(stim_num).VmSTD(:,2)- peaks_stat(stim_num).VmSTD(:,1));
+        %paired ttest 
+        [peaks_stat(stim_num).ttest_h_VmSTD, peaks_stat(stim_num).ttest_p_VmSTD]= ttest(peaks_stat(stim_num).VmSTD(:,1),peaks_stat(stim_num).VmSTD(:,2));   
+        [peaks_stat(stim_num).wilcoxon_p_VmSTD, peaks_stat(stim_num).wilcoxon_h_VmSTD]= signrank(peaks_stat(stim_num).VmSTD(:,1),peaks_stat(stim_num).VmSTD(:,2));
 
         %pre-train response M - absolute values + relative change
         peaks_stat(stim_num).pre_response_M=[peak_pre_response_M{1}(:,stim_num),  peak_pre_response_M{2}(:,stim_num)];
@@ -1666,8 +1707,10 @@ print(gb1,['Mean Response Amplitude_stim ',num2str(stim_num)],'-dpng','-r600','-
 %% rmANOVA with built-in matlab function - Vm STD 
 % pre_response_STD_noNB(:,1)= peaks_stat(1).pre_response_STD(:,1);
 % pre_response_STD_NB(:,1)= peaks_stat(1).pre_response_STD(:,2);
-pre_response_STD_noNB(:,1)= peaks_stat(1).baseline_global_std(:,1);
-pre_response_STD_NB(:,1)= peaks_stat(1).baseline_global_std(:,2);
+% pre_response_STD_noNB(:,1)= peaks_stat(1).baseline_global_std(:,1);
+% pre_response_STD_NB(:,1)= peaks_stat(1).baseline_global_std(:,2);
+pre_response_STD_noNB(:,1)= peaks_stat(1).VmSTD(:,1);
+pre_response_STD_NB(:,1)= peaks_stat(1).VmSTD(:,2);
 Vm_res_STD_meanstim_noNB(:,1)=peaks_stat(1).Vm_res_STD_meanstim(:,1);
 Vm_res_STD_meanstim_NB(:,1)=peaks_stat(1).Vm_res_STD_meanstim(:,2);
 post_train_STD_noNB(:,1)=peaks_stat(1).post_train_STD(:,1);
@@ -1728,8 +1771,10 @@ VmSTD_stat.p_after=VmSTD_p_after;
 %% rmANOVA with matlab function - Vm M 
 % pre_response_M_noNB(:,1)= peaks_stat(1).pre_response_M(:,1); 
 % pre_response_M_NB(:,1)= peaks_stat(1).pre_response_M(:,2);
-pre_response_M_noNB(:,1)= peaks_stat(1).baseline_global(:,1); 
-pre_response_M_NB(:,1)= peaks_stat(1).baseline_global(:,2);
+% pre_response_M_noNB(:,1)= peaks_stat(1).baseline_global(:,1); 
+% pre_response_M_NB(:,1)= peaks_stat(1).baseline_global(:,2);
+pre_response_M_noNB(:,1)= peaks_stat(1).VmM(:,1);
+pre_response_M_NB(:,1)= peaks_stat(1).VmM(:,2);
 Vm_res_M_meanstim_noNB(:,1)=peaks_stat(1).Vm_res_M_meanstim(:,1);
 Vm_res_M_meanstim_NB(:,1)=peaks_stat(1).Vm_res_M_meanstim(:,2);
 post_train_M_noNB(:,1)=peaks_stat(1).post_train_M(:,1);
