@@ -6,7 +6,7 @@ clear all
  global exp_type
 exp_type=1; %1-NBES, 2-ChAT
 data_type='Vm'; %'LFP', 'Vm'
-save_flag= 1;
+save_flag= 0;
 print_flag=1;
 choose_traces=[]; %if choose_traces is empty the script takes all traces for analysis. If it is not empty the script takes the specified traces.
 clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
@@ -620,7 +620,7 @@ patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
-
+uistack(htrace,'top')
 %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -656,8 +656,12 @@ set(rec1,'Position',[x_axis_Elong(1)*dt,ylim_data(1),(x_axis_Elong(end)-x_axis_E
 switch exp_type
     case 1
     case 2
+        stim1_plot=stim1_X{1}.*dt;
+        if stim1_plot(2)>max(xlim_data)
+            stim1_plot(2)=max(xlim_data);
+        end
         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
-        line(stim1_X{1}.*dt,stim1_Y,'LineWidth',3,'Color','b') 
+        line(stim1_plot,stim1_Y,'LineWidth',3,'Color','b') 
 end
 
 %plotting stim_2:
@@ -670,6 +674,7 @@ patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
 patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
+uistack(htrace,'top')
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
@@ -699,9 +704,12 @@ set(rec1,'Position',[x_axis_Elong(1)*dt,ylim_data(1),(x_axis_Elong(end)-x_axis_E
 switch exp_type
     case 1
     case 2
-%         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
+        stim1_plot=stim1_X{1}.*dt;
+        if stim1_plot(2)>max(xlim_data)
+            stim1_plot(2)=max(xlim_data);
+        end
         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
-        line(stim1_X{1}.*dt,stim1_Y,'LineWidth',3,'Color','b') 
+        line(stim1_plot,stim1_Y,'LineWidth',3,'Color','b') 
 end
 
 %for plotting stim_2:
@@ -714,6 +722,7 @@ patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
 patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
+uistack(htrace1,'top'); uistack(htrace2,'top');
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
@@ -744,9 +753,12 @@ set(rec1,'Position',[x_axis_Elong(1)*dt,ylim_data(1),(x_axis_Elong(end)-x_axis_E
 switch exp_type
     case 1
     case 2
-%         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
+        stim1_plot=stim1_X{1}.*dt;
+        if stim1_plot(2)>max(xlim_data)
+            stim1_plot(2)=max(xlim_data);
+        end
         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
-        line(stim1_X{1}.*dt,stim1_Y,'LineWidth',3,'Color','b') 
+        line(stim1_plot,stim1_Y,'LineWidth',3,'Color','b') 
 end
 
 %for plotting stim_2:
@@ -759,6 +771,7 @@ patch_ydata=temp_y(1:size(patch_xdata,1),1:size(patch_xdata,2));
 patch_cdata=ones(size(patch_xdata));
 patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
+uistack(htrace1,'top'); uistack(htrace2,'top');
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
@@ -815,7 +828,8 @@ if plot_stim_2(2);
     yline=ones(size(stim2{2})); 
     yline(1,:)=yline(1,:)*ylim_data(1);
     yline(2,:)=yline(2,:)*ylim_data(2);
-    line(stim2{2}.*dt,yline,'linestyle','--','LineWidth',1,'Color',[0 0 0 0.5])
+    xline=[stim2{2}(1,:).*dt;stim2{2}(1,:).*dt];
+    line(xline,yline,'linestyle','--','LineWidth',1,'Color',[0 0 0 0.5])
     %transparent bars:
 % patch_xdata=[stim2{1}; flipud(stim2{1})];
 % yex=wextend('1D','sym',ylim_data,1);
@@ -825,6 +839,7 @@ if plot_stim_2(2);
 % patch_cdata=ones(size(patch_xdata));
 % patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
+uistack(htrace,'top');
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
@@ -866,8 +881,12 @@ set(rec1,'Position',[x_axis_Eshort(2,1)*dt,ylim_data(1),(x_axis_Eshort(2,end)-x_
 switch exp_type
     case 1
     case 2
+        stim1_plot=stim1_X{1}.*dt;
+        if stim1_plot(2)>max(xlim_data)
+            stim1_plot(2)=max(xlim_data);
+        end
         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
-        line(stim1_X{1}.*dt,stim1_Y,'LineWidth',3,'Color','b') 
+        line(stim1_plot,stim1_Y,'LineWidth',3,'Color','b') 
 end
 
 %plotting stim_2:
@@ -876,7 +895,8 @@ if plot_stim_2(3);
     yline=ones(size(stim2{2})); 
     yline(1,:)=yline(1,:)*ylim_data(1);
     yline(2,:)=yline(2,:)*ylim_data(2);
-    line(stim2{2}.*dt,yline,'linestyle','--','LineWidth',1,'Color',[0 0 0 0.6])
+    xline=[stim2{2}(1,:).*dt;stim2{2}(1,:).*dt];
+    line(xline,yline,'linestyle','--','LineWidth',1,'Color',[0 0 0 0.6])
     %transparent bars:
 % patch_xdata=[stim2{2}; flipud(stim2{2})];
 % yex=wextend('1D','sym',ylim_data,1);
@@ -886,6 +906,7 @@ if plot_stim_2(3);
 % patch_cdata=ones(size(patch_xdata));
 % patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
+uistack(htrace,'top');
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
@@ -915,8 +936,12 @@ set(rec1,'Position',[x_axis_Eshort(1,1)*dt,ylim_data(1),(x_axis_Eshort(1,end)-x_
 switch exp_type
     case 1
     case 2
+        stim1_plot=stim1_X{1}.*dt;
+        if stim1_plot(2)>max(xlim_data)
+            stim1_plot(2)=max(xlim_data);
+        end
         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
-        line(stim1_X{1}.*dt,stim1_Y,'LineWidth',3,'Color','b') 
+        line(stim1_plot,stim1_Y,'LineWidth',3,'Color','b') 
 end
 
 %for plotting stim_2:
@@ -925,7 +950,8 @@ if plot_stim_2(3);
     yline=ones(size(stim2{2})); 
     yline(1,:)=yline(1,:)*ylim_data(1);
     yline(2,:)=yline(2,:)*ylim_data(2);
-    line(stim2{2}.*dt,yline,'linestyle','--','LineWidth',1,'Color',[0 0 0 0.6])
+    xline=[stim2{2}(1,:).*dt;stim2{2}(1,:).*dt];
+    line(xline,yline,'linestyle','--','LineWidth',1,'Color',[0 0 0 0.6])
     %transparent bars:
 % patch_xdata=[stim2{1}; flipud(stim2{1})];
 % yex=wextend('1D','sym',ylim_data,1);
@@ -935,6 +961,7 @@ if plot_stim_2(3);
 % patch_cdata=ones(size(patch_xdata));
 % patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
+uistack(htrace1,'top'); uistack(htrace2,'top');
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
@@ -972,8 +999,12 @@ set(rec1,'Position',[x_axis_Eshort(1,1)*dt,ylim_data(1),(x_axis_Eshort(1,end)-x_
 switch exp_type
     case 1
     case 2
+        stim1_plot=stim1_X{1}.*dt;
+        if stim1_plot(2)>max(xlim_data)
+            stim1_plot(2)=max(xlim_data);
+        end
         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2)+0.1.*abs(ylim_data(2)-ylim_data(1)); 
-        line(stim1_X{1}.*dt,stim1_Y,'LineWidth',3,'Color','b') 
+        line(stim1_plot,stim1_Y,'LineWidth',3,'Color','b') 
 end
 
 %for plotting stim_2:
@@ -982,7 +1013,8 @@ if plot_stim_2(3);
     yline=ones(size(stim2{2})); 
     yline(1,:)=yline(1,:)*ylim_data(1);
     yline(2,:)=yline(2,:)*ylim_data(2);
-    line(stim2{2}.*dt,yline,'linestyle','--','LineWidth',1,'Color',[0 0 0 0.6])
+    xline=[stim2{2}(1,:).*dt;stim2{2}(1,:).*dt];
+    line(xline,yline,'linestyle','--','LineWidth',1,'Color',[0 0 0 0.6])
     %transparent bars:
 % patch_xdata=[stim2{1}; flipud(stim2{1})];
 % yex=wextend('1D','sym',ylim_data,1);
@@ -992,6 +1024,7 @@ if plot_stim_2(3);
 % patch_cdata=ones(size(patch_xdata));
 % patch(patch_xdata.*dt,patch_ydata,patch_cdata,'faceColor','r','edgecolor','none','faceAlpha', 0.3);
 end
+uistack(htrace1,'top'); uistack(htrace2,'top');
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar

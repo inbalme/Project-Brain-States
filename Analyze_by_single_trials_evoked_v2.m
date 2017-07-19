@@ -2,7 +2,7 @@
 clear all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
-exp_type=2; %1-NBES, 2-ChAT, 3-NBES VC
+exp_type=1; %1-NBES, 2-ChAT, 3-NBES VC
 trace_type_input=2; % 
 analyze_time_before_train=0.1;
 analyze_train_only_flag=0;
@@ -1130,6 +1130,7 @@ end
 [stat_onset]=fn_sensory_train_response_2_way_rmANOVA(onset_m_mat{1}(:,:), onset_m_mat{2}(:,:));
 [stat_onset_std]=fn_sensory_train_response_2_way_rmANOVA(onset_std_mat{1}(:,:), onset_std_mat{2}(:,:));
 [stat_amp]=fn_sensory_train_response_2_way_rmANOVA(amplitude_m_mat{1}(:,:), amplitude_m_mat{2}(:,:));
+[stat_amp_norm]=fn_sensory_train_response_2_way_rmANOVA(amplitude_norm_m_mat{1}(:,:), amplitude_norm_m_mat{2}(:,:));
 [stat_amp_std]=fn_sensory_train_response_2_way_rmANOVA(amplitude_std_mat{1}(:,:), amplitude_std_mat{2}(:,:));
 [stat_ampVal]=fn_sensory_train_response_2_way_rmANOVA(ampVal_m_mat{1}(:,:), ampVal_m_mat{2}(:,:));
 [stat_onVal]=fn_sensory_train_response_2_way_rmANOVA(onVal_m_mat{1}(:,:), onVal_m_mat{2}(:,:));
@@ -1376,13 +1377,15 @@ end
       h19=figure; 
       stimz=size(amplitude_norm_m_mat{2}(:,:),2);
 for stim=1:stimz
-        if event_evoked_stat.stim_num(stim).ttest_p_amplitude_norm_m>0.05
+%     p_amp_norm=event_evoked_stat.stim_num(stim).ttest_p_amplitude_norm_m;
+    p_amp_norm=stat_amp.p_stim{stim,1}; 
+        if p_amp_norm>0.05
             asterisk_amp{stim,1}='n.s.';
-        else if event_evoked_stat.stim_num(stim).ttest_p_amplitude_norm_m<0.05 && event_evoked_stat.stim_num(stim).ttest_p_amplitude_norm_m>0.01
+        else if p_amp_norm<0.05 && p_amp_norm>0.01
             asterisk_amp{stim,1}='*';
-            else if event_evoked_stat.stim_num(stim).ttest_p_amplitude_norm_m<0.01 && event_evoked_stat.stim_num(stim).ttest_p_amplitude_norm_m>0.001
+            else if p_amp_norm<0.01 && p_amp_norm>0.001
                     asterisk_amp{stim,1}='**';
-            else if event_evoked_stat.stim_num(stim).ttest_p_amplitude_norm_m<0.001
+            else if p_amp_norm<0.001
                      asterisk_amp{stim,1}='***';
                 end
                 end
@@ -2746,6 +2749,6 @@ saveas(g1,'Evoked Adaptation Amplitude Ratio_paired_plot','fig')
 
 filename='Evoked activity event detection'; 
 save(filename, 'files_to_analyze', 'event_evoked', 'event_evoked_stat','stat_failures','stat_nonspecific_count','stat_onset',...
-    'stat_onset_std','stat_amp','stat_amp_std','stat_ampVal','stat_onVal','stat_ampDel','stat_ampDel_std','stat_halfWidth','stat_halfWidth_std',...
+    'stat_onset_std','stat_amp','stat_amp_norm','stat_amp_std','stat_ampVal','stat_onVal','stat_ampDel','stat_ampDel_std','stat_halfWidth','stat_halfWidth_std',...
     'stat_peak10prcntTime', 'stat_peak10prcntTime_std', 'stat_peak90prcntTime', 'stat_peak90prcntTime_std','stat_peak10to90Time', 'stat_peak10to90Time_std')
 end

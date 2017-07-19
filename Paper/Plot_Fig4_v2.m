@@ -1,7 +1,7 @@
 %% plotting a figure 
 close all
 clear all
-save_flag=1;
+save_flag=0;
  no_numbering_flag=1;
 %opening saved figures:
 %Short traces:

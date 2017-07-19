@@ -2,7 +2,7 @@
 
 close all
 clear all
-save_flag=0;
+save_flag=1;
 no_numbering_flag=1;
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz Presentation'
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP_50Hz+BP0.1-200 Vm_50Hz';
@@ -11,12 +11,15 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP_50Hz+BP1-2
 % [0 0 0; [30,75,14]/256; [136 137 138]/256; [112,172,90]/256; [216 22 22]/256; [255 153 153]/256];
 color1=[30,75,14]/256;
 color2=[112,172,90]/256;
+color3=[160,160,160]./256; %grey; 204 102
+color4=[255, 102,102]./256; %pink
+
 % color3=[255,153,16]./256; %orange
 % color4=[255,178,102]./256; %light orange
-color3=[102,51,0]./256; %brown; 204 102
+% color3=[102,51,0]./256; %brown; 204 102
 % color4=[153,0,0]./256; %brown-red
 % color3=[153, 76,0]./256; %brown
-color4=[204, 102,0]./256; %light brown
+% color4=[204, 102,0]./256; %light brown
 
 %spontaneous:
 spont_trace_Off_f46 = open('Vm-LFP_spont_stim1_Off_f46_t3  4  6.fig');    
@@ -56,14 +59,19 @@ evoked_cc_On_f46 = open('Vm-LFPcc_evoked_f46shuffled_data.fig');
 evoked_cc_On_f46_ax = get(gcf, 'children');
 
 %population parameters:
-%actual_data
+%spontaneous shuff+real
 % cc_paired_plot = open('Vm-LFPcc_spont+evoked_max-peak_paired_population.fig');    
-cc_paired_plot = open('Vm-LFPcc_spont+evoked_lag0_paired_population.fig');    
+% cc_paired_plot = open('Vm-LFPcc_spont+evoked_lag0_paired_population.fig');    
+cc_paired_plot = open('Vm-LFPcc_spont_lag0_paired_population_real-shuff.fig');
 cc_paired_plot_ax = get(gcf, 'children');
-%shuffled data
+%evoked shuff+real
 % cc_paired_plot_shuff = open('Vm-LFPcc_spont+evoked_max-peak_paired_population_shuff.fig');    
-cc_paired_plot_shuff = open('Vm-LFPcc_spont+evoked_lag0_paired_population_shuff.fig');    
+% cc_paired_plot_shuff = open('Vm-LFPcc_spont+evoked_lag0_paired_population_shuff.fig');    
+cc_paired_plot_shuff = open('Vm-LFPcc_evoked_lag0_paired_population_real-shuff.fig');   
 cc_paired_plot_shuff_ax = get(gcf, 'children');
+
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Illustrations+Histology'
+NB_illustration = imread('NBES_Schematic_Illustration_tight','TIF');
 %%
 %open a new figure:
 F = figure;
@@ -76,18 +84,17 @@ set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
  
 %% Positions:
-spont_trace_Off_f46_pos(1,:) = [0.05 , 0.9 , 0.43 , 0.06];
+spont_trace_Off_f46_pos(1,:) = [0.05 , 0.89 , 0.43 , 0.06];
 for i=1:(length(spont_trace_Off_f46_ax)-1)/2
 spont_trace_Off_f46_pos(2*i,:) = spont_trace_Off_f46_pos(2*i-1,:)-[0 , spont_trace_Off_f46_pos(2*i-1,4)-0.02 , 0 , 0];
 spont_trace_Off_f46_pos(2*i+1,:) = spont_trace_Off_f46_pos(2*i,:)-[0 , spont_trace_Off_f46_pos(2*i,4) , 0 , 0];
 end
 
-spont_trace_On_f46_pos(1,:) = spont_trace_Off_f46_pos(1,:); spont_trace_On_f46_pos(1,2)=spont_trace_Off_f46_pos(6,2)-spont_trace_Off_f46_pos(1,4)-0.04;
+spont_trace_On_f46_pos(1,:) = spont_trace_Off_f46_pos(1,:); spont_trace_On_f46_pos(1,2)=spont_trace_Off_f46_pos(6,2)-spont_trace_Off_f46_pos(1,4)-0.03;
 for i=1:(length(spont_trace_On_f46_ax)-1)/2
 spont_trace_On_f46_pos(2*i,:) = spont_trace_On_f46_pos(2*i-1,:)-[0 , spont_trace_On_f46_pos(2*i-1,4)-0.06 , 0 , 0];
 spont_trace_On_f46_pos(2*i+1,:) = spont_trace_On_f46_pos(2*i,:)-[0 , spont_trace_On_f46_pos(2*i,4)+0.015 , 0 , 0];
 end
-
 
 h_dist1=spont_trace_Off_f46_pos(1,1)+spont_trace_Off_f46_pos(1,3)+0.05;
 evoked_trace_Off_f46_pos(1,:) = [h_dist1 , spont_trace_Off_f46_pos(1,2) ,  spont_trace_Off_f46_pos(1,3) ,  spont_trace_Off_f46_pos(1,4)];
@@ -102,7 +109,7 @@ evoked_trace_On_f46_pos(2*i,:) = evoked_trace_On_f46_pos(2*i-1,:)-[0 , evoked_tr
 evoked_trace_On_f46_pos(2*i+1,:) = evoked_trace_On_f46_pos(2*i,:)-[0 , evoked_trace_On_f46_pos(2*i,4)+0.015 , 0 , 0];
 end
 
-spont_cc_On_f46_pos(1,:) = [0.12 , spont_trace_On_f46_pos(6,2)-0.13 , 0.13 , 0.08]; %shuffled
+spont_cc_On_f46_pos(1,:) = [0.12 , spont_trace_On_f46_pos(6,2)-0.14 , 0.13 , 0.08]; %shuffled
 h_dist2=spont_cc_On_f46_pos(1,1)+spont_cc_On_f46_pos(1,3)+0.06;
 spont_cc_Off_f46_pos(1,:) = [h_dist2 ,spont_cc_On_f46_pos(1,2) , spont_cc_On_f46_pos(1,3) , spont_cc_On_f46_pos(1,4)]; 
 h_dist3=spont_cc_Off_f46_pos(1,1)+spont_cc_Off_f46_pos(1,3)+0.15;
@@ -110,7 +117,7 @@ evoked_cc_On_f46_pos(1,:) = [h_dist3 , spont_cc_On_f46_pos(1,2) ,  spont_cc_On_f
 h_dist4=evoked_cc_On_f46_pos(1,1)+evoked_cc_On_f46_pos(1,3)+0.06;
 evoked_cc_Off_f46_pos(1,:) = [h_dist4 , spont_cc_Off_f46_pos(1,2) , evoked_cc_On_f46_pos(1,3) ,  spont_cc_Off_f46_pos(1,4)];
 
-cc_paired_plot_shuff_pos(1,:) = [0.12 , evoked_cc_Off_f46_pos(1,2)-0.24 , 0.27 , 0.13]; 
+cc_paired_plot_shuff_pos(1,:) = [0.12 , evoked_cc_Off_f46_pos(1,2)-0.23 , 0.27 , 0.13]; 
 cc_paired_plot_pos(1,:) =  [cc_paired_plot_shuff_pos(1,1)+cc_paired_plot_shuff_pos(1,3)+0.2 , cc_paired_plot_shuff_pos(1,2) , cc_paired_plot_shuff_pos(1,3) , cc_paired_plot_shuff_pos(1,4)];
 
 %top positions
@@ -126,8 +133,14 @@ evoked_cc_On_f46_pos_top = evoked_cc_On_f46_pos(1,2)+evoked_cc_On_f46_pos(1,4);
 cc_paired_plot_shuff_pos_top = cc_paired_plot_shuff_pos(1,2)+cc_paired_plot_shuff_pos(1,4);
 cc_paired_plot_pos_top = cc_paired_plot_pos(1,2)+cc_paired_plot_pos(1,4);
 
+NB_illustration_pos(1,:)=[spont_trace_Off_f46_pos(1,1)+spont_trace_Off_f46_pos(1,3)-0.03,spont_trace_Off_f46_pos_top-0.02, 0.07, 0.06];
+NB_illustration_pos_top=NB_illustration_pos(1,2)+NB_illustration_pos(1,4);
+
 %%
 %Placing plots in the figure:
+NB_illustration_ax = axes('position',NB_illustration_pos);
+imshow(NB_illustration, 'parent', NB_illustration_ax) 
+
 %Cell 46 - spont
 for i=1:length(spont_trace_Off_f46_ax)-1
     spont_trace_Off_f46_ax_copy(i) = copyobj(spont_trace_Off_f46_ax(i+1),F); % copy axes to new fig
@@ -171,18 +184,23 @@ evoked_trace_On_f46_ax_copy(1).FontSize=10;
 %       h(1).LineWidth =1.5;
 %     end
  %%
+ abslen=0.05;
  %Spontaneous Cross-correlations file 46 actual data+shuffled data
 spont_cc_Off_f46_ax_copy(1) = copyobj(spont_cc_Off_f46_ax(2),F); % copy axes to new fig
 set(spont_cc_Off_f46_ax_copy(1),'position',spont_cc_Off_f46_pos(1,:), 'ylim',[-0.4,0.25])
     set(F, 'currentaxes', spont_cc_Off_f46_ax_copy(1));  yl=ylabel(''); 
 spont_cc_Off_f46_ax_copy(1).FontSize=11;    
-spont_cc_Off_f46_ax_copy(1).YTick=[-0.4,0];
+% spont_cc_Off_f46_ax_copy(1).YTick=[-0.4,0,0.2];
+set(gca,'xtick',[-0.5,0,0.5],'ytick',[-0.4,0,0.2],'tickdir','out')
+ticklen=fn_get_abs_ticklength(gca, abslen);
  
 spont_cc_On_f46_ax_copy(1) = copyobj(spont_cc_On_f46_ax(2),F); % copy axes to new fig
 set(spont_cc_On_f46_ax_copy(1),'position',spont_cc_On_f46_pos(1,:), 'ylim',[-0.4,0.25]) %'xticklabel',[]
  set(F, 'currentaxes', spont_cc_On_f46_ax_copy(1));  %xl=xlabel('');  
 spont_cc_On_f46_ax_copy(1).FontSize=11;
-spont_cc_On_f46_ax_copy(1).YTick=[-0.4,0];
+% spont_cc_On_f46_ax_copy(1).YTick=[-0.4,0,0.2];
+set(gca,'xtick',[-0.5,0,0.5],'ytick',[-0.4,0,0.2],'tickdir','out')
+ticklen=fn_get_abs_ticklength(gca, abslen);
    
 %   set(F, 'currentaxes', spont_trace_On_f33_ax_copy); t=title('NB+'); yl=ylabel(''); xl=xlabel('');
 %    l=legend('Vm','LFP'); set(l,'box','off'), set(l,'FontSize', 8) ; set(l,'linewidth',1.5);set(l,'position',[0.73 0.89 0.03 0.03]);
@@ -192,13 +210,16 @@ evoked_cc_Off_f46_ax_copy = copyobj(evoked_cc_Off_f46_ax,F); % copy axes to new 
 set(evoked_cc_Off_f46_ax_copy(2),'position',evoked_cc_Off_f46_pos(1,:), 'ylim',[-0.4,0.25])
 set(F, 'currentaxes', evoked_cc_Off_f46_ax_copy(2));  yl=ylabel(''); 
 evoked_cc_Off_f46_ax_copy(2).FontSize=11;
-evoked_cc_Off_f46_ax_copy(2).YTick=[-0.4,0];
-
+% evoked_cc_Off_f46_ax_copy(2).YTick=[-0.4,0,0.2];
+set(gca,'xtick',[-0.5,0,0.5],'ytick',[-0.4,0,0.2],'tickdir','out')
+ticklen=fn_get_abs_ticklength(gca, abslen);
 
 evoked_cc_On_f46_ax_copy = copyobj(evoked_cc_On_f46_ax,F); % copy axes to new fig
 set(evoked_cc_On_f46_ax_copy(2),'position',evoked_cc_On_f46_pos(1,:))
    set(F, 'currentaxes', evoked_cc_On_f46_ax_copy(2)); 
    evoked_cc_On_f46_ax_copy(2).FontSize=11;
+  set(gca,'xtick',[-0.5,0,0.5],'ytick',[-1,0,1],'tickdir','out')
+  ticklen=fn_get_abs_ticklength(gca, abslen);
    
    %position legend shuffled
 %  legend_shuff_pos(1,:)=[spont_cc_Off_f46_pos(1,1)+spont_cc_Off_f46_pos(1,3)+0.03, spont_cc_Off_f46_pos_top-0.01, 0.08, 0.05];
@@ -220,10 +241,14 @@ cc_paired_plot_ax_copy = copyobj(cc_paired_plot_ax,F); % copy axes to new fig
 set(cc_paired_plot_ax_copy,'position',cc_paired_plot_pos(1,:))
    set(F, 'currentaxes', cc_paired_plot_ax_copy); yl=ylabel('');
 cc_paired_plot_ax_copy.FontSize=11;
+set(gca,'tickdir','out')
+ticklen=fn_get_abs_ticklength(gca, abslen);
 
 cc_paired_plot_shuff_ax_copy = copyobj(cc_paired_plot_shuff_ax,F); % copy axes to new fig
 set(cc_paired_plot_shuff_ax_copy,'position',cc_paired_plot_shuff_pos(1,:))
 cc_paired_plot_shuff_ax_copy.FontSize=11;
+set(gca,'tickdir','out')
+ticklen=fn_get_abs_ticklength(gca, abslen);
     %   'fontname', 'arial','fontsize',13,'linewidth',1.5,'box','off'); %, 'ylim', y6limits,'ytick', y6ticks,'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
 %  set(F, 'currentaxes', Response_modulation_ax_copy); t=title(''); yl=ylabel('Spikes/Stim. train','fontsize',13);
 

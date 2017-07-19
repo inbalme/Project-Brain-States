@@ -32,7 +32,7 @@ switch exp_type
         end        
 
     case 2
-        files_to_analyze =80; %[74,76,77,80,82,84,87,90,92,112,114,115]; %[74,76,77,80,82,84,87]; %,84,87];
+        files_to_analyze =46; %[74,76,77,80,82,84,87,90,92,112,114,115]; %[74,76,77,80,82,84,87]; %,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light Off', 'Light On'};  y_ax_label={'Vm'}; y_ax_units={'mV'};  
@@ -265,7 +265,89 @@ if save_flag==1;
         print(fg1,filename1,'-dpng','-r600','-opengl') 
 end
 end
-%% Calculating Vm mean and std
+%%
+clear all
+plot_amp_histogram_flag=1;
+save_flag=0;
+if plot_amp_histogram_flag==1;
+    binsize=0.5; %[mV];
+    exp_type=1;
+    switch exp_type
+        case 1
+            fileind=12;
+            legend_string={'NB-','NB+'};
+            cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Spontaneous'
+            load('Spontaneous activity.mat')
+            color_table=[0 0 0; [216 22 22]/256;  [136 137 138]/256; [255 153 153]/256; [30,75,14]/256; [112,172,90]/256];  
+        case 2
+            fileind=4;
+            legend_string={'Light Off','Light On'};
+            cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Spontaneous'
+            load('Spontaneous activity.mat')
+            color_table=[0 0 0; [0 0 204]/256;  [136 137 138]/256; [255 153 153]/256; [30,75,14]/256; [112,172,90]/256];  
+    end
+
+        for t=1:2;
+            %take even number of samples from each condition
+%             samples=min(length(event_amplitude_vec{1}),length(event_amplitude_vec{2}));
+              data_vec{t}=event_ongoing(fileind).amplitude{t}(:);  
+              nbin(t)=ceil(range(data_vec{t}))./binsize; 
+              
+              %bootstrap CI for the median:  
+                    dataset=[];
+                    dataset=data_vec{t}(:)';
+                    k= size(dataset,2);     
+                    lower_bound=2.5;
+                    upper_bound=97.5;
+                    iterations=5000;
+                     [prcntile1(t,:), prcntile2(t,:)]=fn_get_CI_w_bootstrap(dataset,0,5000,2.5,97.5,'median');
+                     data_vec_median(1,t) = median(data_vec{t}(:)); 
+        end
+%             data_vec_norm=data_vec./max(max(data_vec)); %for a population histogram
+%              nbin = 30;
+ 
+    Fig1=figure;
+            hold on
+            [ncounts{1}(1,:),nbins{1}(1,:)]=hist(data_vec{1}(:),nbin(1));
+            ncounts{1}(1,:)=ncounts{1}(1,:)./length(data_vec{1}(:));
+            [ncounts{2}(1,:),nbins{2}(1,:)]=hist(data_vec{2}(:),nbin(2));
+            ncounts{2}(1,:)=ncounts{2}(1,:)./length(data_vec{2}(:));
+            h1=bar(nbins{1}(1,:),ncounts{1}(1,:));
+            h2=bar(nbins{2}(1,:),ncounts{2}(1,:));
+            
+%             obj = gmdistribution.fit(data_vec(:,1),2);
+            set(h2,'FaceColor',color_table(2,:),'EdgeColor','w','faceAlpha', 0.3)
+            set(h1,'FaceColor',color_table(1,:),'EdgeColor','w','faceAlpha', 0.7)
+            ylim1=get(gca,'ylim');       
+            hold off
+%             uistack(h1,'top'); uistack(h2,'top'); 
+            axis tight
+            xlim1=get(gca,'xlim');
+            xrim=diff(xlim).*0.1;
+            xlim1(1)=xlim1(1)-xrim;
+            xlim1(2)=xlim1(2)+xrim;
+            set(gca,'xlim',xlim1,'FontSize', 20,'fontname', 'arial')
+            xlabel('PSP Amplitude [mV]', 'FontSize', 20,'fontname', 'arial');
+            ylabel('Probability', 'FontSize', 20,'fontname', 'arial')
+            l=legend([h1 h2],legend_string, 'position',[0.8,0.9,0.2,0.1],'fontsize',11, 'box', 'off');
+    Fig2=figure;
+        hold on
+            e1=errorbar(1,data_vec_median(1,1),data_vec_median(1,1)-prcntile1(1,1),prcntile2(1,1)-data_vec_median(1,1),'linewidth',2,'color',color_table(1,:)); %,'color',color_table(1,:)
+            e2=errorbar(2,data_vec_median(1,2),data_vec_median(1,2)-prcntile1(2,1),prcntile2(2,1)-data_vec_median(1,2),,'linewidth',2); %
+%             median1(1)=line([data_vec_median(1,1) data_vec_median(1,1)],[ylim1(1) ylim1(2)],'linestyle','-','color',color_table(1,:),'linewidth',1.5);
+%             median1(2)=line([data_vec_median(1,2) data_vec_median(1,2)],[ylim1(1) ylim1(2)],'linestyle','-','color',color_table(2,:),'linewidth',1.5);
+%             median1ci(1)=line([prcntile1(1,1) prcntile1(1,1)],[ylim1(1) ylim1(2)],'linestyle','-.','color',[color_table(1,:),0.6],'linewidth',1.5);
+%             median1ci(2)=line([prcntile2(1,1) prcntile2(1,1)],[ylim1(1) ylim1(2)],'linestyle','-.','color',[color_table(1,:),0.6],'linewidth',1.5);
+%             median2ci(1)=line([prcntile1(2,1) prcntile1(2,1)],[ylim1(1) ylim1(2)],'linestyle','-.','color',[color_table(2,:),0.6],'linewidth',1.5);
+%             median2ci(2)=line([prcntile2(2,1) prcntile2(2,1)],[ylim1(1) ylim1(2)],'linestyle','-.','color',[color_table(2,:),0.6],'linewidth',1.5);
+        hold off
+%             pause
+       if save_flag==1;     
+            saveas(Fig1,'Event_Amp_Hist','fig') 
+            print(Fig1,'Event_Amp_Hist','-dpng','-r600','-opengl')
+       end   
+end
+%% Calculating Vm mean and std - not used anymore. I am using the same code in the script "Analyze_response_parameters_10_20Hz_v2"
 interval=[]; Vm_spont=[]; VmM=[]; VmSTD=[];
 %taking 
 switch exp_type             
@@ -273,7 +355,7 @@ switch exp_type
          start_time = [0.4,5.6]; %[sec] %[0,5]
          duration = 1; %[sec]                
     case 2
-        start_time=[0.4, stim1_X{x_value(1)}(1,1).*dt+0.6];
+        start_time=[0.4, stim1_X{x_value(1)}(1,1).*dt+0.4];
         duration =1;                                                
 end
 for t=1:2

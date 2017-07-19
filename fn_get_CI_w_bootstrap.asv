@@ -38,7 +38,6 @@ end
                  bs_set(:,bootstrap_ind)=median(tmp_set,2);
              end
          end
- end
  prcntile1 = prctile(bs_set,lower_bound,2);
  prcntile2 = prctile(bs_set,upper_bound,2);
  

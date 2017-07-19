@@ -20,7 +20,7 @@ trace_type_input=[2]; %for exp_type=2||3 use [1,2], for exp_type=1 use [3,2]
 trace_type=trace_type_input;
 analyze_time_before_train=0;
 analyze_train_only_flag=1;
-save_flag=0;
+save_flag=1;
 print_flag=1;
 norm_flag=0;
 clamp_flag=3; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
@@ -261,9 +261,9 @@ end
 
          start_sample(:,t) = ceil(start_time(t).*sf{1}); 
          end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1})-1;
-         interval(:,t) = start_sample(:,t):end_sample(:,t);    
+         interval_spont(:,t) = start_sample(:,t):end_sample(:,t);    
 % from intervals to analyze
-                Vm_spont(:,:,t) = current_data(interval(:,t),:,1);
+                Vm_spont(:,:,t) = current_data(interval_spont(:,t),:,1);
                 VmM(:,t) =mean(mean(Vm_spont(:,:,t),2));
                 VmSTD(:,t) = mean(std(Vm_spont(:,:,t),0,2)); %mean std across traces (trial-to-trial)
                
@@ -2069,38 +2069,23 @@ end
         title(['Membrane Mean, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
      %% Plot VmM before sensory stimulation
     j3=figure;     
-    nstim=1;
-    hold on
-        errbar_h1=errorbar(1-0.15,nanmean([peaks_stat(stim_num).pre_response_M(:,1)],1), nanstd([peaks_stat(stim_num).pre_response_M(:,1)],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-        errbar_h2=errorbar(1+0.15,nanmean([peaks_stat(stim_num).pre_response_M(:,2)],1), nanstd([peaks_stat(stim_num).pre_response_M(:,2),],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-        bar1=bar(1-0.15, nanmean([peaks_stat(stim_num).pre_response_M(:,1)],1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:));
-        bar2=bar(1+0.15, nanmean([peaks_stat(stim_num).pre_response_M(:,2)],1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:));
-%        L1=line(pre_response_M_X,pre_response_M_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k');
-%setting the errorbars not to appear in the legend:
-hAnnotation = get(errbar_h1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
-hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
-% hAnnotation = get(L1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
-% [legh,objh,outh,outm] = legend('NB Off','NB On','Location','northeast');
-l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
-ylim_data=[get(gca,'ylim')]';
-if ylim_data(2)<=0
-    my=[-70];%min(ylim_data)+2;
-    ylim_data=[-73, -45]; %[ylim_data(1)-5 ylim_data(1)+25]; 
-else
-    my=max(ylim_data)-1;
-    ylim_data(1)=0;
-end
-
-        if VmM_stat.p_before{1,1} >0.05 
+    %option 1: paired-plot (lines)
+    stim_num=1;
+    tmp_Y= peaks_stat(stim_num).VmM';
+tmp_X(1,:)=ones(1,size(tmp_Y,2));
+tmp_X(2,:)=2*ones(1,size(tmp_Y,2));
+E = peaks_stat(stim_num).VmM_std;
+VmM_p=peaks_stat(stim_num).wilcoxon_p_VmM;
+ if VmM_p >0.05 
     asterisk_before='n.s.';
     a1_fontsize=13;
-else if VmM_stat.p_before{1,1}<0.05 && VmM_stat.p_before{1,1}>0.01
+else if VmM_p<0.05 && VmM_p>0.01
     asterisk_before='*';
     a1_fontsize=17;
-    else if VmM_stat.p_before{1,1}<0.01 && VmM_stat.p_before{1,1}>0.001
+    else if VmM_p<0.01 && VmM_p>0.001
             asterisk_before='**';
             a1_fontsize=17;
-    else if VmM_stat.p_before{1,1}<0.001
+    else if VmM_p<0.001
              asterisk_before='***';
              a1_fontsize=17;
         end
@@ -2108,15 +2093,74 @@ else if VmM_stat.p_before{1,1}<0.05 && VmM_stat.p_before{1,1}>0.01
     end
 end
 
-text(1,my,asterisk_before,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a1_fontsize)
-% set(gca,'ydir','reverse')
-        hold off
-     
-        x1limits = [0.5 1.5];   x1ticks = [1];    
-        set( gca, 'xlim', x1limits,'xtick', [],'ylim',ylim_data,'fontsize',28,'linewidth',1,...
-        'ticklength', [0.010 0.010],'fontname', 'arial','FontSize', 16 ,'box', 'off'); %'fontweight', 'bold', 
-        ylabel([y_ax_label{1},' Mean [',y_ax_units{1},']'] ,'FontSize', 16);   
-        title(['Membrane Mean before sensory train, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
+my=max(max(peaks_stat(stim_num).VmM))+5; %+5; +10
+hold on
+line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
+errorbar(tmp_X(:,1), nanmean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
+text(1.5,my,asterisk_before,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a1_fontsize);
+hold off
+        x1limits = [0.75 2.25];
+        x1ticks = [1,2];
+        switch exp_type
+            case 1
+                y1limits = [-80 -30];
+            case 2
+                y1limits = [-70 -45];
+        end
+%         y1ticks = [0,0.5,1];
+        set( gca, 'xlim', x1limits,'xtick', x1ticks,'ylim', y1limits,'fontsize',28,'linewidth',1,...
+        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold',  
+        ylabel('Vm mean [mV]', 'FontSize', 28,'fontname', 'arial');
+        title(['VmM spontaneous,  p=' num2str(VmM_p)] ,'FontSize', 20,'fontname', 'arial');
+    % option 2: bar-plot
+%     nstim=1;
+%     hold on
+%         errbar_h1=errorbar(1-0.15,nanmean([peaks_stat(stim_num).pre_response_M(:,1)],1), nanstd([peaks_stat(stim_num).pre_response_M(:,1)],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         errbar_h2=errorbar(1+0.15,nanmean([peaks_stat(stim_num).pre_response_M(:,2)],1), nanstd([peaks_stat(stim_num).pre_response_M(:,2),],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         bar1=bar(1-0.15, nanmean([peaks_stat(stim_num).pre_response_M(:,1)],1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:));
+%         bar2=bar(1+0.15, nanmean([peaks_stat(stim_num).pre_response_M(:,2)],1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:));
+% %        L1=line(pre_response_M_X,pre_response_M_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k');
+% %setting the errorbars not to appear in the legend:
+% hAnnotation = get(errbar_h1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
+% hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
+% % hAnnotation = get(L1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
+% % [legh,objh,outh,outm] = legend('NB Off','NB On','Location','northeast');
+% l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
+% ylim_data=[get(gca,'ylim')]';
+% if ylim_data(2)<=0
+%     my=[-70];%min(ylim_data)+2;
+%     ylim_data=[-73, -45]; %[ylim_data(1)-5 ylim_data(1)+25]; 
+% else
+%     my=max(ylim_data)-1;
+%     ylim_data(1)=0;
+% end
+% 
+%         if VmM_stat.p_before{1,1} >0.05 
+%     asterisk_before='n.s.';
+%     a1_fontsize=13;
+% else if VmM_stat.p_before{1,1}<0.05 && VmM_stat.p_before{1,1}>0.01
+%     asterisk_before='*';
+%     a1_fontsize=17;
+%     else if VmM_stat.p_before{1,1}<0.01 && VmM_stat.p_before{1,1}>0.001
+%             asterisk_before='**';
+%             a1_fontsize=17;
+%     else if VmM_stat.p_before{1,1}<0.001
+%              asterisk_before='***';
+%              a1_fontsize=17;
+%         end
+%         end
+%     end
+% end
+% 
+% text(1,my,asterisk_before,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a1_fontsize)
+% % set(gca,'ydir','reverse')
+%         hold off
+%      
+%         x1limits = [0.5 1.5];   x1ticks = [1];    
+%         set( gca, 'xlim', x1limits,'xtick', [],'ylim',ylim_data,'fontsize',28,'linewidth',1,...
+%         'ticklength', [0.010 0.010],'fontname', 'arial','FontSize', 16 ,'box', 'off'); %'fontweight', 'bold', 
+%         ylabel([y_ax_label{1},' Mean [',y_ax_units{1},']'] ,'FontSize', 16);   
+%         title(['Membrane Mean before sensory train, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
 
         %% plot VmM during sensory stimulation
     j4=figure;     
@@ -2129,13 +2173,14 @@ E = peaks_stat(stim_num).Vm_res_M_meanstim_std;
  if VmM_stat.p_during{1,1} >0.05 
     asterisk_during='n.s.';
     a1_fontsize=13;
-else if VmM_stat.p_during{1,1}<0.05 && VmM_stat.p_during{1,1}>0.01
+    VmM_p=peaks_stat(stim_num).wilcoxon_p_Vm_res_M_meanstim;
+else if VmM_p<0.05 && VmM_p>0.01
     asterisk_during='*';
     a1_fontsize=17;
-    else if VmM_stat.p_during{1,1}<0.01 && VmM_stat.p_during{1,1}>0.001
+    else if VmM_p<0.01 && VmM_p>0.001
             asterisk_during='**';
             a1_fontsize=17;
-    else if VmM_stat.p_during{1,1}<0.001
+    else if VmM_p<0.001
              asterisk_during='***';
              a1_fontsize=17;
         end
@@ -2151,67 +2196,67 @@ text(1.5,my,asterisk_during,'HorizontalAlignment', 'center','verticalAlignment',
 hold off
         x1limits = [0.75 2.25];
         x1ticks = [1,2];
-%         switch exp_type
-%             case 1
-%                 y1limits = [-80 -30];
-%             case 2
-%                 y1limits = [-70 -45];
-%         end
+        switch exp_type
+            case 1
+                y1limits = [-75 -20];
+            case 2
+                y1limits = [-70 -40];
+        end
 %         y1ticks = [0,0.5,1];
-        set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
-        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold',  'ylim', y1limits,
+        set( gca, 'xlim', x1limits,'xtick', x1ticks,'ylim', y1limits,'fontsize',28,'linewidth',1,...
+        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold',  
         ylabel('Vm mean [mV]', 'FontSize', 28,'fontname', 'arial');
-        title(['VmM,  p=' num2str(VmM_stat.p_during{1})] ,'FontSize', 20,'fontname', 'arial');
+        title(['VmM evoked,  p=' num2str(VmM_p)] ,'FontSize', 20,'fontname', 'arial');
 
-    %% option 2: bar-plot
-    nstim=1;
-    hold on
-        errbar_h1=errorbar(1-0.15,nanmean([peaks_stat(stim_num).Vm_res_M_meanstim(:,1)],1), nanstd([peaks_stat(stim_num).Vm_res_M_meanstim(:,1)],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-        errbar_h2=errorbar(1+0.15,nanmean([peaks_stat(stim_num).Vm_res_M_meanstim(:,2)],1), nanstd([peaks_stat(stim_num).Vm_res_M_meanstim(:,2),],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-        bar1=bar(1-0.15, nanmean([peaks_stat(stim_num).Vm_res_M_meanstim(:,1)],1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:));
-        bar2=bar(1+0.15, nanmean([peaks_stat(stim_num).Vm_res_M_meanstim(:,2)],1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:));
-%        L1=line(Vm_res_M_meanstim_X,Vm_res_M_meanstim_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k');
-%setting the errorbars not to appear in the legend:
-hAnnotation = get(errbar_h1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
-hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
-% hAnnotation = get(L1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
-% [legh,objh,outh,outm] = legend('NB Off','NB On','Location','northeast');
-l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
-ylim_data=[get(gca,'ylim')]';
-if ylim_data(2)<=0
-    my=[-67];%min(ylim_data)+2;
-    ylim_data=[-70, -45]; %[ylim_data(1)-5 ylim_data(1)+25]; 
-else
-    my=max(ylim_data)-1;
-    ylim_data(1)=0;
-end
-
-        if VmM_stat.p_during{1,1} >0.05 
-    asterisk_during='n.s.';
-    a1_fontsize=13;
-else if VmM_stat.p_during{1,1}<0.05 && VmM_stat.p_during{1,1}>0.01
-    asterisk_during='*';
-    a1_fontsize=17;
-    else if VmM_stat.p_during{1,1}<0.01 && VmM_stat.p_during{1,1}>0.001
-            asterisk_during='**';
-            a1_fontsize=17;
-    else if VmM_stat.p_during{1,1}<0.001
-             asterisk_during='***';
-             a1_fontsize=17;
-        end
-        end
-    end
-end
-
-text(1,my,asterisk_during,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a1_fontsize)
-% set(gca,'ydir','reverse')
-        hold off
-     
-        x1limits = [0.5 1.5];   x1ticks = [1];    
-        set( gca, 'xlim', x1limits,'xtick', [],'ylim',ylim_data,'fontsize',28,'linewidth',1,...
-        'ticklength', [0.010 0.010],'fontname', 'arial','FontSize', 16 ,'box', 'off'); %'fontweight', 'bold', 
-        ylabel([y_ax_label{1},' Mean [',y_ax_units{1},']'] ,'FontSize', 16);   
-        title(['Membrane Mean during sensory train, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
+    % option 2: bar-plot
+%     nstim=1;
+%     hold on
+%         errbar_h1=errorbar(1-0.15,nanmean([peaks_stat(stim_num).Vm_res_M_meanstim(:,1)],1), nanstd([peaks_stat(stim_num).Vm_res_M_meanstim(:,1)],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         errbar_h2=errorbar(1+0.15,nanmean([peaks_stat(stim_num).Vm_res_M_meanstim(:,2)],1), nanstd([peaks_stat(stim_num).Vm_res_M_meanstim(:,2),],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         bar1=bar(1-0.15, nanmean([peaks_stat(stim_num).Vm_res_M_meanstim(:,1)],1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:));
+%         bar2=bar(1+0.15, nanmean([peaks_stat(stim_num).Vm_res_M_meanstim(:,2)],1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:));
+% %        L1=line(Vm_res_M_meanstim_X,Vm_res_M_meanstim_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k');
+% %setting the errorbars not to appear in the legend:
+% hAnnotation = get(errbar_h1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
+% hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
+% % hAnnotation = get(L1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
+% % [legh,objh,outh,outm] = legend('NB Off','NB On','Location','northeast');
+% l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
+% ylim_data=[get(gca,'ylim')]';
+% if ylim_data(2)<=0
+%     my=[-67];%min(ylim_data)+2;
+%     ylim_data=[-70, -45]; %[ylim_data(1)-5 ylim_data(1)+25]; 
+% else
+%     my=max(ylim_data)-1;
+%     ylim_data(1)=0;
+% end
+% 
+%         if VmM_stat.p_during{1,1} >0.05 
+%     asterisk_during='n.s.';
+%     a1_fontsize=13;
+% else if VmM_stat.p_during{1,1}<0.05 && VmM_stat.p_during{1,1}>0.01
+%     asterisk_during='*';
+%     a1_fontsize=17;
+%     else if VmM_stat.p_during{1,1}<0.01 && VmM_stat.p_during{1,1}>0.001
+%             asterisk_during='**';
+%             a1_fontsize=17;
+%     else if VmM_stat.p_during{1,1}<0.001
+%              asterisk_during='***';
+%              a1_fontsize=17;
+%         end
+%         end
+%     end
+% end
+% 
+% text(1,my,asterisk_during,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a1_fontsize)
+% % set(gca,'ydir','reverse')
+%         hold off
+%      
+%         x1limits = [0.5 1.5];   x1ticks = [1];    
+%         set( gca, 'xlim', x1limits,'xtick', [],'ylim',ylim_data,'fontsize',28,'linewidth',1,...
+%         'ticklength', [0.010 0.010],'fontname', 'arial','FontSize', 16 ,'box', 'off'); %'fontweight', 'bold', 
+%         ylabel([y_ax_label{1},' Mean [',y_ax_units{1},']'] ,'FontSize', 16);   
+%         title(['Membrane Mean during sensory train, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
                 %% plot VmM after sensory stimulation
     j5=figure;     
     nstim=1;
@@ -2264,32 +2309,23 @@ text(1,my,asterisk_after,'HorizontalAlignment', 'center','verticalAlignment','mi
         title(['Membrane Mean after sensory train, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
          %% Plot VmSTD before sensory stimulation
     j6=figure;     
-    nstim=1;
-    hold on
-        errbar_h1=errorbar(1-0.15,nanmean([peaks_stat(stim_num).pre_response_STD(:,1)],1), nanstd([peaks_stat(stim_num).pre_response_STD(:,1)],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-        errbar_h2=errorbar(1+0.15,nanmean([peaks_stat(stim_num).pre_response_STD(:,2)],1), nanstd([peaks_stat(stim_num).pre_response_STD(:,2),],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-        bar1=bar(1-0.15, nanmean([peaks_stat(stim_num).pre_response_STD(:,1)],1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:));
-        bar2=bar(1+0.15, nanmean([peaks_stat(stim_num).pre_response_STD(:,2)],1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:));
-%        L1=line(pre_response_STD_X,pre_response_STD_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k');
-%setting the errorbars not to appear in the legend:
-hAnnotation = get(errbar_h1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
-hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
-% hAnnotation = get(L1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
-% [legh,objh,outh,outm] = legend('NB Off','NB On','Location','northeast');
-l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
-ylim_data=[0,6]; %NB [0,8], ChAT [0,6]
-my=5.5; %NB 7.5, ChAT 5.5
-
-        if VmSTD_stat.p_before{1,1} >0.05 
+    %option 1: paired-plot (lines)
+    stim_num=1;
+    tmp_Y= peaks_stat(stim_num).VmSTD';
+tmp_X(1,:)=ones(1,size(tmp_Y,2));
+tmp_X(2,:)=2*ones(1,size(tmp_Y,2));
+E = peaks_stat(stim_num).VmSTD_std;
+VmSTD_p=peaks_stat(stim_num).wilcoxon_p_VmSTD;
+ if VmSTD_p >0.05 
     asterisk_before='n.s.';
     a1_fontsize=13;
-else if VmSTD_stat.p_before{1,1}<0.05 && VmSTD_stat.p_before{1,1}>0.01
+else if VmSTD_p<0.05 && VmSTD_p>0.01
     asterisk_before='*';
     a1_fontsize=17;
-    else if VmSTD_stat.p_before{1,1}<0.01 && VmSTD_stat.p_before{1,1}>0.001
+    else if VmSTD_p<0.01 && VmSTD_p>0.001
             asterisk_before='**';
             a1_fontsize=17;
-    else if VmSTD_stat.p_before{1,1}<0.001
+    else if VmSTD_p<0.001
              asterisk_before='***';
              a1_fontsize=17;
         end
@@ -2297,15 +2333,68 @@ else if VmSTD_stat.p_before{1,1}<0.05 && VmSTD_stat.p_before{1,1}>0.01
     end
 end
 
-text(1,my,asterisk_before,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a1_fontsize)
-% set(gca,'ydir','reverse')
-        hold off
-     
-        x1limits = [0.5 1.5];   x1ticks = [1];    
-        set( gca, 'xlim', x1limits,'xtick', [],'ylim',ylim_data,'fontsize',28,'linewidth',1,...
-        'ticklength', [0.010 0.010],'fontname', 'arial','FontSize', 16 ,'box', 'off'); %'fontweight', 'bold', 
-        ylabel([y_ax_label{1},' Mean [',y_ax_units{1},']'] ,'FontSize', 16);   
-        title(['Membrane STD before sensory train, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
+my=max(max(peaks_stat(stim_num).VmSTD))+1; %+5; +10
+hold on
+line(tmp_X,tmp_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
+errorbar(tmp_X(:,1), nanmean(tmp_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
+text(1.5,my,asterisk_before,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a1_fontsize);
+hold off
+        x1limits = [0.75 2.25];
+        x1ticks = [1,2];
+        switch exp_type
+            case 1
+                y1limits = [0 11];
+            case 2
+                y1limits = [0 7];
+        end
+%         y1ticks = [0,0.5,1];
+        set( gca, 'xlim', x1limits,'xtick', x1ticks, 'ylim', y1limits,'fontsize',28,'linewidth',1,...
+        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
+        ylabel('Vm STD [mV]', 'FontSize', 28,'fontname', 'arial');
+        title(['VmSTD spontaneous,  p=' num2str(VmSTD_p)] ,'FontSize', 20,'fontname', 'arial');
+    % option 2: bar-plot
+%     nstim=1;
+%     hold on
+%         errbar_h1=errorbar(1-0.15,nanmean([peaks_stat(stim_num).pre_response_STD(:,1)],1), nanstd([peaks_stat(stim_num).pre_response_STD(:,1)],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         errbar_h2=errorbar(1+0.15,nanmean([peaks_stat(stim_num).pre_response_STD(:,2)],1), nanstd([peaks_stat(stim_num).pre_response_STD(:,2),],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         bar1=bar(1-0.15, nanmean([peaks_stat(stim_num).pre_response_STD(:,1)],1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:));
+%         bar2=bar(1+0.15, nanmean([peaks_stat(stim_num).pre_response_STD(:,2)],1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:));
+% %        L1=line(pre_response_STD_X,pre_response_STD_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k');
+% %setting the errorbars not to appear in the legend:
+% hAnnotation = get(errbar_h1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
+% hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
+% % hAnnotation = get(L1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
+% % [legh,objh,outh,outm] = legend('NB Off','NB On','Location','northeast');
+% l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
+% ylim_data=[0,6]; %NB [0,8], ChAT [0,6]
+% my=5.5; %NB 7.5, ChAT 5.5
+% 
+%         if VmSTD_stat.p_before{1,1} >0.05 
+%     asterisk_before='n.s.';
+%     a1_fontsize=13;
+% else if VmSTD_stat.p_before{1,1}<0.05 && VmSTD_stat.p_before{1,1}>0.01
+%     asterisk_before='*';
+%     a1_fontsize=17;
+%     else if VmSTD_stat.p_before{1,1}<0.01 && VmSTD_stat.p_before{1,1}>0.001
+%             asterisk_before='**';
+%             a1_fontsize=17;
+%     else if VmSTD_stat.p_before{1,1}<0.001
+%              asterisk_before='***';
+%              a1_fontsize=17;
+%         end
+%         end
+%     end
+% end
+% 
+% text(1,my,asterisk_before,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a1_fontsize)
+% % set(gca,'ydir','reverse')
+%         hold off
+%      
+%         x1limits = [0.5 1.5];   x1ticks = [1];    
+%         set( gca, 'xlim', x1limits,'xtick', [],'ylim',ylim_data,'fontsize',28,'linewidth',1,...
+%         'ticklength', [0.010 0.010],'fontname', 'arial','FontSize', 16 ,'box', 'off'); %'fontweight', 'bold', 
+%         ylabel([y_ax_label{1},' Mean [',y_ax_units{1},']'] ,'FontSize', 16);   
+%         title(['Membrane STD before sensory train, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
 
         %% plot VmSTD during sensory stimulation
     j7=figure;     
@@ -2315,16 +2404,17 @@ text(1,my,asterisk_before,'HorizontalAlignment', 'center','verticalAlignment','m
 tmp_X(1,:)=ones(1,size(tmp_Y,2));
 tmp_X(2,:)=2*ones(1,size(tmp_Y,2));
 E = peaks_stat(stim_num).Vm_res_STD_meanstim_std;
- if VmSTD_stat.p_during{1,1} >0.05 
+VmSTD_p=peaks_stat.wilcoxon_p_Vm_res_STD_meanstim;
+ if VmSTD_p >0.05 
     asterisk_during='n.s.';
     a1_fontsize=13;
-else if VmSTD_stat.p_during{1,1}<0.05 && VmSTD_stat.p_during{1,1}>0.01
+else if VmSTD_p<0.05 && VmSTD_p>0.01
     asterisk_during='*';
     a1_fontsize=17;
-    else if VmSTD_stat.p_during{1,1}<0.01 && VmSTD_stat.p_during{1,1}>0.001
+    else if VmSTD_p<0.01 && VmSTD_p>0.001
             asterisk_during='**';
             a1_fontsize=17;
-    else if VmSTD_stat.p_during{1,1}<0.001
+    else if VmSTD_p<0.001
              asterisk_during='***';
              a1_fontsize=17;
         end
@@ -2350,51 +2440,51 @@ hold off
         set( gca, 'xlim', x1limits,'xtick', x1ticks, 'ylim', y1limits,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('Vm std [mV]', 'FontSize', 28,'fontname', 'arial');
-        title(['VmSTD,  p=' num2str(VmSTD_stat.p_during{1})] ,'FontSize', 20,'fontname', 'arial');
+        title(['VmSTD evoked,  p=' num2str(VmSTD_p)] ,'FontSize', 20,'fontname', 'arial');
 
     %% option 2: bar-plot
-    nstim=1;
-    hold on
-        errbar_h1=errorbar(1-0.15,nanmean([peaks_stat(stim_num).Vm_res_STD_meanstim(:,1)],1), nanstd([peaks_stat(stim_num).Vm_res_STD_meanstim(:,1)],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-        errbar_h2=errorbar(1+0.15,nanmean([peaks_stat(stim_num).Vm_res_STD_meanstim(:,2)],1), nanstd([peaks_stat(stim_num).Vm_res_STD_meanstim(:,2),],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
-        bar1=bar(1-0.15, nanmean([peaks_stat(stim_num).Vm_res_STD_meanstim(:,1)],1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:));
-        bar2=bar(1+0.15, nanmean([peaks_stat(stim_num).Vm_res_STD_meanstim(:,2)],1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:));
-%        L1=line(Vm_res_STD_meanstim_X,Vm_res_STD_meanstim_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k');
-%setting the errorbars not to appear in the legend:
-hAnnotation = get(errbar_h1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
-hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
-% hAnnotation = get(L1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
-% [legh,objh,outh,outm] = legend('NB Off','NB On','Location','northeast');
-l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
-ylim_data=[0,5]; %NB [0,8], ChAT [0,5]
-my=4.5; %NB 7.5, ChAT 4.5
-
-        if VmSTD_stat.p_during{1,1} >0.05 
-    asterisk_during='n.s.';
-    a1_fontsize=13;
-else if VmSTD_stat.p_during{1,1}<0.05 && VmSTD_stat.p_during{1,1}>0.01
-    asterisk_during='*';
-    a1_fontsize=17;
-    else if VmSTD_stat.p_during{1,1}<0.01 && VmSTD_stat.p_during{1,1}>0.001
-            asterisk_during='**';
-            a1_fontsize=17;
-    else if VmSTD_stat.p_during{1,1}<0.001
-             asterisk_during='***';
-             a1_fontsize=17;
-        end
-        end
-    end
-end
-
-text(1,my,asterisk_during,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a1_fontsize)
-% set(gca,'ydir','reverse')
-        hold off
-     
-        x1limits = [0.5 1.5];   x1ticks = [1];    
-        set( gca, 'xlim', x1limits,'xtick', [],'ylim',ylim_data,'fontsize',28,'linewidth',1,...
-        'ticklength', [0.010 0.010],'fontname', 'arial','FontSize', 16 ,'box', 'off'); %'fontweight', 'bold', 
-        ylabel([y_ax_label{1},' Mean [',y_ax_units{1},']'] ,'FontSize', 16);   
-        title(['Membrane STD during sensory train, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
+%     nstim=1;
+%     hold on
+%         errbar_h1=errorbar(1-0.15,nanmean([peaks_stat(stim_num).Vm_res_STD_meanstim(:,1)],1), nanstd([peaks_stat(stim_num).Vm_res_STD_meanstim(:,1)],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         errbar_h2=errorbar(1+0.15,nanmean([peaks_stat(stim_num).Vm_res_STD_meanstim(:,2)],1), nanstd([peaks_stat(stim_num).Vm_res_STD_meanstim(:,2),],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
+%         bar1=bar(1-0.15, nanmean([peaks_stat(stim_num).Vm_res_STD_meanstim(:,1)],1),'barwidth',barwidth1,'facecolor', color_table(1,:),'edgecolor', color_table(1,:));
+%         bar2=bar(1+0.15, nanmean([peaks_stat(stim_num).Vm_res_STD_meanstim(:,2)],1),'barwidth',barwidth1,'facecolor', color_table(2,:),'edgecolor', color_table(2,:));
+% %        L1=line(Vm_res_STD_meanstim_X,Vm_res_STD_meanstim_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k');
+% %setting the errorbars not to appear in the legend:
+% hAnnotation = get(errbar_h1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
+% hAnnotation = get(errbar_h2,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
+% % hAnnotation = get(L1,'Annotation');  hLegendEntry = get(hAnnotation,'LegendInformation'); set(hLegendEntry,'IconDisplayStyle','off')
+% % [legh,objh,outh,outm] = legend('NB Off','NB On','Location','northeast');
+% l = legend (legend_string,'fontsize',9,'Location','northeast'); legend('boxoff')
+% ylim_data=[0,5]; %NB [0,8], ChAT [0,5]
+% my=4.5; %NB 7.5, ChAT 4.5
+% 
+%         if VmSTD_stat.p_during{1,1} >0.05 
+%     asterisk_during='n.s.';
+%     a1_fontsize=13;
+% else if VmSTD_stat.p_during{1,1}<0.05 && VmSTD_stat.p_during{1,1}>0.01
+%     asterisk_during='*';
+%     a1_fontsize=17;
+%     else if VmSTD_stat.p_during{1,1}<0.01 && VmSTD_stat.p_during{1,1}>0.001
+%             asterisk_during='**';
+%             a1_fontsize=17;
+%     else if VmSTD_stat.p_during{1,1}<0.001
+%              asterisk_during='***';
+%              a1_fontsize=17;
+%         end
+%         end
+%     end
+% end
+% 
+% text(1,my,asterisk_during,'HorizontalAlignment', 'center','verticalAlignment','middle','fontsize',a1_fontsize)
+% % set(gca,'ydir','reverse')
+%         hold off
+%      
+%         x1limits = [0.5 1.5];   x1ticks = [1];    
+%         set( gca, 'xlim', x1limits,'xtick', [],'ylim',ylim_data,'fontsize',28,'linewidth',1,...
+%         'ticklength', [0.010 0.010],'fontname', 'arial','FontSize', 16 ,'box', 'off'); %'fontweight', 'bold', 
+%         ylabel([y_ax_label{1},' Mean [',y_ax_units{1},']'] ,'FontSize', 16);   
+%         title(['Membrane STD during sensory train, n=' num2str(length(files_to_analyze))] ,'FontSize', 16);   
                 %% plot VmSTD after sensory stimulation
     j8=figure;     
     nstim=1;

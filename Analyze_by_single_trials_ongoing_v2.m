@@ -32,7 +32,7 @@ switch exp_type
         end        
 
     case 2
-        files_to_analyze =[74,76,77,80,82,84,87,90,92,112,114,115]; %[74,76,77,80,82,84,87]; %,84,87];
+        files_to_analyze =46; %[74,76,77,80,82,84,87,90,92,112,114,115]; %[74,76,77,80,82,84,87]; %,84,87];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light Off', 'Light On'};  y_ax_label={'Vm'}; y_ax_units={'mV'};  
@@ -265,7 +265,7 @@ if save_flag==1;
         print(fg1,filename1,'-dpng','-r600','-opengl') 
 end
 end
-%% Calculating Vm mean and std
+%% Calculating Vm mean and std - not used anymore. I am using the same code in the script "Analyze_response_parameters_10_20Hz_v2"
 interval=[]; Vm_spont=[]; VmM=[]; VmSTD=[];
 %taking 
 switch exp_type             

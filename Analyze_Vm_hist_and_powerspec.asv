@@ -123,9 +123,9 @@ data_preprocessing
         diff_val= ongoing(fileind).Vm_median(:,2)- ongoing(fileind).Vm_median(:,1);
         [ongoing(fileind).lillietest_h_Vm_median,ongoing(fileind).lillietest_p_Vm_median] = lillietest(diff_val);
         %paired ttest 
-        [ongoing(fileind).ttest_h_Vm_median,ongoing(fileind).ttest_p_Vm_median]= ttest(ongoing(fileind).Vm_median(:,1),ongoing(fileind).Vm_median(:,2));
-        [ongoing(fileind).wilcoxon_p_Vm_median,ongoing(fileind).wilcoxon_h_Vm_median]= signrank(ongoing(fileind).Vm_median(:,1),ongoing(fileind).Vm_median(:,2));
-        clear diff_val
+        [ongoing(fileind).ttest_h_Vm_median,ongoing(fileind).ttest_p_Vm_median]= ttest(hists_stat(trace_type).Vm_5prctile(:,1),hists_stat(trace_type).Vm_5prctile(:,2));
+        [ongoing(fileind).wilcoxon_p_Vm_median,ongoing(fileind).wilcoxon_h_Vm_median]= signrank(hists_stat(trace_type).Vm_5prctile(:,1),hists_stat(trace_type).Vm_5prctile(:,2));
+        clear norm_Vm_5prctile_noES norm_Vm_5prctile_ES diff_val
         
         ongoing(fileind).Vm_5prctile=data_vec_5prctile{trace_type}(fileind,:);   
 
