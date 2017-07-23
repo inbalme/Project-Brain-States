@@ -4,8 +4,6 @@ close all
 clear all
 save_flag=0;
 no_numbering_flag=1;
- abslen=0.05;
- ax_fontsize=11;
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz Presentation'
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP_50Hz+BP0.1-200 Vm_50Hz';
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP_50Hz+BP1-200 Vm_50Hz';
@@ -186,11 +184,12 @@ evoked_trace_On_f46_ax_copy(1).FontSize=10;
 %       h(1).LineWidth =1.5;
 %     end
  %%
+ abslen=0.05;
  %Spontaneous Cross-correlations file 46 actual data+shuffled data
 spont_cc_Off_f46_ax_copy(1) = copyobj(spont_cc_Off_f46_ax(2),F); % copy axes to new fig
 set(spont_cc_Off_f46_ax_copy(1),'position',spont_cc_Off_f46_pos(1,:), 'ylim',[-0.4,0.25])
     set(F, 'currentaxes', spont_cc_Off_f46_ax_copy(1));  yl=ylabel(''); 
-spont_cc_Off_f46_ax_copy(1).FontSize=ax_fontsize;    
+spont_cc_Off_f46_ax_copy(1).FontSize=11;    
 % spont_cc_Off_f46_ax_copy(1).YTick=[-0.4,0,0.2];
 set(gca,'xtick',[-0.5,0,0.5],'ytick',[-0.4,0,0.2],'tickdir','out')
 ticklen=fn_get_abs_ticklength(gca, abslen);
@@ -198,7 +197,7 @@ ticklen=fn_get_abs_ticklength(gca, abslen);
 spont_cc_On_f46_ax_copy(1) = copyobj(spont_cc_On_f46_ax(2),F); % copy axes to new fig
 set(spont_cc_On_f46_ax_copy(1),'position',spont_cc_On_f46_pos(1,:), 'ylim',[-0.4,0.25]) %'xticklabel',[]
  set(F, 'currentaxes', spont_cc_On_f46_ax_copy(1));  %xl=xlabel('');  
-spont_cc_On_f46_ax_copy(1).FontSize=ax_fontsize;
+spont_cc_On_f46_ax_copy(1).FontSize=11;
 L1=findobj(gca,'type','line');
 set(L1,'linestyle','-');
 % spont_cc_On_f46_ax_copy(1).YTick=[-0.4,0,0.2];
@@ -212,7 +211,7 @@ ticklen=fn_get_abs_ticklength(gca, abslen);
 evoked_cc_Off_f46_ax_copy = copyobj(evoked_cc_Off_f46_ax,F); % copy axes to new fig
 set(evoked_cc_Off_f46_ax_copy(2),'position',evoked_cc_Off_f46_pos(1,:), 'ylim',[-0.4,0.25])
 set(F, 'currentaxes', evoked_cc_Off_f46_ax_copy(2));  yl=ylabel(''); 
-evoked_cc_Off_f46_ax_copy(2).FontSize=ax_fontsize;
+evoked_cc_Off_f46_ax_copy(2).FontSize=11;
 % evoked_cc_Off_f46_ax_copy(2).YTick=[-0.4,0,0.2];
 set(gca,'xtick',[-0.5,0,0.5],'ytick',[-0.4,0,0.2],'tickdir','out')
 ticklen=fn_get_abs_ticklength(gca, abslen);
@@ -220,7 +219,7 @@ ticklen=fn_get_abs_ticklength(gca, abslen);
 evoked_cc_On_f46_ax_copy = copyobj(evoked_cc_On_f46_ax,F); % copy axes to new fig
 set(evoked_cc_On_f46_ax_copy(2),'position',evoked_cc_On_f46_pos(1,:))
    set(F, 'currentaxes', evoked_cc_On_f46_ax_copy(2)); 
-   evoked_cc_On_f46_ax_copy(2).FontSize=ax_fontsize;
+   evoked_cc_On_f46_ax_copy(2).FontSize=11;
    L2=findobj(gca,'type','line');
 set(L2,'linestyle','-');
   set(gca,'xtick',[-0.5,0,0.5],'ytick',[-1,0,1],'tickdir','out')
@@ -249,31 +248,20 @@ cc_paired_plot_ax_copy = copyobj(cc_paired_plot_ax,F); % copy axes to new fig
 set(cc_paired_plot_ax_copy,'position',cc_paired_plot_pos(1,:))
    set(F, 'currentaxes', cc_paired_plot_ax_copy); yl=ylabel('');
    txt1=findobj(gca,'type','text'); delete(txt1(1:2));
-cc_paired_plot_ax_copy.FontSize=ax_fontsize;
+cc_paired_plot_ax_copy.FontSize=11;
 set(gca,'tickdir','out')
 ticklen=fn_get_abs_ticklength(gca, abslen);
 
 cc_paired_plot_shuff_ax_copy = copyobj(cc_paired_plot_shuff_ax,F); % copy axes to new fig
 set(cc_paired_plot_shuff_ax_copy,'position',cc_paired_plot_shuff_pos(1,:))
- set(F, 'currentaxes', cc_paired_plot_shuff_ax_copy); 
 txt2=findobj(gca,'type','text'); delete(txt2(1:2));
-cc_paired_plot_shuff_ax_copy.FontSize=ax_fontsize;
+cc_paired_plot_shuff_ax_copy.FontSize=11;
 set(gca,'tickdir','out')
 ticklen=fn_get_abs_ticklength(gca, abslen);
     %   'fontname', 'arial','fontsize',13,'linewidth',1.5,'box','off'); %, 'ylim', y6limits,'ytick', y6ticks,'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
 %  set(F, 'currentaxes', Response_modulation_ax_copy); t=title(''); yl=ylabel('Spikes/Stim. train','fontsize',13);
 
-%Changing the fontsize of xlabel and ylabel of all axes in the figure:
- haxes=get(gcf,'children');
- haxes1=get(haxes,'type');
- for i=1:size(haxes1,1)
-    findax(i)=strcmp({'axes'},haxes1{i});
- end
- haxlabels=get(haxes(findax),{'XLabel' 'YLabel'});
- for i=1:numel(haxlabels)
-    set(haxlabels{i},'fontsize',ax_fontsize);
- end
- 
+
 %   annotation:
 annotation('textbox', [spont_trace_Off_f46_pos(1,1) spont_trace_Off_f46_pos_top 0 0]+[0.06 0. 0.5 0.05],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Spontaneous Activity', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
@@ -288,13 +276,9 @@ annotation('textbox', [spont_cc_On_f46_pos(1,1)+0.01 spont_cc_On_f46_pos_top+0.0
  annotation('textbox', [evoked_cc_Off_f46_pos(1,1)+0.01 evoked_cc_Off_f46_pos_top+0.03 0 0],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Corrected', 'FontName','arial', 'fontsize', 11)
  %population
- annotation('textbox', [cc_paired_plot_shuff_pos(1,1)+0.005 cc_paired_plot_shuff_pos_top+0.03 0 0],...
+ annotation('textbox', [cc_paired_plot_shuff_pos(1,1) cc_paired_plot_shuff_pos_top+0.03 0 0],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Shuffled', 'FontName','arial', 'fontsize', 11)
- annotation('textbox', [cc_paired_plot_shuff_pos(1,1)+0.155 cc_paired_plot_shuff_pos_top+0.03 0 0],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Corrected', 'FontName','arial', 'fontsize', 11)
- annotation('textbox', [cc_paired_plot_pos(1,1)+0.005 cc_paired_plot_pos_top+0.03 0 0],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Shuffled', 'FontName','arial', 'fontsize', 11)
- annotation('textbox', [cc_paired_plot_pos(1,1)+0.155 cc_paired_plot_pos_top+0.03 0 0],...
+ annotation('textbox', [cc_paired_plot_shuff_pos(1,1)+0.16 cc_paired_plot_shuff_pos_top+0.03 0 0],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Corrected', 'FontName','arial', 'fontsize', 11)
  %  
  a_pos1=[-0.03 -0.02 0.04 0.04];

@@ -4,7 +4,7 @@ close all
 clear all
 save_flag=1;
 no_numbering_flag=1;
-abslen=0.05; %[in cm]
+
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz Presentation'
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP_50Hz+BP0.1-200 Vm_50Hz';
 cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Vm-LFP correlations\LFP_50Hz+BP1-200 Vm_50Hz';
@@ -185,6 +185,7 @@ evoked_trace_On_f80_ax_copy(1).FontSize=10;
 %       h(1).LineWidth =1.5;
 %     end
  %%
+ abslen=0.05; %[in cm]
  %Spontaneous Cross-correlations file 46 actual data+shuffled data
 spont_cc_Off_f80_ax_copy(1) = copyobj(spont_cc_Off_f80_ax(2),F); % copy axes to new fig
 set(spont_cc_Off_f80_ax_copy(1),'position',spont_cc_Off_f80_pos(1,:), 'ylim',[-0.5,0.25])

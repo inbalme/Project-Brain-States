@@ -2,11 +2,12 @@
 
 close all
 clear all
-ax_fontsize=11;
+ax_fontsize=10;
 %f23 - xlim=[5.5 8.5], f28 - [4 7], f55 - [4.5 7.5], f60 - [5 8];
 xlim1=[4,7]; xlim2=[4.5,7.5];
 save_flag=0;
 no_numbering_flag=0;
+rectangle_color=[210 210 210]/256;
 
 %opening saved figures:
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Illustrations+Histology'
@@ -17,12 +18,16 @@ NB_histology = imread('20150709_slide1(red)_sec3_whole section_2_v1','TIF');
 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\LFP depth'
 
-% traces_depth3 = open('20150323-002_LFP_traces_h6_t3  6  7_4600um.fig');    
-traces_depth3 = open('2016-10-20-001_LFP_traces_h28_t2  3  4  5  6_v3.fig');    
+% traces_depth3 = open('20150323-002_LFP_traces_h6_t3  6  7_4600um.fig');    2016-10-20-001_LFP_traces_h28_t2  3  4  5  6_v3
+traces_depth3 = open('2016-10-20-001_LFP_traces_h28_t2  3  4  5  6_5000um.fig');    
+rec=findobj(gca,'type','rectangle'); 
+set(rec(2:3),'FaceColor',rectangle_color);
+traceh=get(gca,'children');
+set(traceh(6:16),'Linewidth',0.8) %these are the handles of the traces
 traces_depth3_ax = get(gcf, 'children');
 
-% PSD_depth3 = open('20150323-002_LFP_PSD_1-100Hz_h6_4600um.fig');    
-PSD_depth3 = open('2016-10-20-001_LFP_PSD_1-100Hz_h28_v3.fig');    
+% PSD_depth3 = open('20150323-002_LFP_PSD_1-100Hz_h6_4600um.fig');    2016-10-20-001_LFP_PSD_1-100Hz_h28_v3 
+PSD_depth3 = open('2016-10-20-001_LFP_PSD_1-100Hz_h28_5000um.fig');    
 PSD_depth3_ax = get(gcf, 'children');
 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm Histograms and Powerspec\Powerspec LFP\Not Normalized';
@@ -86,32 +91,32 @@ set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 NB_illustration_pos = [0 , 0.75 , 0.27 , 0.17];
 NB_histology_pos = [0.04 , 0.52 , 0.17 , 0.2];
 
-traces_depth3_pos(1,:) = [0.25 , 0.65 , 0.45 , 0.3];
+traces_depth3_pos(1,:) = [0.27 , 0.7 , 0.51 , 0.25];
 
-dist1=0.12; dist2=0.06; h_dist1=traces_depth3_pos(1,1)+traces_depth3_pos(1,3)+dist1;
+dist1=0.05; dist2=0.07; h_dist1=traces_depth3_pos(1,1)+traces_depth3_pos(1,3)+dist1;
 
-PSD_depth3_pos(1,:) = [h_dist1 , traces_depth3_pos(1,2)+0.13 ,  0.12,  0.15];
+PSD_depth3_pos(1,:) = [h_dist1 , traces_depth3_pos(1,2)+0.08 ,  0.12,  0.15];
 
-total_power_pos(1,:) = [0.35 , 0.5 , 0.1 , 0.1]; total_power_pos(1,2)=traces_depth3_pos(1,2)-total_power_pos(1,4)-0.03;
+total_power_pos(1,:) = [0.33 , 0.5 , 0.1 , 0.1]; total_power_pos(1,2)=traces_depth3_pos(1,2)-total_power_pos(1,4)-0.07;
 delta_pos(1,:) = [total_power_pos(1,1)+total_power_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 beta_pos(1,:) = [delta_pos(1,1)+delta_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 gamma_pos(1,:) = [beta_pos(1,1)+beta_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 
-evoked_trace_Off_pos(1,:) = [0.1 , total_power_pos(1,2)-0.15 , 0.25 , 0.09];
+evoked_trace_Off_pos(1,:) = [0.1 , total_power_pos(1,2)-0.16 , 0.25 , 0.09];
 evoked_trace_Off_pos(2,:) = [evoked_trace_Off_pos(1,1) , 0.5 ,evoked_trace_Off_pos(1,3) ,evoked_trace_Off_pos(1,4)]; evoked_trace_Off_pos(2,2)=evoked_trace_Off_pos(1,2)-evoked_trace_Off_pos(2,4)-0.01;
 evoked_trace_On_pos(1,:) = [evoked_trace_Off_pos(1,1) , 0.5 , evoked_trace_Off_pos(1,3) , evoked_trace_Off_pos(1,4)];  evoked_trace_On_pos(1,2)=evoked_trace_Off_pos(2,2)-evoked_trace_Off_pos(1,4)-0.01;
 evoked_trace_On_pos(2,:) = [evoked_trace_Off_pos(1,1) , 0.5 , evoked_trace_Off_pos(1,3) , evoked_trace_Off_pos(1,4)]; evoked_trace_On_pos(2,2)=evoked_trace_On_pos(1,2)-evoked_trace_On_pos(2,4)-0.01;
 
-evoked_trace_Off2_pos(1,:) = [evoked_trace_Off_pos(1,1)+evoked_trace_Off_pos(1,3)+0.1 , evoked_trace_Off_pos(1,2) , evoked_trace_Off_pos(1,3) , evoked_trace_Off_pos(1,4)];
+evoked_trace_Off2_pos(1,:) = [evoked_trace_Off_pos(1,1)+evoked_trace_Off_pos(1,3)+0.12 , evoked_trace_Off_pos(1,2) , evoked_trace_Off_pos(1,3) , evoked_trace_Off_pos(1,4)];
 evoked_trace_Off2_pos(2,:) = [evoked_trace_Off2_pos(1,1) , 0.5 ,evoked_trace_Off2_pos(1,3) ,evoked_trace_Off2_pos(1,4)]; evoked_trace_Off2_pos(2,2)=evoked_trace_Off2_pos(1,2)-evoked_trace_Off2_pos(2,4)-0.01;
 evoked_trace_On2_pos(1,:) = [evoked_trace_Off2_pos(1,1) , 0.5 , evoked_trace_Off2_pos(1,3) , evoked_trace_Off2_pos(1,4)];  evoked_trace_On2_pos(1,2)=evoked_trace_Off2_pos(2,2)-evoked_trace_Off2_pos(1,4)-0.01;
 evoked_trace_On2_pos(2,:) = [evoked_trace_Off2_pos(1,1) , 0.5 , evoked_trace_Off2_pos(1,3) , evoked_trace_Off2_pos(1,4)]; evoked_trace_On2_pos(2,2)=evoked_trace_On2_pos(1,2)-evoked_trace_On2_pos(2,4)-0.01;
 
 vert_dim=0.1;
-SNR_pos(1,:) = [h_dist1 , evoked_trace_On_pos(2,2)-0.03, 0.13 , vert_dim];
-Modulation_index_pos(1,:) = [h_dist1 , SNR_pos(1,2)+vert_dim+0.05 , 0.13 , vert_dim];
-Background_spikes_pos(1,:) = [h_dist1 , SNR_pos(1,2)+vert_dim+0.05 , 0.13 , vert_dim];
-Response_modulation_pos(1,:) = [h_dist1 , Modulation_index_pos(1,2)+vert_dim+0.05 , 0.13 , vert_dim];
+SNR_pos(1,:) = [h_dist1-0.01 , evoked_trace_On_pos(2,2)-0.03, 0.12 , vert_dim];
+Modulation_index_pos(1,:) = [SNR_pos(1,1) , SNR_pos(1,2)+vert_dim+0.05 , 0.13 , vert_dim];
+Background_spikes_pos(1,:) = [SNR_pos(1,1) , SNR_pos(1,2)+vert_dim+0.05 , 0.13 , vert_dim];
+Response_modulation_pos(1,:) = [SNR_pos(1,1) , Modulation_index_pos(1,2)+vert_dim+0.05 , 0.13 , vert_dim];
 
 %top positions
 PSD_depth3_pos_top = PSD_depth3_pos(1,2)+PSD_depth3_pos(1,4);
@@ -154,15 +159,14 @@ total_power_ax_copy = copyobj(total_power_ax,F); % copy axes to new fig
 set(total_power_ax_copy,'position',total_power_pos(1,:))
 total_power_ax_copy.FontSize=ax_fontsize;
 set(F, 'currentaxes', total_power_ax_copy); 
-tl=title({'Total Power'; ''},'fontweight','normal','fontsize',12);
+tl=title({'Total Power'; ''},'fontweight','normal','fontsize',10);
 set(gca,'ylim',[0 15e-3],'YTick',[0, 5e-3, 10e-3, 15e-3],'YTickLabel',[0, 5, 10, 15],'tickdir','out')
-
 delta_ax_copy = copyobj(delta_ax,F); % copy axes to new fig
 set(delta_ax_copy,'position',delta_pos(1,:))
 delta_ax_copy.FontSize=ax_fontsize;
 set(F, 'currentaxes', delta_ax_copy); 
 %  tl=title({'Delta Power'; ''},'fontweight','normal','fontsize',12);
- tl=title({'1-10 Hz'; ''},'fontweight','normal','fontsize',12); yl=ylabel('');
+ tl=title({'1-10 Hz'; ''},'fontweight','normal','fontsize',10); yl=ylabel('');
 set(gca,'ylim',[0 15e-3],'YTick',[0, 5e-3, 10e-3, 15e-3],'YTickLabel',[0, 5, 10, 15],'tickdir','out')
 % yl=ylabel('Normalized PSD');
 
@@ -171,7 +175,7 @@ set(beta_ax_copy,'position',beta_pos(1,:))
 beta_ax_copy.FontSize=ax_fontsize;
 set(F, 'currentaxes', beta_ax_copy); 
 % yl=ylabel('');  tl=title({'Beta Power'; ''},'fontweight','normal','fontsize',12);
-yl=ylabel('');  tl=title({'12-25 Hz'; ''},'fontweight','normal','fontsize',12);
+yl=ylabel('');  tl=title({'12-25 Hz'; ''},'fontweight','normal','fontsize',10);
  set(gca,'ylim',[0 10e-4],'YTick',[0, 5e-4, 10e-4],'YTickLabel',[0, 5, 10],'tickdir','out')
 
 gamma_ax_copy = copyobj(gamma_ax,F); % copy axes to new fig
@@ -179,12 +183,12 @@ set(gamma_ax_copy,'position',gamma_pos(1,:))
 gamma_ax_copy.FontSize=ax_fontsize;
 set(F, 'currentaxes', gamma_ax_copy); 
 % yl=ylabel('');  tl=title({'Gamma Power'; ''},'fontweight','normal','fontsize',12);
-yl=ylabel('');  tl=title({'30-50 Hz'; ''},'fontweight','normal','fontsize',12);
+yl=ylabel('');  tl=title({'30-50 Hz'; ''},'fontweight','normal','fontsize',10);
 set(gca,'ylim',[0 4e-4],'YTick',[0, 2e-4, 4e-4],'YTickLabel',[0, 2, 4],'tickdir','out')
 
 %   annotation:
-annotation('textbox', [traces_depth3_pos(1,1) traces_depth3_pos_top 0 0]+[0.12 0.01 0.5 0.05],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Barrel cortex L4 LFP traces', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
+annotation('textbox', [traces_depth3_pos(1,1) traces_depth3_pos_top 0 0]+[0.07 -0.01 0.5 0.05],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Barrel cortex L4 LFP traces', 'FontName','arial', 'fontsize', 12) %, 'fontweight', 'bold'
 annotation('textbox', [total_power_pos(1,1)-0.009 total_power_pos_top+0.035 0 0],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'x10^{-3}', 'FontName','arial', 'fontsize', 8) 
 annotation('textbox', [delta_pos(1,1)-0.009 delta_pos_top+0.035 0 0],...
@@ -215,39 +219,39 @@ set(evoked_trace_Off_ax_copy(2),'position',evoked_trace_Off_pos(1,:),'xticklabel
 evoked_trace_On_ax_copy = copyobj(evoked_trace_On_ax,F); % copy axes to new fig
 set(evoked_trace_On_ax_copy(2),'position',evoked_trace_On_pos(1,:),'xlim',xlim1,...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'tickdir','out'); %,1.5, 'ylim', y1limits(1,:),'ytick', y1ticks(1,:)
-   set(F, 'currentaxes', evoked_trace_On_ax_copy(2)); t=title(''); yl=ylabel('Trial#'); xl=xlabel('');  
+   set(F, 'currentaxes', evoked_trace_On_ax_copy(2)); t=title(''); yl=ylabel('Trial#','fontsize',ax_fontsize); xl=xlabel('');  
     set(evoked_trace_On_ax_copy(1),'position',evoked_trace_On_pos(2,:),'xlim',xlim1,...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'tickdir','out'); %,'xlim',x1limits,'xtick',x1ticks, 'xticklabel',x1ticklab, 'ylim', y2limits(2,:),'ytick', y2ticks(2,:)
- set(F, 'currentaxes', evoked_trace_On_ax_copy(1)); t=title(''); yl=ylabel('Spikes/S');  xl=xlabel('Time from ES offset [S]');  
+ set(F, 'currentaxes', evoked_trace_On_ax_copy(1)); t=title(''); yl=ylabel('Spikes/S','fontsize',ax_fontsize);  xl=xlabel('Time from ES offset [S]','fontsize',ax_fontsize);  
  
  evoked_trace_Off2_ax_copy = copyobj(evoked_trace_Off2_ax,F); % copy axes to new fig
 set(evoked_trace_Off2_ax_copy(2),'position',evoked_trace_Off2_pos(1,:),'xticklabel',[], 'xlim',xlim2,...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'tickdir','out'); % 'ylim', y1limits(1,:),'ytick', y1ticks(1,:)
-   set(F, 'currentaxes', evoked_trace_Off2_ax_copy(2)); t=title(''); yl=ylabel('Trial#'); xl=xlabel('');  
+   set(F, 'currentaxes', evoked_trace_Off2_ax_copy(2)); t=title(''); yl=ylabel('Trial#','fontsize',ax_fontsize); xl=xlabel('');  
    set(evoked_trace_Off2_ax_copy(1),'position',evoked_trace_Off2_pos(2,:),'xticklabel',[],'xlim',xlim2,...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'tickdir','out'); %'xlim',x1limits,'xtick',x1ticks, 'xticklabel',[], 'ylim', y2limits(2,:),'ytick', y2ticks(2,:)
-  set(F, 'currentaxes', evoked_trace_Off2_ax_copy(1)); t=title(''); yl=ylabel('Spikes/S'); xl=xlabel('');  
+  set(F, 'currentaxes', evoked_trace_Off2_ax_copy(1)); t=title(''); yl=ylabel('Spikes/S','fontsize',ax_fontsize); xl=xlabel('');  
   
 evoked_trace_On2_ax_copy = copyobj(evoked_trace_On2_ax,F); % copy axes to new fig
 set(evoked_trace_On2_ax_copy(2),'position',evoked_trace_On2_pos(1,:),'xlim',xlim2,...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'tickdir','out'); %,1.5, 'ylim', y1limits(1,:),'ytick', y1ticks(1,:)
-   set(F, 'currentaxes', evoked_trace_On2_ax_copy(2)); t=title(''); yl=ylabel('Trial#'); xl=xlabel('');  
+   set(F, 'currentaxes', evoked_trace_On2_ax_copy(2)); t=title(''); yl=ylabel('Trial#','fontsize',ax_fontsize); xl=xlabel('');  
     set(evoked_trace_On2_ax_copy(1),'position',evoked_trace_On2_pos(2,:),'xlim',xlim2,...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'tickdir','out'); %,'xlim',x1limits,'xtick',x1ticks, 'xticklabel',x1ticklab, 'ylim', y2limits(2,:),'ytick', y2ticks(2,:)
- set(F, 'currentaxes', evoked_trace_On2_ax_copy(1)); t=title(''); yl=ylabel('Spikes/S');  xl=xlabel('Time from ES offset [S]');  
+ set(F, 'currentaxes', evoked_trace_On2_ax_copy(1)); t=title(''); yl=ylabel('Spikes/S','fontsize',ax_fontsize);  xl=xlabel('Time from ES offset [S]','fontsize',ax_fontsize);  
 
  %Response modulation
 Response_modulation_ax_copy = copyobj(Response_modulation_ax,F); % copy axes to new fig
 set(Response_modulation_ax_copy,'position',Response_modulation_pos(1,:),'ylim',[-5 30] ,'ytick', [0 10 20],'xticklabel',[],...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'box','off','tickdir','out'); %, 'ylim', y6limits,'ytick', y6ticks,'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
- set(F, 'currentaxes', Response_modulation_ax_copy); t=title(''); yl=ylabel('Spikes/Train','fontsize',13); 
+ set(F, 'currentaxes', Response_modulation_ax_copy); t=title(''); yl=ylabel('Spikes/Train','fontsize',ax_fontsize); 
  set(gca,'ylim',[0 30],'YTick',[0, 10, 20,30])
 
  %Background Spikes
 Background_spikes_ax_copy = copyobj(Background_spikes_ax,F); % copy axes to new fig
 set(Background_spikes_ax_copy,'position',Background_spikes_pos(1,:),'ylim',[-5 20],'xticklabel',[] ,...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'box','off','tickdir','out'); %, 'ylim',[-5 30] ,'ytick', [0 10 20],'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
- set(F, 'currentaxes', Background_spikes_ax_copy); t=title(''); yl=ylabel('#Spikes','fontsize',13);
+ set(F, 'currentaxes', Background_spikes_ax_copy); t=title(''); yl=ylabel('Spikes','fontsize',ax_fontsize);
 
  %Modulation index
 %  Modulation_index_ax_copy = copyobj(Modulation_index_ax,F); % copy axes to new fig
@@ -259,7 +263,18 @@ set(Background_spikes_ax_copy,'position',Background_spikes_pos(1,:),'ylim',[-5 2
 SNR_ax_copy = copyobj(SNR_ax,F); % copy axes to new fig
 set(SNR_ax_copy,'position',SNR_pos(1,:),'ylim',[-0.1 1.1] ,'ytick', [0 0.5 1],...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'box','off','tickdir','out'); %, 'ylim', y6limits,'ytick', y6ticks,'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
- set(F, 'currentaxes', SNR_ax_copy); t=title(''); yl=ylabel('SNRI','fontsize',13); %set Ytick to be on the left side and not on the right
+ set(F, 'currentaxes', SNR_ax_copy); t=title(''); yl=ylabel('SNRI','fontsize',ax_fontsize); %set Ytick to be on the left side and not on the right
+
+ %Changing the fontsize of xlabel and ylabel of all axes in the figure:
+ haxes=get(gcf,'children');
+ haxes1=get(haxes,'type');
+ for i=1:size(haxes1,1)
+    findax(i)=strcmp({'axes'},haxes1{i});
+ end
+ haxlabels=get(haxes(findax),{'XLabel' 'YLabel'});
+ for i=1:numel(haxlabels)
+    set(haxlabels{i},'fontsize',ax_fontsize);
+ end
 
  %  
  a_pos1=[0 -0.02 0.04 0.04];
@@ -294,7 +309,7 @@ else
     cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures\Neuron'
 end
 if save_flag==1;
-filename='Fig 1 LFP traces+PSD_1-100Hz+SNR_file28';
+filename='Fig 1 LFP traces+PSD_1-100Hz+SNR_file28_v2';
 saveas(F,filename,'fig'); 
 print(F,filename,'-dpng','-r600','-opengl') 
 print(F, '-depsc2', filename);

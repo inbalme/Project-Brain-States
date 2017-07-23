@@ -6,7 +6,7 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
 %different ES depth. same LFP location in barrel cortex:
 % load Set2-2015-03-23-002_h1-7 %data1, different depths
 %  load Set2-2015-04-02-001_h3-12 %different depths
- load 2016-10-20-001_h2-34 %different depths data1; [27,28,29,30,31,33,34], gain 10, DC_int=0.4;depth: [5200,5000,4700,4000, 3700,4700,3000, 2300]
+ load 2016-10-20-001_h2-34 %different depths data1; [27,28,29,30,31,33,34], gain 10, DC_int=0.4;
 %Atropine+Mecamylamine:
 % load 2015-12-28-006_h1-6 %data2
 % load 2015-07-29-002_h1-6 %data2 ESdel7sec, trace 15sec, cut 1500samples from both sides of the trace
@@ -43,14 +43,13 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
 
 
 %% 2015-05-06-001_LFP_traces_h2_t2  3  4  5  7; 
- orig_header=33; %[27,28,29,30,31,33,34] [1,2,3,4,5,6,7]; 2016-10-20-001_LFP_PSD_1-100Hz_h28_v3
+ orig_header=28; %[27,28,29,30,31,33,34] [1,2,3,4,5,6,7]; 2016-10-20-001_LFP_PSD_1-100Hz_h28_v3
  save_flag=0;
  galvano_flag=0;
  ES_del=10; %10
  dataCh=1;
  gain=10; %20;
  DC_int=0.4;
- depth=3000; %[2500,3000,3500,4000,4300,4600,4100]; 
  trace_ind = [2,3,4,5,6]; %1:size(plot_data,2);  %trace_ind is the numbers of traces to be plotted [2,3,4,5,6];
  header=find(headers==orig_header);
  stim2_X=[];
@@ -333,12 +332,12 @@ l.FontSize=10;
 %  end
 
 %% 
-if save_flag==1; 
+if save_flag==1;
     %for different depths:
-filename_PSD = ['2016-10-20-001_LFP_PSD_1-100Hz_h',num2str(orig_header),'_',num2str(depth),'um'];
-filename_traces = ['2016-10-20-001_LFP_traces_h',num2str(orig_header),'_t',num2str(trace_ind),'_',num2str(depth),'um'];
-% filename_PSD = ['2016-10-20-001_LFP_PSD_1-100Hz_h',num2str(orig_header),'_',num2str(depth(header)),'um'];
-% filename_traces = ['20150323-002_LFP_traces_h',num2str(orig_header),'_t',num2str(trace_ind),'_',num2str(depth(header)),'um'];
+depth=[2500,3000,3500,4000,4300,4600,4100];
+% filename = ['20150506-003_LFP_PSD_h',num2str(orig_header)];
+filename_PSD = ['20150323-002_LFP_PSD_1-100Hz_h',num2str(orig_header),'_',num2str(depth(header)),'um'];
+filename_traces = ['20150323-002_LFP_traces_h',num2str(orig_header),'_t',num2str(trace_ind),'_',num2str(depth(header)),'um'];
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\LFP depth';
 %for Blockers:
 filename_PSD = ['2015-31-12-002_LFP_PSD_1-100Hz_h',num2str(orig_header)];

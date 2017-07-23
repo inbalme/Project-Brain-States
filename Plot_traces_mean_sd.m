@@ -279,7 +279,6 @@ switch exp_type
         segment1=x_axis_Slong(1):stim1_X{1}(1,1);
         segment2=stim1_X{1}(1,1)+1:x_axis_Slong(end);
 end
- 
 %need to put nans in the place of the step current and then make a double-line
 %according to the nans and write "step current".
 

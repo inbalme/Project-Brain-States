@@ -4,7 +4,8 @@ close all
 clear all
 save_flag=0;
 no_numbering_flag=1;
-dotsize=5; %markersize of dots for detected events
+abslen=0.05; %[in cm]
+dotsize=10; %markersize of dots for detected events
 %opening saved figures:
 
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm Histograms and Powerspec\Spontaneous histograms'
@@ -86,7 +87,7 @@ cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Spontaneous\d
 color_onset=[255,178,102]./256; color_top=[255,153,16]./256;
         detection_example1_ChAT= open('detection example - ongoing NB-, trace 5.fig');    
         a=findall(gca,'type','line'); delete(a(2));
-        b=findall(gca,'type','text'); delete(b(2));
+        b=findall(gca,'type','text'); delete(b(2)); set(b(1),'rotation',0)
         c=findall(gca,'type','scatter');
         set(c(1),'sizedata',dotsize);
         set(c(2),'sizedata',dotsize);
@@ -101,7 +102,7 @@ color_onset=[255,178,102]./256; color_top=[255,153,16]./256;
          cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Spontaneous\detection f74'
         detection_example3_ChAT= open('detection example - ongoing NB-, trace 3.fig');    %8,9
         a=findall(gca,'type','line'); %delete(a(2));
-        b=findall(gca,'type','text'); %delete(b(2));
+        b=findall(gca,'type','text'); set(b(1),'rotation',0) %delete(b(2));
         c=findall(gca,'type','scatter');
         set(c(1),'sizedata',dotsize);
         set(c(2),'sizedata',dotsize);
@@ -136,6 +137,11 @@ cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Rin'
     spont_Rin_ChAT = open('Rin.fig');    
     spont_Rin_ChAT_ax = get(gcf, 'children');
 
+    cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Illustrations+Histology'
+NB_illustration = imread('NBES_Schematic_Illustration_tight','TIF');
+
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Illustrations+Histology'
+ChAT_illustration = imread('ChAT_Schematic_Illustration_tight','TIF');
 %%
 %open a new figure:
 F = figure;
@@ -149,26 +155,26 @@ set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
  
 %% Positions:
 %NB
-spont_Vm_hist_pos(1,:)=[0.1, 0.88, 0.35, 0.08];
+spont_Vm_hist_pos(1,:)=[0.18, 0.89, 0.27, 0.08];
 % spont_Vm_median_pos(1,:)=[spont_Vm_hist_pos(1,1)+0.22, spont_Vm_hist_pos(1,2)+0.02, 0.08, 0.04];
 h_dist1=spont_Vm_hist_pos(1,1)+spont_Vm_hist_pos(1,3)+0.18;
 spont_Vm_5prcentile_pos(1,:) = [h_dist1 , spont_Vm_hist_pos(1,2) ,  0.1 ,  0.08];
 spont_Rin_pos(1,:) = [h_dist1+spont_Vm_5prcentile_pos(1,3)+0.12, spont_Vm_5prcentile_pos(1,2) ,  spont_Vm_5prcentile_pos(1,3) ,  spont_Vm_5prcentile_pos(1,4)];
 
-detection_example1_pos(1,:) = [0.05 , 0.5 , 0.45 , 0.12]; detection_example1_pos(1,2)=spont_Vm_hist_pos(1,2)-detection_example1_pos(1,4)-0.05;
+detection_example1_pos(1,:) = [0.05 , 0.5 , 0.45 , 0.12]; detection_example1_pos(1,2)=spont_Vm_hist_pos(1,2)-detection_example1_pos(1,4)-0.04;
 hdist3=detection_example1_pos(1,1)+detection_example1_pos(1,3)+0.05;
 detection_example2_pos(1,:) = [hdist3 , detection_example1_pos(1,2) , detection_example1_pos(1,3) , detection_example1_pos(1,4)]; %detection_example2_pos(1,2)=detection_example1_pos(1,2)-detection_example1_pos(1,4)+0.05;
 detection_example3_pos(1,:) = [detection_example1_pos(1,1) , 0.5 , detection_example1_pos(1,3) , detection_example1_pos(1,4)]; detection_example3_pos(1,2)=detection_example1_pos(1,2)-detection_example3_pos(1,4)+0.07;
 detection_example4_pos(1,:) = [hdist3 , detection_example3_pos(1,2) , detection_example1_pos(1,3) , detection_example1_pos(1,4)]; %detection_example4_pos(1,2)=detection_example3_pos(1,2)-detection_example3_pos(1,4)+0.05;
 
-spont_amp_hist_pos(1,:) = [spont_Vm_hist_pos(1,1), 0.5 ,  spont_Vm_hist_pos(1,3) ,  0.08]; spont_amp_hist_pos(1,2)=detection_example4_pos(1,2)-spont_amp_hist_pos(1,4)-0.01;
+spont_amp_hist_pos(1,:) = [0.1, 0.5 ,  0.35 ,  0.08]; spont_amp_hist_pos(1,2)=detection_example4_pos(1,2)-spont_amp_hist_pos(1,4)-0.02;
 spont_amp_median_pos(1,:) = [spont_amp_hist_pos(1,1)+0.24, spont_amp_hist_pos(1,2)+0.04,0.05,0.05];
 h_dist2=spont_amp_hist_pos(1,1)+spont_amp_hist_pos(1,3)+0.15;
 spont_event_freq_pos(1,:) =[spont_Vm_5prcentile_pos(1,1),spont_amp_hist_pos(1,2)-0.02, spont_Vm_5prcentile_pos(1,3),spont_Vm_5prcentile_pos(1,4)];
 spont_event_amp_pos(1,:)=[spont_event_freq_pos(1,1)+spont_event_freq_pos(1,3)+0.1,spont_event_freq_pos(1,2),spont_event_freq_pos(1,3),spont_event_freq_pos(1,4)];
 
 %ChAT:
-spont_Vm_hist_ChAT_pos(1,:)=[0.1, 0.4, 0.35, 0.08];
+spont_Vm_hist_ChAT_pos(1,:)=[0.18, 0.4, 0.27, 0.08];
 % spont_Vm_median_ChAT_pos(1,:) = [spont_Vm_hist_ChAT_pos(1,1)+0.22, spont_Vm_hist_ChAT_pos(1,2)+0.02,0.08,0.04];
 % h_dist1=spont_Vm_hist_pos(1,1)+spont_Vm_hist_pos(1,3)+0.14;
 spont_Vm_5prcentile_ChAT_pos(1,:) = [h_dist1 , spont_Vm_hist_ChAT_pos(1,2) ,  0.1 ,  0.08];
@@ -177,10 +183,10 @@ spont_Rin_ChAT_pos(1,:) = [h_dist1+spont_Vm_5prcentile_ChAT_pos(1,3)+0.12, spont
 detection_example1_ChAT_pos(1,:) = [0.05 , 0.5 , 0.45 , 0.22]; detection_example1_ChAT_pos(1,2)=spont_Vm_hist_ChAT_pos(1,2)-detection_example1_ChAT_pos(1,4)+0.05;
 hdist3=detection_example1_ChAT_pos(1,1)+detection_example1_ChAT_pos(1,3)+0.05;
 detection_example2_ChAT_pos(1,:) = [hdist3 , detection_example1_ChAT_pos(1,2) , detection_example1_ChAT_pos(1,3) , detection_example1_ChAT_pos(1,4)]; %detection_example2_pos(1,2)=detection_example1_pos(1,2)-detection_example1_pos(1,4)+0.05;
-detection_example3_ChAT_pos(1,:) = [detection_example1_ChAT_pos(1,1) , 0.5 , detection_example1_ChAT_pos(1,3) , detection_example1_ChAT_pos(1,4)]; detection_example3_ChAT_pos(1,2)=detection_example1_ChAT_pos(1,2)-detection_example3_ChAT_pos(1,4)+0.15;
+detection_example3_ChAT_pos(1,:) = [detection_example1_ChAT_pos(1,1) , 0.5 , detection_example1_ChAT_pos(1,3) , detection_example1_ChAT_pos(1,4)]; detection_example3_ChAT_pos(1,2)=detection_example1_ChAT_pos(1,2)-detection_example3_ChAT_pos(1,4)+0.16;
 detection_example4_ChAT_pos(1,:) = [hdist3 , detection_example3_ChAT_pos(1,2) , detection_example1_ChAT_pos(1,3) , detection_example1_ChAT_pos(1,4)]; %detection_example4_pos(1,2)=detection_example3_pos(1,2)-detection_example3_pos(1,4)+0.05;
 
-spont_amp_hist_ChAT_pos(1,:) = [spont_Vm_hist_ChAT_pos(1,1), 0.5 ,  spont_Vm_hist_ChAT_pos(1,3) ,  0.08]; spont_amp_hist_ChAT_pos(1,2)=detection_example4_ChAT_pos(1,2)-spont_amp_hist_ChAT_pos(1,4)-0.01;
+spont_amp_hist_ChAT_pos(1,:) = [0.1, 0.5 ,  0.35,  0.08]; spont_amp_hist_ChAT_pos(1,2)=detection_example4_ChAT_pos(1,2)-spont_amp_hist_ChAT_pos(1,4)-0.02;
 spont_amp_median_ChAT_pos(1,:) = [spont_amp_hist_ChAT_pos(1,1)+0.24, spont_amp_hist_ChAT_pos(1,2)+0.04,0.05,0.05];
 h_dist2=spont_amp_hist_pos(1,1)+spont_amp_hist_pos(1,3)+0.15;
 spont_event_freq_ChAT_pos(1,:) =[spont_Vm_5prcentile_ChAT_pos(1,1),spont_amp_hist_ChAT_pos(1,2)-0.02, spont_Vm_5prcentile_ChAT_pos(1,3),spont_Vm_5prcentile_ChAT_pos(1,4)];
@@ -209,18 +215,25 @@ detection_example3_ChAT_pos_top = detection_example3_ChAT_pos(1,2)+detection_exa
 detection_example4_ChAT_pos_top = detection_example4_ChAT_pos(1,2)+detection_example4_ChAT_pos(1,4);
 spont_amp_hist_ChAT_pos_top = spont_amp_hist_ChAT_pos(1,2)+spont_amp_hist_ChAT_pos(1,4);
 
+NB_illustration_pos(1,:)=[0.01,spont_Vm_hist_pos_top-0.06, 0.08, 0.09];
+ChAT_illustration_pos(1,:)=[NB_illustration_pos(1,1),spont_Vm_hist_ChAT_pos_top-0.06, NB_illustration_pos(1,3), NB_illustration_pos(1,4)];
+
+NB_illustration_pos_top=NB_illustration_pos(1,2)+NB_illustration_pos(1,4);
+ChAT_illustration_pos_top=ChAT_illustration_pos(1,2)+ChAT_illustration_pos(1,4);
+
 % spont_event_halfwidth_pos_top = spont_event_halfwidth_pos(1,2)+spont_event_halfwidth_pos(1,4);
 % spont_event_risetime_pos_top = spont_event_risetime_pos(1,2)+spont_event_risetime_pos(1,4);
-
 %%
 %Placing plots in the figure:
-ax_fontsize=11;
+ax_fontsize=10;
 color_table=[0 0 0; [216 22 22]/256;  [136 137 138]/256; [255 153 153]/256; [30,75,14]/256; [112,172,90]/256];        
 spont_Vm_hist_ax_copy = copyobj(spont_Vm_hist_ax,F); % copy axes to new fig
 set(spont_Vm_hist_ax_copy(2),'position',spont_Vm_hist_pos(1,:))
 set(F, 'currentaxes', spont_Vm_hist_ax_copy(2));  tl=title('');
 spont_Vm_hist_ax_copy(2).FontSize=ax_fontsize;
 set(gca,'tickdir','out');
+ticklen=fn_get_abs_ticklength(gca, abslen);
+
 % spont_Vm_hist_ax_copy.XTickLabel=[];
 
 %placing legend:
@@ -250,10 +263,12 @@ set(F, 'currentaxes', spont_Vm_5prcentile_ax_copy);   tl=title('');
 yl=ylabel({'Lower 5th'; 'perc. [mV]'});
 spont_Vm_5prcentile_ax_copy.FontSize=ax_fontsize;
 set(gca,'tickdir','out');
+ticklen=fn_get_abs_ticklength(gca, abslen);
 
 spont_amp_hist_ax_copy = copyobj(spont_amp_hist_ax(2),F); % copy axes to new fig
 set(spont_amp_hist_ax_copy,'position',spont_amp_hist_pos(1,:),'tickdir','out');
 spont_amp_hist_ax_copy.FontSize=ax_fontsize;
+ticklen=fn_get_abs_ticklength(gca, abslen);
 
 spont_amp_median_ax_copy = copyobj(spont_amp_median_ax,F); % copy axes to new fig
 set(spont_amp_median_ax_copy,'position',spont_amp_median_pos(1,:))
@@ -267,6 +282,7 @@ set(F, 'currentaxes', spont_event_freq_ax_copy);  xl=xlabel('');  tl=title('');
 yl=ylabel('Freq. [Hz]');
 spont_event_freq_ax_copy.FontSize=ax_fontsize;
 set(gca,'tickdir','out');
+ticklen=fn_get_abs_ticklength(gca, abslen);
 % spont_event_freq_ax_copy.XTickLabel=[];
 
   spont_event_amp_ax_copy = copyobj(spont_event_amp_ax,F); % copy axes to new fig
@@ -275,6 +291,7 @@ set(F, 'currentaxes', spont_event_amp_ax_copy);  xl=xlabel('');  tl=title('');
 yl=ylabel('Amp. [mV]');
 spont_event_amp_ax_copy.FontSize=ax_fontsize;
 set(gca,'tickdir','out');
+ticklen=fn_get_abs_ticklength(gca, abslen);
 % spont_event_amp_ax_copy.XTickLabel=[];
 
 spont_Rin_ax_copy = copyobj(spont_Rin_ax,F); % copy axes to new fig
@@ -283,6 +300,7 @@ set(F, 'currentaxes', spont_Rin_ax_copy);   tl=title('');
 % yl=ylabel('Rin [MOhm]');
 spont_Rin_ax_copy.FontSize=ax_fontsize;
 set(gca,'tickdir','out');
+ticklen=fn_get_abs_ticklength(gca, abslen);
 
 detection_example1_ax_copy = copyobj(detection_example1_ax,F); % copy axes to new fig
 set(detection_example1_ax_copy,'position',detection_example1_pos(1,:))
@@ -296,8 +314,6 @@ set(detection_example3_ax_copy,'position',detection_example3_pos(1,:))
 detection_example4_ax_copy = copyobj(detection_example4_ax,F); % copy axes to new fig
 set(detection_example4_ax_copy,'position',detection_example4_pos(1,:))
 
-set(findall(gcf,'type','scatter'),'sizedata',20);
-
 %ChAT:
 color_table=[0 0 0; [0 0 204]/256;  [136 137 138]/256; [102, 172,255]./256; [30,75,14]/256; [112,172,90]/256];  
 spont_Vm_hist_ChAT_ax_copy = copyobj(spont_Vm_hist_ChAT_ax,F); % copy axes to new fig
@@ -305,6 +321,7 @@ set(spont_Vm_hist_ChAT_ax_copy(2),'position',spont_Vm_hist_ChAT_pos(1,:))
 set(F, 'currentaxes', spont_Vm_hist_ChAT_ax_copy(2));  tl=title('');
 spont_Vm_hist_ChAT_ax_copy(2).FontSize=ax_fontsize;
 set(gca,'tickdir','out');
+ticklen=fn_get_abs_ticklength(gca, abslen);
 % spont_Vm_hist_ax_copy.XTickLabel=[];
 
 %placing legend:
@@ -336,15 +353,18 @@ yl=ylabel({'Lower 5th'; 'perc. [mV]'});
 spont_Vm_5prcentile_ChAT_ax_copy.FontSize=ax_fontsize;
 spont_Vm_5prcentile_ChAT_ax_copy.XTickLabel={'Off','On'};
 set(gca,'tickdir','out');
+ticklen=fn_get_abs_ticklength(gca, abslen);
 
 spont_amp_hist_ChAT_ax_copy = copyobj(spont_amp_hist_ChAT_ax(2),F); % copy axes to new fig
 set(spont_amp_hist_ChAT_ax_copy,'position',spont_amp_hist_ChAT_pos(1,:))
 spont_amp_hist_ChAT_ax_copy.FontSize=ax_fontsize;
+ticklen=fn_get_abs_ticklength(gca, abslen);
 
 spont_amp_median_ChAT_ax_copy = copyobj(spont_amp_median_ChAT_ax,F); % copy axes to new fig
 set(spont_amp_median_ChAT_ax_copy,'position',spont_amp_median_ChAT_pos(1,:))
 set(F, 'currentaxes', spont_amp_median_ChAT_ax_copy);  tl=title('');
 set(gca,'xlim',[0.7 2.3],'xticklabel',{'Off','On'},'tickdir','out');
+ticklen=fn_get_abs_ticklength(gca, abslen);
 spont_amp_median_ChAT_ax_copy.FontSize=8;
 
 spont_event_freq_ChAT_ax_copy = copyobj(spont_event_freq_ChAT_ax,F); % copy axes to new fig
@@ -354,6 +374,7 @@ yl=ylabel('Freq. [Hz]');
 spont_event_freq_ChAT_ax_copy.FontSize=ax_fontsize;
 spont_event_freq_ChAT_ax_copy.XTickLabel={'Off','On'};
 set(gca,'tickdir','out');
+ticklen=fn_get_abs_ticklength(gca, abslen);
 
   spont_event_amp_ChAT_ax_copy = copyobj(spont_event_amp_ChAT_ax,F); % copy axes to new fig
 set(spont_event_amp_ChAT_ax_copy,'position',spont_event_amp_ChAT_pos(1,:))
@@ -362,6 +383,7 @@ yl=ylabel('Amp. [mV]');
 spont_event_amp_ChAT_ax_copy.FontSize=ax_fontsize;
 spont_event_amp_ChAT_ax_copy.XTickLabel={'Off','On'};
 set(gca,'tickdir','out');
+ticklen=fn_get_abs_ticklength(gca, abslen);
 
 spont_Rin_ChAT_ax_copy = copyobj(spont_Rin_ChAT_ax,F); % copy axes to new fig
 set(spont_Rin_ChAT_ax_copy,'position',spont_Rin_ChAT_pos(1,:))
@@ -370,6 +392,7 @@ set(F, 'currentaxes', spont_Rin_ChAT_ax_copy);   tl=title('');
 spont_Rin_ChAT_ax_copy.FontSize=ax_fontsize;
 spont_Rin_ChAT_ax_copy.XTickLabel={'Off','On'};
 set(gca,'tickdir','out');
+ticklen=fn_get_abs_ticklength(gca, abslen);
 
 detection_example1_ChAT_ax_copy = copyobj(detection_example1_ChAT_ax,F); % copy axes to new fig
 set(detection_example1_ChAT_ax_copy,'position',detection_example1_ChAT_pos(1,:))
@@ -383,8 +406,25 @@ set(detection_example3_ChAT_ax_copy,'position',detection_example3_ChAT_pos(1,:))
 detection_example4_ChAT_ax_copy = copyobj(detection_example4_ChAT_ax,F); % copy axes to new fig
 set(detection_example4_ChAT_ax_copy,'position',detection_example4_ChAT_pos(1,:))
 
-set(findall(gcf,'type','scatter'),'sizedata',20);
+set(findall(gcf,'type','scatter'),'sizedata',dotsize);
 
+NB_illustration_ax = axes('position',NB_illustration_pos);
+imshow(NB_illustration, 'parent', NB_illustration_ax) 
+
+ChAT_illustration_ax = axes('position',ChAT_illustration_pos);
+imshow(ChAT_illustration, 'parent', ChAT_illustration_ax) 
+
+%Changing the fontsize of xlabel and ylabel of all axes in the figure:
+ haxes=get(gcf,'children');
+ haxes1=get(haxes,'type');
+ for i=1:size(haxes1,1)
+    findax(i)=strcmp({'axes'},haxes1{i});
+ end
+ haxlabels=get(haxes(findax),{'XLabel' 'YLabel'});
+ for i=1:numel(haxlabels)
+    set(haxlabels{i},'fontsize',ax_fontsize);
+ end
+ 
 color_text=[102,51,0]./256;
  a_pos1=[-0.06 0 0.04 0.04];
 %  annotation('textbox', [spont_Vm_hist_pos(1,1),spont_Vm_hist_pos_top+0.03 0.4 0.05],...

@@ -51,7 +51,7 @@ else %for vertical bar
     barXend=barXstart;
     barYstart=min(yl);
     barYend=min(yl)+lengthh;
-    x_units=2*perc2*diff(xl);  
+    x_units=4*perc2*diff(xl);  %if there is 90 degree rotation then use x_units=2;
      y_units=perc2*diff(yl);
     pos = get(gca,'position');
     set(gca,'xlim',[xl(1),barXend+x_units]);  %setting new xlim for the axes to contain the scale bar

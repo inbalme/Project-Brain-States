@@ -226,7 +226,18 @@ Amplitude_Noise_ChAT_ax_copy.XTickLabel={'Off','On'};
  set(gca,'tickdir','out')
 ticklen=fn_get_abs_ticklength(gca, abslen);
 
-%position legend:
+%Changing the fontsize of xlabel and ylabel of all axes in the figure:
+ haxes=get(gcf,'children');
+ haxes1=get(haxes,'type');
+ for i=1:size(haxes1,1)
+    findax(i)=strcmp({'axes'},haxes1{i});
+ end
+ haxlabels=get(haxes(findax),{'XLabel' 'YLabel'});
+ for i=1:numel(haxlabels)
+    set(haxlabels{i},'fontsize',ax_fontsize);
+ end
+ 
+ %position legend:
 % set(evoked_mean_f80_zoom_ax_copy(1),'position',[0.83 evoked_trace_Off_f80_zoom_pos_top+0.03 0.08 0.005])
 % evoked_mean_f80_zoom_ax_copy(1).FontSize=10;
 

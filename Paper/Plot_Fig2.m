@@ -1,7 +1,7 @@
 %% plotting a figure 
 close all
 clear all
-save_flag=1;
+save_flag=0;
  no_numbering_flag=1;
 %opening saved figures:
 %Long traces NB:
@@ -98,7 +98,7 @@ spont_trace_f46_pos(1,:) = [0.15 , 0.73 ,  0.6 ,  0.2];
 spont_mean_f46_pos(1,:) = [spont_trace_f46_pos(1,1), spont_trace_f46_pos(1,2)-0.10-v_dist, spont_trace_f46_pos(1,3), 0.10];
 spont_std_f46_pos(1,:) = [spont_trace_f46_pos(1,1), spont_mean_f46_pos(1,2)-spont_mean_f46_pos(1,4)-v_dist, spont_trace_f46_pos(1,3), spont_mean_f46_pos(1,4)];
 
-spont_trace_f80_pos(1,:) =[spont_trace_f46_pos(1,1) , 0.5 ,  spont_trace_f46_pos(1,3) ,  spont_trace_f46_pos(1,4)]; spont_trace_f80_pos(1,2)=spont_std_f46_pos(1,2)-spont_trace_f80_pos(1,4)-0.05;
+spont_trace_f80_pos(1,:) =[spont_trace_f46_pos(1,1) , 0.5 ,  spont_trace_f46_pos(1,3) ,  spont_trace_f46_pos(1,4)]; spont_trace_f80_pos(1,2)=spont_std_f46_pos(1,2)-spont_trace_f80_pos(1,4)-0.07;
 spont_mean_f80_pos(1,:) =[spont_trace_f80_pos(1,1), spont_trace_f80_pos(1,2)-0.10-v_dist, spont_trace_f80_pos(1,3), 0.10];
 spont_std_f80_pos(1,:) =[spont_trace_f80_pos(1,1), spont_mean_f80_pos(1,2)-spont_mean_f80_pos(1,4)-v_dist, spont_trace_f80_pos(1,3), spont_mean_f80_pos(1,4)];
 
@@ -196,7 +196,7 @@ spont_mean_f80_ax_copy(1).FontSize=10;
 %   annotation:
 
 annotation('textbox', [spont_trace_f46_pos(1,1), spont_trace_f46_pos_top 0 0]+[0 0.03 0.5 0.05],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Spontaneous Activity', 'FontName','arial', 'fontsize', 14, 'fontweight', 'bold')
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Spontaneous Activity', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') %
  
  a_pos1=[-0.03 -0.01 0.04 0.04];
  a_pos4=[0 -0.01 0.16 0.04];
