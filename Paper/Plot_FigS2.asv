@@ -13,54 +13,12 @@ color1=[255, 102,102]./256; %pink
 color2=[102, 172,255]./256; %light blue
 %opening saved figures:
 
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\single trial analysis\Spontaneous'
-%         eventoverlay = open('f46_events overlay.fig');    
-%         eventoverlay_ax = get(gcf, 'children');
-    spont_amp_hist = open('Event_Amp_Hist.fig');
-    spont_amp_hist_ax = get(gcf, 'children');
-    spont_amp_median = open('Event_Amp_Median_ci.fig');
-    hm=get(gca,'Children');
-    set(hm,'MarkerSize',2)
-    spont_amp_median_ax = get(gcf, 'children');
-    
-    spont_event_freq = open('Spontaneous event frequency.fig');    
-        l1=findall(gcf,'color',[0.7 0.7 0.7]);
-        set(l1(10),'color',color1); uistack(l1(10),'top')
-    spont_event_freq_ax = get(gcf, 'children');
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Raster+PSTH'
 
-    spont_event_amp = open('Spontaneous event amplitude.fig');    
-            l1=findall(gcf,'color',[0.7 0.7 0.7]);
-            set(l1(10),'color',color1); uistack(l1(10),'top')
-    spont_event_amp_ax = get(gcf, 'children');
-    
+% Modulation Index
+Modulation_index = open('Modulation index.fig');    
+Modulation_index_ax = get(gcf, 'children');    
 
-    %% ChAT:
-    
-cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\single trial analysis\Spontaneous'
-   
-    spont_amp_hist_ChAT = open('Event_Amp_Hist.fig');
-    spont_amp_hist_ChAT_ax = get(gcf, 'children');
-    spont_amp_median_ChAT = open('Event_Amp_Median_ci.fig');
-    hm=get(gca,'Children');
-    set(hm,'MarkerSize',2)
-    spont_amp_median_ChAT_ax = get(gcf, 'children');
-    
-    spont_event_freq_ChAT = open('Spontaneous event frequency.fig');  
-     set(gca,'ylim',[0 10])
-        l1=findall(gcf,'color',[0.7 0.7 0.7]);
-        set(l1(9),'color',color2); uistack(l1(9),'top')
-    spont_event_freq_ChAT_ax = get(gcf, 'children');
-
-    spont_event_amp_ChAT = open('Spontaneous event amplitude.fig');  
-        l1=findall(gcf,'color',[0.7 0.7 0.7]);
-        set(l1(9),'color',color2); uistack(l1(9),'top')
-    spont_event_amp_ChAT_ax = get(gcf, 'children');
-
-    cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Illustrations+Histology'
-NB_illustration = imread('NBES_Schematic_Illustration_one-electrode_tight','TIF');
-
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Illustrations+Histology'
-ChAT_illustration = imread('ChAT_Schematic_Illustration_one-electrode_tight','TIF');
 %%
 %open a new figure:
 F = figure;
@@ -68,7 +26,7 @@ set(gcf,'color','w');
 set(gcf,'DefaultAxesFontSize',18);
 set(gcf,'DefaultAxesFontName','arial');
 set(gcf, 'PaperType', 'A4');
-set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 18 12]); %[left, bottom, width, height] 
+set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 7 10]); %[left, bottom, width, height] 
 set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
  
@@ -80,26 +38,15 @@ h_dist2=spont_amp_hist_pos(1,1)+spont_amp_hist_pos(1,3)+0.15;
 spont_event_freq_pos(1,:) =[spont_amp_hist_pos(1,1),0.5, 0.13,0.2]; spont_event_freq_pos(1,2)=spont_amp_hist_pos(1,2)-spont_event_freq_pos(1,4)-0.19;
 spont_event_amp_pos(1,:)=[spont_event_freq_pos(1,1)+spont_event_freq_pos(1,3)+0.1,spont_event_freq_pos(1,2),spont_event_freq_pos(1,3),spont_event_freq_pos(1,4)];
 
-%ChAT:
-spont_amp_hist_ChAT_pos(1,:) = [h_dist2, spont_amp_hist_pos(1,2) ,  spont_amp_hist_pos(1,3),  spont_amp_hist_pos(1,4)]; 
-spont_amp_median_ChAT_pos(1,:) = [spont_amp_hist_ChAT_pos(1,1)+0.24, spont_amp_hist_ChAT_pos(1,2)+0.09,0.09,0.09];
-spont_event_freq_ChAT_pos(1,:) =[spont_amp_hist_ChAT_pos(1,1),0.5, spont_event_freq_pos(1,3),spont_event_freq_pos(1,4)]; spont_event_freq_ChAT_pos(1,2)=spont_amp_hist_ChAT_pos(1,2)-spont_event_freq_ChAT_pos(1,4)-0.19;
-spont_event_amp_ChAT_pos(1,:)=[spont_event_freq_ChAT_pos(1,1)+spont_event_freq_ChAT_pos(1,3)+0.1,spont_event_freq_ChAT_pos(1,2),spont_event_freq_ChAT_pos(1,3),spont_event_freq_ChAT_pos(1,4)];
 
 %top positions:
 spont_event_freq_pos_top = spont_event_freq_pos(1,2)+spont_event_freq_pos(1,4);
 spont_event_amp_pos_top = spont_event_amp_pos(1,2)+spont_event_amp_pos(1,4);
 spont_amp_hist_pos_top = spont_amp_hist_pos(1,2)+spont_amp_hist_pos(1,4);
-%ChAT:
-spont_event_freq_ChAT_pos_top = spont_event_freq_ChAT_pos(1,2)+spont_event_freq_ChAT_pos(1,4);
-spont_event_amp_ChAT_pos_top = spont_event_amp_ChAT_pos(1,2)+spont_event_amp_ChAT_pos(1,4);
-spont_amp_hist_ChAT_pos_top = spont_amp_hist_ChAT_pos(1,2)+spont_amp_hist_ChAT_pos(1,4);
 
-NB_illustration_pos(1,:)=[spont_amp_hist_pos(1,1)+0.1,spont_amp_hist_pos_top+0.05, 0.15, 0.15];
-ChAT_illustration_pos(1,:)=[spont_amp_hist_ChAT_pos(1,1)+0.05,NB_illustration_pos(1,2), NB_illustration_pos(1,3), NB_illustration_pos(1,4)];
 
-NB_illustration_pos_top=NB_illustration_pos(1,2)+NB_illustration_pos(1,4);
-ChAT_illustration_pos_top=ChAT_illustration_pos(1,2)+ChAT_illustration_pos(1,4);
+% NB_illustration_pos(1,:)=[spont_amp_hist_pos(1,1)+0.1,spont_amp_hist_pos_top+0.05, 0.15, 0.15];
+% NB_illustration_pos_top=NB_illustration_pos(1,2)+NB_illustration_pos(1,4);
 
 %% Old positions
 % %NB

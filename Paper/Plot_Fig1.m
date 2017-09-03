@@ -6,13 +6,14 @@ ax_fontsize=10;
 %f23 - xlim=[5.5 8.5], f28 - [4 7], f55 - [4.5 7.5], f60 - [5 8];
 xlim1=[4,7]; xlim2=[4.5,7.5];
 save_flag=0;
-no_numbering_flag=0;
+no_numbering_flag=1;
+abslen=0.05; %[in cm]
 rectangle_color=[210 210 210]/256;
 
 %opening saved figures:
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Illustrations+Histology'
 
-NB_illustration = imread('NBES_Schematic_Illustration_tight','TIF');
+NB_illustration = imread('NBES_Schematic_Illustration_one-electrode_tight','TIF');
 
 NB_histology = imread('20150709_slide1(red)_sec3_whole section_2_v1','TIF');
 
@@ -127,10 +128,14 @@ beta_pos_top = beta_pos(1,2)+beta_pos(1,4);
 gamma_pos_top = gamma_pos(1,2)+gamma_pos(1,4);
 evoked_trace_Off_pos_top = evoked_trace_Off_pos(1,2)+evoked_trace_Off_pos(1,4);
 evoked_trace_On_pos_top = evoked_trace_On_pos(1,2)+evoked_trace_On_pos(1,4);
+evoked_trace_Off2_pos_top = evoked_trace_Off2_pos(1,2)+evoked_trace_Off2_pos(1,4);
+evoked_trace_On2_pos_top = evoked_trace_On2_pos(1,2)+evoked_trace_On2_pos(1,4);
 Modulation_index_pos_top = Modulation_index_pos(1,2)+Modulation_index_pos(1,4);
 Response_modulation_pos_top = Response_modulation_pos(1,2)+Response_modulation_pos(1,4);
 SNR_pos_top = SNR_pos(1,2)+SNR_pos(1,4);
 Background_spikes_pos_top = Background_spikes_pos(1,2)+Background_spikes_pos(1,4);
+NB_illustration_pos_top = NB_illustration_pos(1,2)+NB_illustration_pos(1,4);
+NB_histology_pos_top = NB_histology_pos(1,2)+NB_histology_pos(1,4);
 %%
 %Placing plots in the figure:
 
@@ -150,10 +155,16 @@ set(PSD_depth3_ax_copy(2),'position',PSD_depth3_pos(1,:))
 set(F, 'currentaxes', PSD_depth3_ax_copy(2)); 
 PSD_depth3_ax_copy(2).FontSize=ax_fontsize;
 set(gca,'tickdir','out'); %'yminortick','off'
+ticklen=fn_get_abs_ticklength(gca, abslen);
 %position legend:
-set(PSD_depth3_ax_copy(1),'position',[0.88 PSD_depth3_pos_top-0.025 0.08 0.05])
-PSD_depth3_ax_copy(1).FontSize=ax_fontsize;
+set(PSD_depth3_ax_copy(1),'position',[0.885 PSD_depth3_pos_top-0.025 0.08 0.05])
+PSD_depth3_ax_copy(1).FontSize=9;
 PSD_depth3_ax_copy(1).LineWidth=1.5;  
+%     for ix=1:length(PSD_depth3_ax_copy(1).String)
+%       str = PSD_depth3_ax_copy(1).String{ix};
+%       h = findobj(gcf,'DisplayName',str);
+%       h.LineWidth =1.5;
+%     end
 
 total_power_ax_copy = copyobj(total_power_ax,F); % copy axes to new fig
 set(total_power_ax_copy,'position',total_power_pos(1,:))
@@ -161,6 +172,8 @@ total_power_ax_copy.FontSize=ax_fontsize;
 set(F, 'currentaxes', total_power_ax_copy); 
 tl=title({'Total Power'; ''},'fontweight','normal','fontsize',10);
 set(gca,'ylim',[0 15e-3],'YTick',[0, 5e-3, 10e-3, 15e-3],'YTickLabel',[0, 5, 10, 15],'tickdir','out')
+ticklen=fn_get_abs_ticklength(gca, abslen);
+
 delta_ax_copy = copyobj(delta_ax,F); % copy axes to new fig
 set(delta_ax_copy,'position',delta_pos(1,:))
 delta_ax_copy.FontSize=ax_fontsize;
@@ -168,6 +181,7 @@ set(F, 'currentaxes', delta_ax_copy);
 %  tl=title({'Delta Power'; ''},'fontweight','normal','fontsize',12);
  tl=title({'1-10 Hz'; ''},'fontweight','normal','fontsize',10); yl=ylabel('');
 set(gca,'ylim',[0 15e-3],'YTick',[0, 5e-3, 10e-3, 15e-3],'YTickLabel',[0, 5, 10, 15],'tickdir','out')
+ticklen=fn_get_abs_ticklength(gca, abslen);
 % yl=ylabel('Normalized PSD');
 
 beta_ax_copy = copyobj(beta_ax,F); % copy axes to new fig
@@ -177,6 +191,7 @@ set(F, 'currentaxes', beta_ax_copy);
 % yl=ylabel('');  tl=title({'Beta Power'; ''},'fontweight','normal','fontsize',12);
 yl=ylabel('');  tl=title({'12-25 Hz'; ''},'fontweight','normal','fontsize',10);
  set(gca,'ylim',[0 10e-4],'YTick',[0, 5e-4, 10e-4],'YTickLabel',[0, 5, 10],'tickdir','out')
+ ticklen=fn_get_abs_ticklength(gca, abslen);
 
 gamma_ax_copy = copyobj(gamma_ax,F); % copy axes to new fig
 set(gamma_ax_copy,'position',gamma_pos(1,:))
@@ -185,6 +200,7 @@ set(F, 'currentaxes', gamma_ax_copy);
 % yl=ylabel('');  tl=title({'Gamma Power'; ''},'fontweight','normal','fontsize',12);
 yl=ylabel('');  tl=title({'30-50 Hz'; ''},'fontweight','normal','fontsize',10);
 set(gca,'ylim',[0 4e-4],'YTick',[0, 2e-4, 4e-4],'YTickLabel',[0, 2, 4],'tickdir','out')
+ticklen=fn_get_abs_ticklength(gca, abslen);
 
 %   annotation:
 annotation('textbox', [traces_depth3_pos(1,1) traces_depth3_pos_top 0 0]+[0.07 -0.01 0.5 0.05],...
@@ -212,39 +228,47 @@ annotation('textbox', [beta_pos(1,1)-0.009 beta_pos_top+0.035 0 0],...
 set(evoked_trace_Off_ax_copy(2),'position',evoked_trace_Off_pos(1,:),'xticklabel',[], 'xlim',xlim1,...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'tickdir','out'); % 'ylim', y1limits(1,:),'ytick', y1ticks(1,:)
    set(F, 'currentaxes', evoked_trace_Off_ax_copy(2)); t=title(''); yl=ylabel('Trial#'); xl=xlabel('');  
+   ticklen=fn_get_abs_ticklength(gca, abslen);
    set(evoked_trace_Off_ax_copy(1),'position',evoked_trace_Off_pos(2,:),'xticklabel',[],'xlim',xlim1,...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'tickdir','out'); %'xlim',x1limits,'xtick',x1ticks, 'xticklabel',[], 'ylim', y2limits(2,:),'ytick', y2ticks(2,:)
-  set(F, 'currentaxes', evoked_trace_Off_ax_copy(1)); t=title(''); yl=ylabel('Spikes/S'); xl=xlabel('');  
+  set(F, 'currentaxes', evoked_trace_Off_ax_copy(1)); t=title(''); yl=ylabel('Spikes/s'); xl=xlabel('');  
+  ticklen=fn_get_abs_ticklength(gca, abslen);
   
 evoked_trace_On_ax_copy = copyobj(evoked_trace_On_ax,F); % copy axes to new fig
 set(evoked_trace_On_ax_copy(2),'position',evoked_trace_On_pos(1,:),'xlim',xlim1,...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'tickdir','out'); %,1.5, 'ylim', y1limits(1,:),'ytick', y1ticks(1,:)
    set(F, 'currentaxes', evoked_trace_On_ax_copy(2)); t=title(''); yl=ylabel('Trial#','fontsize',ax_fontsize); xl=xlabel('');  
+   ticklen=fn_get_abs_ticklength(gca, abslen);
     set(evoked_trace_On_ax_copy(1),'position',evoked_trace_On_pos(2,:),'xlim',xlim1,...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'tickdir','out'); %,'xlim',x1limits,'xtick',x1ticks, 'xticklabel',x1ticklab, 'ylim', y2limits(2,:),'ytick', y2ticks(2,:)
- set(F, 'currentaxes', evoked_trace_On_ax_copy(1)); t=title(''); yl=ylabel('Spikes/S','fontsize',ax_fontsize);  xl=xlabel('Time from ES offset [S]','fontsize',ax_fontsize);  
- 
+ set(F, 'currentaxes', evoked_trace_On_ax_copy(1)); t=title(''); yl=ylabel('Spikes/s','fontsize',ax_fontsize);  xl=xlabel('Time from ES offset (s)','fontsize',ax_fontsize);  
+ticklen=fn_get_abs_ticklength(gca, abslen);
+
  evoked_trace_Off2_ax_copy = copyobj(evoked_trace_Off2_ax,F); % copy axes to new fig
 set(evoked_trace_Off2_ax_copy(2),'position',evoked_trace_Off2_pos(1,:),'xticklabel',[], 'xlim',xlim2,...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'tickdir','out'); % 'ylim', y1limits(1,:),'ytick', y1ticks(1,:)
    set(F, 'currentaxes', evoked_trace_Off2_ax_copy(2)); t=title(''); yl=ylabel('Trial#','fontsize',ax_fontsize); xl=xlabel('');  
+   ticklen=fn_get_abs_ticklength(gca, abslen);
    set(evoked_trace_Off2_ax_copy(1),'position',evoked_trace_Off2_pos(2,:),'xticklabel',[],'xlim',xlim2,...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'tickdir','out'); %'xlim',x1limits,'xtick',x1ticks, 'xticklabel',[], 'ylim', y2limits(2,:),'ytick', y2ticks(2,:)
-  set(F, 'currentaxes', evoked_trace_Off2_ax_copy(1)); t=title(''); yl=ylabel('Spikes/S','fontsize',ax_fontsize); xl=xlabel('');  
+  set(F, 'currentaxes', evoked_trace_Off2_ax_copy(1)); t=title(''); yl=ylabel('Spikes/s','fontsize',ax_fontsize); xl=xlabel('');  
+  ticklen=fn_get_abs_ticklength(gca, abslen);
   
 evoked_trace_On2_ax_copy = copyobj(evoked_trace_On2_ax,F); % copy axes to new fig
 set(evoked_trace_On2_ax_copy(2),'position',evoked_trace_On2_pos(1,:),'xlim',xlim2,...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'tickdir','out'); %,1.5, 'ylim', y1limits(1,:),'ytick', y1ticks(1,:)
    set(F, 'currentaxes', evoked_trace_On2_ax_copy(2)); t=title(''); yl=ylabel('Trial#','fontsize',ax_fontsize); xl=xlabel('');  
+   ticklen=fn_get_abs_ticklength(gca, abslen);
     set(evoked_trace_On2_ax_copy(1),'position',evoked_trace_On2_pos(2,:),'xlim',xlim2,...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'tickdir','out'); %,'xlim',x1limits,'xtick',x1ticks, 'xticklabel',x1ticklab, 'ylim', y2limits(2,:),'ytick', y2ticks(2,:)
- set(F, 'currentaxes', evoked_trace_On2_ax_copy(1)); t=title(''); yl=ylabel('Spikes/S','fontsize',ax_fontsize);  xl=xlabel('Time from ES offset [S]','fontsize',ax_fontsize);  
-
+ set(F, 'currentaxes', evoked_trace_On2_ax_copy(1)); t=title(''); yl=ylabel('Spikes/s','fontsize',ax_fontsize);  xl=xlabel('Time from ES offset (s)','fontsize',ax_fontsize);  
+ticklen=fn_get_abs_ticklength(gca, abslen);
  %Response modulation
 Response_modulation_ax_copy = copyobj(Response_modulation_ax,F); % copy axes to new fig
 set(Response_modulation_ax_copy,'position',Response_modulation_pos(1,:),'ylim',[-5 30] ,'ytick', [0 10 20],'xticklabel',[],...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'box','off','tickdir','out'); %, 'ylim', y6limits,'ytick', y6ticks,'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
  set(F, 'currentaxes', Response_modulation_ax_copy); t=title(''); yl=ylabel('Spikes/Train','fontsize',ax_fontsize); 
+ ticklen=fn_get_abs_ticklength(gca, abslen);
  set(gca,'ylim',[0 30],'YTick',[0, 10, 20,30])
 
  %Background Spikes
@@ -252,7 +276,7 @@ Background_spikes_ax_copy = copyobj(Background_spikes_ax,F); % copy axes to new 
 set(Background_spikes_ax_copy,'position',Background_spikes_pos(1,:),'ylim',[-5 20],'xticklabel',[] ,...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'box','off','tickdir','out'); %, 'ylim',[-5 30] ,'ytick', [0 10 20],'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
  set(F, 'currentaxes', Background_spikes_ax_copy); t=title(''); yl=ylabel('Spikes','fontsize',ax_fontsize);
-
+ticklen=fn_get_abs_ticklength(gca, abslen);
  %Modulation index
 %  Modulation_index_ax_copy = copyobj(Modulation_index_ax,F); % copy axes to new fig
 % set(Modulation_index_ax_copy,'position',Modulation_index_pos(1,:),'ylim',[-1 1] ,'ytick', [-1 0 1],...
@@ -264,6 +288,7 @@ SNR_ax_copy = copyobj(SNR_ax,F); % copy axes to new fig
 set(SNR_ax_copy,'position',SNR_pos(1,:),'ylim',[-0.1 1.1] ,'ytick', [0 0.5 1],...
        'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'box','off','tickdir','out'); %, 'ylim', y6limits,'ytick', y6ticks,'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
  set(F, 'currentaxes', SNR_ax_copy); t=title(''); yl=ylabel('SNRI','fontsize',ax_fontsize); %set Ytick to be on the left side and not on the right
+ticklen=fn_get_abs_ticklength(gca, abslen);
 
  %Changing the fontsize of xlabel and ylabel of all axes in the figure:
  haxes=get(gcf,'children');
@@ -288,26 +313,35 @@ set(SNR_ax_copy,'position',SNR_pos(1,:),'ylim',[-0.1 1.1] ,'ytick', [0 0.5 1],..
 %  
 if no_numbering_flag==1
 
- annotation('textbox', [traces_depth3_pos(1,1) traces_depth3_pos_top 0 0]+a_pos1,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- annotation('textbox', [PSD_depth3_pos(1,1) PSD_depth3_pos_top 0 0]+a_pos2,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
- annotation('textbox', [total_power_pos(1,1) total_power_pos_top 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
-annotation('textbox', [delta_pos(1,1) total_power_pos_top 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')  
- annotation('textbox', [beta_pos(1,1) total_power_pos_top 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'G', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
-  annotation('textbox', [gamma_pos(1,1) total_power_pos_top 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'H', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') 
+ annotation('textbox', [NB_illustration_pos(1,1)+0.03 NB_illustration_pos_top 0 0]+a_pos1,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
+ annotation('textbox', [NB_histology_pos(1,1) NB_histology_pos_top 0 0]+a_pos1,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
+ annotation('textbox', [traces_depth3_pos(1,1)-0.04 traces_depth3_pos_top 0 0]+a_pos1,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')
+ annotation('textbox', [PSD_depth3_pos(1,1) traces_depth3_pos_top+a_pos1(2) 0 0]+a_pos2,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')
+ annotation('textbox', [total_power_pos(1,1)-0.02 total_power_pos_top 0 0]+a_pos4,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
+annotation('textbox', [evoked_trace_Off_pos(1,1)-0.05 evoked_trace_Off_pos_top+0.025 0 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')  
+ annotation('textbox', [evoked_trace_On_pos(1,1)-0.05 evoked_trace_On_pos_top+0.025 0 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'G', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
+  annotation('textbox', [evoked_trace_Off2_pos(1,1)-0.05 evoked_trace_Off2_pos_top+0.025 0 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'H', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
+  annotation('textbox', [evoked_trace_On2_pos(1,1)-0.05 evoked_trace_On2_pos_top+0.025 0 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'I', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
+ annotation('textbox', [Response_modulation_pos(1,1)-0.01 Response_modulation_pos_top-0.01 0 0]+a_pos4,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'J', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
+ annotation('textbox', [Background_spikes_pos(1,1)-0.01 Background_spikes_pos_top-0.01 0 0]+a_pos4,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'K', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
+ annotation('textbox', [SNR_pos(1,1)-0.01 SNR_pos_top-0.01 0 0]+a_pos4,...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'L', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
 end
  
 %% 
-if no_numbering_flag==1
-    cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures\No Numbering'
-else 
     cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures\Neuron'
-end
+
 if save_flag==1;
 filename='Fig 1 LFP traces+PSD_1-100Hz+SNR_file28_v2';
 saveas(F,filename,'fig'); 

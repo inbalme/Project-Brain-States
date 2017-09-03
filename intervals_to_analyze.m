@@ -23,7 +23,7 @@ switch exp_type
         switch trace_type
             case 1
                  start_time = [0.4,5.6]; %[sec] %[0,5]
-                 duration = 2.5; %[sec] 
+                 duration = 2.5; %[sec] %2.5
                     for t=1:length(start_time);
                      start_sample(:,t) = ceil(start_time(t).*sf{1});
                         if start_time(t)==0
