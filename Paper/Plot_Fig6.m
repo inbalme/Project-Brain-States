@@ -28,22 +28,49 @@ spont_trace_Off_f46 = open('Vm-LFP_spont_stim1_Off_f46_t3  4  6.fig');
 spont_trace_Off_f46_ax = get(gcf, 'children');
         c1=findall(gcf,'color',color1);
         set(c1,'color',color3);
+        t1=findall(gcf,'type','text');
+        set(t1,'fontsize',10)
+        set(t1(13),'string','200 ms')
+        line1=findall(gcf,'type','line');
+        linexdata=get(line1(2),'xdata');
+        set(line1(2),'xdata',linexdata-100);
+        set(line1(6),'xdata',linexdata-100);
 spont_trace_On_f46 = open('Vm-LFP_spont_stim1_On_f46_t2  3  4.fig');    
 spont_trace_On_f46_ax = get(gcf, 'children');
         c2=findall(gcf,'color',color2);
         set(c2,'color',color4);
+         t2=findall(gcf,'type','text');
+        set(t2,'fontsize',10)
+        set(t2(13),'string','200 ms')
+        line2=findall(gcf,'type','line');
+        linexdata=get(line2(2),'xdata');
+        set(line2(2),'xdata',linexdata-100);
+        set(line2(6),'xdata',linexdata-100);
 
 %evoked
 evoked_trace_Off_f46 = open('Vm-LFP_evoked_stim1_Off_f46_t2  3  4.fig');    
 evoked_trace_Off_f46_ax = get(gcf, 'children');
         c1=findall(gcf,'color',color1);
         set(c1,'color',color3);
+        t1=findall(gcf,'type','text');
+        set(t1,'fontsize',10)
+        set(t1(13),'string','200 ms')
+        line1=findall(gcf,'type','line');
+        linexdata=get(line1(2),'xdata');
+        set(line1(2),'xdata',linexdata-50);
+        set(line1(39),'xdata',linexdata-50);
 
 evoked_trace_On_f46 = open('Vm-LFP_evoked_stim1_On_f46_t2  3  4.fig');    
 evoked_trace_On_f46_ax = get(gcf, 'children');
         c2=findall(gcf,'color',color2);
         set(c2,'color',color4);
-
+        t2=findall(gcf,'type','text');
+        set(t2,'fontsize',10)
+        set(t2(13),'string','200 ms')
+        line2=findall(gcf,'type','line');
+        linexdata=get(line2(2),'xdata');
+        set(line2(2),'xdata',linexdata-50);
+        set(line2(39),'xdata',linexdata-50);
 %%
 % cross-correlations
 %spontaneous:
@@ -95,7 +122,7 @@ set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 spont_trace_Off_f46_pos(1,:) = [0.05 , 0.87 , 0.43 , 0.06];
 for i=1:(length(spont_trace_Off_f46_ax)-1)/2
 spont_trace_Off_f46_pos(2*i,:) = spont_trace_Off_f46_pos(2*i-1,:)-[0 , spont_trace_Off_f46_pos(2*i-1,4)-0.02 , 0 , 0];
-spont_trace_Off_f46_pos(2*i+1,:) = spont_trace_Off_f46_pos(2*i,:)-[0 , spont_trace_Off_f46_pos(2*i,4) , 0 , 0];
+spont_trace_Off_f46_pos(2*i+1,:) = spont_trace_Off_f46_pos(2*i,:)-[0 , spont_trace_Off_f46_pos(2*i,4)+0.01 , 0 , 0];
 end
 
 spont_trace_On_f46_pos(1,:) = spont_trace_Off_f46_pos(1,:); spont_trace_On_f46_pos(1,2)=spont_trace_Off_f46_pos(6,2)-spont_trace_Off_f46_pos(1,4)-0.03;
@@ -108,7 +135,7 @@ h_dist1=spont_trace_Off_f46_pos(1,1)+spont_trace_Off_f46_pos(1,3)+0.05;
 evoked_trace_Off_f46_pos(1,:) = [h_dist1 , spont_trace_Off_f46_pos(1,2) ,  spont_trace_Off_f46_pos(1,3) ,  spont_trace_Off_f46_pos(1,4)];
 for i=1:(length(evoked_trace_Off_f46_ax)-1)/2
 evoked_trace_Off_f46_pos(2*i,:) = evoked_trace_Off_f46_pos(2*i-1,:)-[0 , evoked_trace_Off_f46_pos(2*i-1,4)-0.02 , 0 , 0];
-evoked_trace_Off_f46_pos(2*i+1,:) = evoked_trace_Off_f46_pos(2*i,:)-[0 , evoked_trace_Off_f46_pos(2*i,4) , 0 , 0];
+evoked_trace_Off_f46_pos(2*i+1,:) = evoked_trace_Off_f46_pos(2*i,:)-[0 , evoked_trace_Off_f46_pos(2*i,4)+0.01 , 0 , 0];
 end
 
 evoked_trace_On_f46_pos(1,:) = [h_dist1, spont_trace_On_f46_pos(1,2) ,  evoked_trace_Off_f46_pos(1,3) ,  spont_trace_Off_f46_pos(1,4)];
@@ -117,7 +144,7 @@ evoked_trace_On_f46_pos(2*i,:) = evoked_trace_On_f46_pos(2*i-1,:)-[0 , evoked_tr
 evoked_trace_On_f46_pos(2*i+1,:) = evoked_trace_On_f46_pos(2*i,:)-[0 , evoked_trace_On_f46_pos(2*i,4)+0.015 , 0 , 0];
 end
 
-spont_cc_On_f46_pos(1,:) = [0.105 , spont_trace_On_f46_pos(6,2)-0.14 , 0.13 , 0.08]; %shuffled
+spont_cc_On_f46_pos(1,:) = [0.105 , spont_trace_On_f46_pos(6,2)-0.14 , 0.13 , 0.07]; %shuffled
 h_dist2=spont_cc_On_f46_pos(1,1)+spont_cc_On_f46_pos(1,3)+0.06;
 spont_cc_Off_f46_pos(1,:) = [h_dist2 ,spont_cc_On_f46_pos(1,2) , spont_cc_On_f46_pos(1,3) , spont_cc_On_f46_pos(1,4)]; 
 h_dist3=spont_cc_Off_f46_pos(1,1)+spont_cc_Off_f46_pos(1,3)+0.165;
@@ -125,7 +152,7 @@ evoked_cc_On_f46_pos(1,:) = [h_dist3 , spont_cc_On_f46_pos(1,2) ,  spont_cc_On_f
 h_dist4=evoked_cc_On_f46_pos(1,1)+evoked_cc_On_f46_pos(1,3)+0.06;
 evoked_cc_Off_f46_pos(1,:) = [h_dist4 , spont_cc_Off_f46_pos(1,2) , evoked_cc_On_f46_pos(1,3) ,  spont_cc_Off_f46_pos(1,4)];
 
-cc_paired_plot_shuff_pos(1,:) = [0.12 , evoked_cc_Off_f46_pos(1,2)-0.22 , 0.27 , 0.12]; 
+cc_paired_plot_shuff_pos(1,:) = [0.12 , evoked_cc_Off_f46_pos(1,2)-0.195 , 0.27 , 0.1]; 
 cc_paired_plot_pos(1,:) =  [cc_paired_plot_shuff_pos(1,1)+cc_paired_plot_shuff_pos(1,3)+0.2 , cc_paired_plot_shuff_pos(1,2) , cc_paired_plot_shuff_pos(1,3) , cc_paired_plot_shuff_pos(1,4)];
 
 %top positions
@@ -195,7 +222,7 @@ evoked_trace_On_f46_ax_copy(1).FontSize=9;
  %Spontaneous Cross-correlations file 46 actual data+shuffled data
 spont_cc_Off_f46_ax_copy(1) = copyobj(spont_cc_Off_f46_ax(2),F); % copy axes to new fig
 set(spont_cc_Off_f46_ax_copy(1),'position',spont_cc_Off_f46_pos(1,:), 'ylim',[-0.4,0.25])
-    set(F, 'currentaxes', spont_cc_Off_f46_ax_copy(1));  yl=ylabel(''); 
+    set(F, 'currentaxes', spont_cc_Off_f46_ax_copy(1));  yl=ylabel(''); xl=xlabel('Lags (s)','fontsize',ax_fontsize);
 spont_cc_Off_f46_ax_copy(1).FontSize=ax_fontsize;    
 % spont_cc_Off_f46_ax_copy(1).YTick=[-0.4,0,0.2];
 set(gca,'xtick',[-0.5,0,0.5],'ytick',[-0.4,0,0.2],'tickdir','out')
@@ -203,7 +230,7 @@ ticklen=fn_get_abs_ticklength(gca, abslen);
  
 spont_cc_On_f46_ax_copy(1) = copyobj(spont_cc_On_f46_ax(2),F); % copy axes to new fig
 set(spont_cc_On_f46_ax_copy(1),'position',spont_cc_On_f46_pos(1,:), 'ylim',[-0.4,0.25]) %'xticklabel',[]
- set(F, 'currentaxes', spont_cc_On_f46_ax_copy(1));  %xl=xlabel('');  
+ set(F, 'currentaxes', spont_cc_On_f46_ax_copy(1));  xl=xlabel('Lags (s)','fontsize',ax_fontsize);
 spont_cc_On_f46_ax_copy(1).FontSize=ax_fontsize;
 L1=findobj(gca,'type','line');
 set(L1,'linestyle','-');
@@ -217,7 +244,7 @@ ticklen=fn_get_abs_ticklength(gca, abslen);
 %Evoked Cross-correlations file 46 actual data+shuffled data
 evoked_cc_Off_f46_ax_copy = copyobj(evoked_cc_Off_f46_ax,F); % copy axes to new fig
 set(evoked_cc_Off_f46_ax_copy(2),'position',evoked_cc_Off_f46_pos(1,:), 'ylim',[-0.4,0.25])
-set(F, 'currentaxes', evoked_cc_Off_f46_ax_copy(2));  yl=ylabel(''); 
+set(F, 'currentaxes', evoked_cc_Off_f46_ax_copy(2));  yl=ylabel(''); xl=xlabel('Lags (s)','fontsize',ax_fontsize);
 evoked_cc_Off_f46_ax_copy(2).FontSize=ax_fontsize;
 % evoked_cc_Off_f46_ax_copy(2).YTick=[-0.4,0,0.2];
 set(gca,'xtick',[-0.5,0,0.5],'ytick',[-0.4,0,0.2],'tickdir','out')
@@ -225,7 +252,7 @@ ticklen=fn_get_abs_ticklength(gca, abslen);
 
 evoked_cc_On_f46_ax_copy = copyobj(evoked_cc_On_f46_ax,F); % copy axes to new fig
 set(evoked_cc_On_f46_ax_copy(2),'position',evoked_cc_On_f46_pos(1,:))
-   set(F, 'currentaxes', evoked_cc_On_f46_ax_copy(2)); 
+   set(F, 'currentaxes', evoked_cc_On_f46_ax_copy(2)); xl=xlabel('Lags (s)','fontsize',ax_fontsize);
    evoked_cc_On_f46_ax_copy(2).FontSize=ax_fontsize;
    L2=findobj(gca,'type','line');
 set(L2,'linestyle','-');

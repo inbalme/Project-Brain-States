@@ -1,7 +1,7 @@
 %% plotting a figure 
 close all
 clear all
-save_flag=1;
+save_flag=0;
  no_numbering_flag=0;
  abslen=0.05;
  ax_fontsize=10;
@@ -87,7 +87,7 @@ set(gcf,'color','w');
 set(gcf,'DefaultAxesFontSize',11);
 set(gcf,'DefaultAxesFontName','arial');
 set(gcf, 'PaperType', 'A4');
-set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 18 16]); %[left, bottom, width, height] 
+set(gcf,'PaperUnits','centimeters','PaperPosition',[1.2 1.2 18 13]); %[left, bottom, width, height] 
 set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 
@@ -96,12 +96,12 @@ set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 %% Positions:
     
 v_dist=0.12;
-VmM_pos(1,:)=[0.12, 0.68, 0.1, 0.12]; 
-VmSTD_pos(1,:)= VmM_pos; VmSTD_pos(1,1)=VmM_pos(1,1)+VmM_pos(1,3)+0.07;
-Peak_amp_pos(1,:)=[VmM_pos(1,1),0.5, 0.3, 0.22 ]; Peak_amp_pos(1,2)=VmM_pos(1,2)-Peak_amp_pos(1,4)-v_dist;
+VmM_pos(1,:)=[0.12, 0.68, 0.1, 0.13]; 
+VmSTD_pos(1,:)= VmM_pos; VmSTD_pos(1,1)=VmM_pos(1,1)+VmM_pos(1,3)+0.09;
+Peak_amp_pos(1,:)=[VmM_pos(1,1), 0.5, 0.34, 0.2 ]; Peak_amp_pos(1,2)=VmM_pos(1,2)-Peak_amp_pos(1,4)-v_dist;
 % Peak_amp_pos(1,:)=[0.5,VmM_pos(1,2)+0.03, 0.15, VmM_pos(1,4)-0.03];  Peak_amp_pos(1,1)=VmSTD_pos(1,1)+VmSTD_pos(1,3)+0.08;
 
-SNR_pos(1,:)= [VmM_pos(1,1), 0.5,0.08, 0.12]; SNR_pos(1,2)=Peak_amp_pos(1,2)-SNR_pos(1,4)-v_dist-0.01;
+SNR_pos(1,:)= [VmM_pos(1,1), 0.5,0.08, 0.13]; SNR_pos(1,2)=Peak_amp_pos(1,2)-SNR_pos(1,4)-v_dist-0.05;
 Amplitude_Signal_pos(1,:)=SNR_pos; Amplitude_Signal_pos(1,1)=SNR_pos(1,1)+SNR_pos(1,3)+0.05;
 Amplitude_Noise_pos(1,:)=Amplitude_Signal_pos; Amplitude_Noise_pos(1,1)=Amplitude_Signal_pos(1,1)+Amplitude_Signal_pos(1,3)+0.05;
 
@@ -109,7 +109,7 @@ Amplitude_Noise_pos(1,:)=Amplitude_Signal_pos; Amplitude_Noise_pos(1,1)=Amplitud
 h_dist1=VmSTD_pos(1,1)+VmSTD_pos(1,3)+0.1;
 
 VmM_ChAT_pos(1,:)=VmM_pos; VmM_ChAT_pos(1,1)=0.57;
-VmSTD_ChAT_pos(1,:)= VmSTD_pos; VmSTD_ChAT_pos(1,1)=VmM_ChAT_pos(1,1)+VmM_ChAT_pos(1,3)+0.07;
+VmSTD_ChAT_pos(1,:)= VmSTD_pos; VmSTD_ChAT_pos(1,1)=VmM_ChAT_pos(1,1)+VmM_ChAT_pos(1,3)+0.09;
 Peak_amp_ChAT_pos(1,:)=Peak_amp_pos; Peak_amp_ChAT_pos(1,1)=VmM_ChAT_pos(1,1);
 
 SNR_ChAT_pos(1,:)= [VmM_ChAT_pos(1,1), SNR_pos(1,2),0.08, 0.12]; 
