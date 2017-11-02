@@ -7,8 +7,7 @@ no_numbering_flag=0;
 abslen=0.05; %[in cm]
 ax_fontsize=10;
 % cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP filtered 49-51Hz Presentation'
-% cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\LFP_50Hz+BP0.1-200 Vm_50Hz';
-cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Vm-LFP correlations\LFP_50Hz+BP1-200 Vm_50Hz';
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm-LFP correlations\VmLFP traces';
 %opening saved figures:
 % [0 0 0; [30,75,14]/256; [136 137 138]/256; [112,172,90]/256; [216 22 22]/256; [255 153 153]/256];
 color1=[30,75,14]/256;
@@ -16,97 +15,49 @@ color2=[112,172,90]/256;
 color3=[160,160,160]./256; %grey; 
 color4=[102, 172,255]./256; %light blue
 
-% color3=[255,153,16]./256; %orange
-% color4=[255,178,102]./256; %light orange
-% color3=[102,51,0]./256; %brown; 204 102
-% color4=[153,0,0]./256; %brown-red
-% color3=[153, 76,0]./256; %brown
-% color4=[204, 102,0]./256; %light brown
 
 %spontaneous:
-spont_trace_Off_f80 = open('Vm-LFP_spont_stim1_Off_f80_t2  4  5.fig');    
-spont_trace_Off_f80_ax = get(gcf, 'children');
-        c1=findall(gcf,'color',color1);
-        set(c1,'color',color3);
+spont_trace_f80 = open('Vm-LFP_spont_f80_t2  4  5.fig');    
+spont_trace_f80_ax = get(gcf, 'children');
+        
         t1=findall(gcf,'type','text');
         set(t1,'fontsize',10)
-        set(t1(13),'string','200 ms')
-        line1=findall(gcf,'type','line');
-        linexdata=get(line1(2),'xdata');
-        set(line1(2),'xdata',linexdata-100);
-        set(line1(6),'xdata',linexdata-100);
-spont_trace_On_f80 = open('Vm-LFP_spont_stim1_On_f80_t2  4  5.fig');    
-spont_trace_On_f80_ax = get(gcf, 'children');
-        c2=findall(gcf,'color',color2);
-        set(c2,'color',color4);
-        t2=findall(gcf,'type','text');
-        set(t2,'fontsize',10)
-        set(t2(13),'string','200 ms')
-        line2=findall(gcf,'type','line');
-        linexdata=get(line2(2),'xdata');
-        set(line2(2),'xdata',linexdata-100);
-        set(line2(6),'xdata',linexdata-100);
-%evoked
-evoked_trace_Off_f80 = open('Vm-LFP_evoked_stim1_Off_f80_t2  4  5.fig');    
-evoked_trace_Off_f80_ax = get(gcf, 'children');
-        c1=findall(gcf,'color',color1);
-        set(c1,'color',color3);
-        t1=findall(gcf,'type','text');
-        set(t1,'fontsize',10)
-        set(t1(13),'string','200 ms')
-        line1=findall(gcf,'type','line');
-        linexdata=get(line1(2),'xdata');
-        set(line1(2),'xdata',linexdata-50);
-        set(line1(6),'xdata',linexdata-50);
-        for ind=1:75
-            temp=get(line1(ind),'xdata');
-            if length(temp)==2
-            xdataforlines(ind,:)=temp;
-            end
-        end
-evoked_trace_On_f80 = open('Vm-LFP_evoked_stim1_On_f80_t2  4  5.fig');    
-evoked_trace_On_f80_ax = get(gcf, 'children');
-        c2=findall(gcf,'color',color2);
-        set(c2,'color',color4);
-        t2=findall(gcf,'type','text');
-        set(t2,'fontsize',10)
+%         set(t1(13),'string','200 ms')
+%         line1=findall(gcf,'type','line');
+%         linexdata=get(line1(2),'xdata');
+%         set(line1(2),'xdata',linexdata-100);
+%         set(line1(6),'xdata',linexdata-100);
+cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Traces+std+mean\Long Trace Presentation\style2'
+
+spont_mean_f80 = open('f80_mean_x1_v2.fig');   
+b2=findall(gcf,'type','text');
+set(b2,'fontsize',10);
+set(b2(2),'string','1 s');
+b1=findall(gcf,'type','line');
+linexdata=get(b1(1),'xdata');
+set(b1(1),'xdata',linexdata-200/1000);
+lineydata=get(b1(2),'ydata');
+set(b1(2),'ydata',lineydata-0.2);
+spont_mean_f80_ax = get(gcf, 'children');
+
+%         for ind=1:75 %this code was meant to help recognizing the right line object
+%             temp=get(line1(ind),'xdata');
+%             if length(temp)==2
+%             xdataforlines(ind,:)=temp;
+%             else
+%                 xdataforlines(ind,:)=[1,1];
+%             end
+%         end
 %%
 % cross-correlations
+cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Vm-LFP correlations\LFP_50Hz+BP1-200 Vm_50Hz';
 %spontaneous:
 spont_cc_Off_f80 = open('Vm-LFPcc_spont_f80actual_data.fig');    
 spont_cc_Off_f80_ax = get(gcf, 'children');
 
-spont_cc_On_f80 = open('Vm-LFPcc_spont_f80shuffled_data.fig');    
-spont_cc_On_f80_ax = get(gcf, 'children');
-
-%evoked
-evoked_cc_Off_f80 = open('Vm-LFPcc_evoked_f80actual_data.fig');    
-evoked_cc_Off_f80_ax = get(gcf, 'children');
-
-evoked_cc_On_f80 = open('Vm-LFPcc_evoked_f80shuffled_data.fig');    
-evoked_cc_On_f80_ax = get(gcf, 'children');
-
-%population parameters:
-%spontaneous shuff+real
-% cc_paired_plot = open('Vm-LFPcc_spont+evoked_max-peak_paired_population.fig');    
-% cc_paired_plot = open('Vm-LFPcc_spont+evoked_lag0_paired_population.fig');    
-cc_paired_plot = open('Vm-LFPcc_evoked_lag0_paired_population_real-shuff.fig');
-l1=findall(gcf,'color',[0.7 0.7 0.7]);
-        set(l1(7),'color',color4); uistack(l1(7),'top');
-        set(l1(16),'color',color4); uistack(l1(16),'top');
-        
-cc_paired_plot_ax = get(gcf, 'children');
-%evoked shuff+real
-% cc_paired_plot_shuff = open('Vm-LFPcc_spont+evoked_max-peak_paired_population_shuff.fig');    
-% cc_paired_plot_shuff = open('Vm-LFPcc_spont+evoked_lag0_paired_population_shuff.fig');    
-cc_paired_plot_shuff = open('Vm-LFPcc_spont_lag0_paired_population_real-shuff.fig'); 
-l2=findall(gcf,'color',[0.7 0.7 0.7]);
-        set(l2(7),'color',color4); uistack(l2(7),'top')
-        set(l2(16),'color',color4); uistack(l2(16),'top')
-cc_paired_plot_shuff_ax = get(gcf, 'children');
-
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Illustrations+Histology'
 ChAT_illustration = imread('ChAT_Schematic_Illustration_two-electrodes_tight','TIF');
+ChAT_histology = imread('ChAT_Histology_tight','PNG');
 %%
 %open a new figure:
 F = figure;
@@ -119,33 +70,33 @@ set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
  
 %% Positions:
-spont_trace_Off_f80_pos(1,:) = [0.05 , 0.87 , 0.43 , 0.06];
-for i=1:(length(spont_trace_Off_f80_ax)-1)/2
-spont_trace_Off_f80_pos(2*i,:) = spont_trace_Off_f80_pos(2*i-1,:)-[0 , spont_trace_Off_f80_pos(2*i-1,4)-0.02 , 0 , 0];
-spont_trace_Off_f80_pos(2*i+1,:) = spont_trace_Off_f80_pos(2*i,:)-[0 , spont_trace_Off_f80_pos(2*i,4) , 0 , 0];
+spont_trace_f80_pos(1,:) = [0.05 , 0.87 , 0.43 , 0.06];
+for i=1:(length(spont_trace_f80_ax)-1)/2
+spont_trace_f80_pos(2*i,:) = spont_trace_f80_pos(2*i-1,:)-[0 , spont_trace_f80_pos(2*i-1,4)-0.02 , 0 , 0];
+spont_trace_f80_pos(2*i+1,:) = spont_trace_f80_pos(2*i,:)-[0 , spont_trace_f80_pos(2*i,4)+0.01 , 0 , 0];
 end
 
-spont_trace_On_f80_pos(1,:) = spont_trace_Off_f80_pos(1,:); spont_trace_On_f80_pos(1,2)=spont_trace_Off_f80_pos(6,2)-spont_trace_Off_f80_pos(1,4)-0.03;
+spont_trace_On_f80_pos(1,:) = spont_trace_f80_pos(1,:); spont_trace_On_f80_pos(1,2)=spont_trace_f80_pos(6,2)-spont_trace_f80_pos(1,4)-0.03;
 for i=1:(length(spont_trace_On_f80_ax)-1)/2
 spont_trace_On_f80_pos(2*i,:) = spont_trace_On_f80_pos(2*i-1,:)-[0 , spont_trace_On_f80_pos(2*i-1,4)-0.06 , 0 , 0];
 spont_trace_On_f80_pos(2*i+1,:) = spont_trace_On_f80_pos(2*i,:)-[0 , spont_trace_On_f80_pos(2*i,4)+0.015 , 0 , 0];
 end
 
 
-h_dist1=spont_trace_Off_f80_pos(1,1)+spont_trace_Off_f80_pos(1,3)+0.05;
-evoked_trace_Off_f80_pos(1,:) = [h_dist1 , spont_trace_Off_f80_pos(1,2) ,  spont_trace_Off_f80_pos(1,3) ,  spont_trace_Off_f80_pos(1,4)];
+h_dist1=spont_trace_f80_pos(1,1)+spont_trace_f80_pos(1,3)+0.05;
+evoked_trace_Off_f80_pos(1,:) = [h_dist1 , spont_trace_f80_pos(1,2) ,  spont_trace_f80_pos(1,3) ,  spont_trace_f80_pos(1,4)];
 for i=1:(length(evoked_trace_Off_f80_ax)-1)/2
 evoked_trace_Off_f80_pos(2*i,:) = evoked_trace_Off_f80_pos(2*i-1,:)-[0 , evoked_trace_Off_f80_pos(2*i-1,4)-0.02 , 0 , 0];
-evoked_trace_Off_f80_pos(2*i+1,:) = evoked_trace_Off_f80_pos(2*i,:)-[0 , evoked_trace_Off_f80_pos(2*i,4) , 0 , 0];
+evoked_trace_Off_f80_pos(2*i+1,:) = evoked_trace_Off_f80_pos(2*i,:)-[0 , evoked_trace_Off_f80_pos(2*i,4)+0.01 , 0 , 0];
 end
 
-evoked_trace_On_f80_pos(1,:) = [h_dist1, spont_trace_On_f80_pos(1,2) ,  evoked_trace_Off_f80_pos(1,3) ,  spont_trace_Off_f80_pos(1,4)];
+evoked_trace_On_f80_pos(1,:) = [h_dist1, spont_trace_On_f80_pos(1,2) ,  evoked_trace_Off_f80_pos(1,3) ,  spont_trace_f80_pos(1,4)];
 for i=1:(length(evoked_trace_On_f80_ax)-1)/2
 evoked_trace_On_f80_pos(2*i,:) = evoked_trace_On_f80_pos(2*i-1,:)-[0 , evoked_trace_On_f80_pos(2*i-1,4)-0.06 , 0 , 0];
 evoked_trace_On_f80_pos(2*i+1,:) = evoked_trace_On_f80_pos(2*i,:)-[0 , evoked_trace_On_f80_pos(2*i,4)+0.015 , 0 , 0];
 end
 
-spont_cc_On_f80_pos(1,:) = [0.105 , spont_trace_On_f80_pos(6,2)-0.14 , 0.13 , 0.08]; %shuffled
+spont_cc_On_f80_pos(1,:) = [0.105 , spont_trace_On_f80_pos(6,2)-0.14 , 0.13 , 0.07]; %shuffled
 h_dist2=spont_cc_On_f80_pos(1,1)+spont_cc_On_f80_pos(1,3)+0.06;
 spont_cc_Off_f80_pos(1,:) = [h_dist2 ,spont_cc_On_f80_pos(1,2) , spont_cc_On_f80_pos(1,3) , spont_cc_On_f80_pos(1,4)]; 
 h_dist3=spont_cc_Off_f80_pos(1,1)+spont_cc_Off_f80_pos(1,3)+0.165;
@@ -153,11 +104,11 @@ evoked_cc_On_f80_pos(1,:) = [h_dist3 , spont_cc_On_f80_pos(1,2) ,  spont_cc_On_f
 h_dist4=evoked_cc_On_f80_pos(1,1)+evoked_cc_On_f80_pos(1,3)+0.06;
 evoked_cc_Off_f80_pos(1,:) = [h_dist4 , spont_cc_Off_f80_pos(1,2) , evoked_cc_On_f80_pos(1,3) ,  spont_cc_Off_f80_pos(1,4)];
 
-cc_paired_plot_shuff_pos(1,:) = [0.12 , evoked_cc_Off_f80_pos(1,2)-0.22 , 0.27 , 0.12]; 
+cc_paired_plot_shuff_pos(1,:) = [0.12 , evoked_cc_Off_f80_pos(1,2)-0.195 , 0.27 , 0.1]; 
 cc_paired_plot_pos(1,:) =  [cc_paired_plot_shuff_pos(1,1)+cc_paired_plot_shuff_pos(1,3)+0.2 , cc_paired_plot_shuff_pos(1,2) , cc_paired_plot_shuff_pos(1,3) , cc_paired_plot_shuff_pos(1,4)];
 
 %top positions
-spont_trace_Off_f80_pos_top = spont_trace_Off_f80_pos(1,2)+spont_trace_Off_f80_pos(1,4);
+spont_trace_f80_pos_top = spont_trace_f80_pos(1,2)+spont_trace_f80_pos(1,4);
 spont_trace_On_f80_pos_top = spont_trace_On_f80_pos(1,2)+spont_trace_On_f80_pos(1,4);
 evoked_trace_Off_f80_pos_top = evoked_trace_Off_f80_pos(1,2)+evoked_trace_Off_f80_pos(1,4);
 evoked_trace_On_f80_pos_top = evoked_trace_On_f80_pos(1,2)+evoked_trace_On_f80_pos(1,4);
@@ -169,7 +120,7 @@ evoked_cc_On_f80_pos_top = evoked_cc_On_f80_pos(1,2)+evoked_cc_On_f80_pos(1,4);
 cc_paired_plot_shuff_pos_top = cc_paired_plot_shuff_pos(1,2)+cc_paired_plot_shuff_pos(1,4);
 cc_paired_plot_pos_top = cc_paired_plot_pos(1,2)+cc_paired_plot_pos(1,4);
 
-ChAT_illustration_pos(1,:)=[spont_trace_Off_f80_pos(1,1)+spont_trace_Off_f80_pos(1,3)-0.04,spont_trace_Off_f80_pos_top-0.01, 0.08, 0.08];
+ChAT_illustration_pos(1,:)=[spont_trace_f80_pos(1,1)+spont_trace_f80_pos(1,3)-0.04,spont_trace_f80_pos_top-0.01, 0.08, 0.08];
 ChAT_illustration_pos_top=ChAT_illustration_pos(1,2)+ChAT_illustration_pos(1,4);
 %%
 %Placing plots in the figure:
@@ -177,9 +128,9 @@ ChAT_illustration_ax = axes('position',ChAT_illustration_pos);
 imshow(ChAT_illustration, 'parent', ChAT_illustration_ax) 
 
 %Cell 46 - spont
-for i=1:length(spont_trace_Off_f80_ax)-1
-    spont_trace_Off_f80_ax_copy(i) = copyobj(spont_trace_Off_f80_ax(i+1),F); % copy axes to new fig
-    set(spont_trace_Off_f80_ax_copy(i),'position',spont_trace_Off_f80_pos(i,:))
+for i=1:length(spont_trace_f80_ax)-1
+    spont_trace_f80_ax_copy(i) = copyobj(spont_trace_f80_ax(i+1),F); % copy axes to new fig
+    set(spont_trace_f80_ax_copy(i),'position',spont_trace_f80_pos(i,:))
 end
    %    'fontname', 'arial','fontsize',13,'linewidth',1.5, 'ylim', y1limits(1,:),'ytick', y1ticks(1,:));
 for i=1:length(spont_trace_On_f80_ax)-1
@@ -229,7 +180,7 @@ ticklen=fn_get_abs_ticklength(gca, abslen);
  
 spont_cc_On_f80_ax_copy(1) = copyobj(spont_cc_On_f80_ax(2),F); % copy axes to new fig
 set(spont_cc_On_f80_ax_copy(1),'position',spont_cc_On_f80_pos(1,:), 'ylim',[-0.5,0.25]) %'xticklabel',[]
- set(F, 'currentaxes', spont_cc_On_f80_ax_copy(1));  xl=xlabel('Lags (s)','fontsize',ax_fontsize); %xl=xlabel('');  
+ set(F, 'currentaxes', spont_cc_On_f80_ax_copy(1));  xl=xlabel('Lags (s)','fontsize',ax_fontsize); 
 spont_cc_On_f80_ax_copy(1).FontSize=ax_fontsize;
 L1=findobj(gca,'type','line');
 set(L1,'linestyle','-');
@@ -304,7 +255,7 @@ ticklen=fn_get_abs_ticklength(gca, abslen);
  end    
 
 %   annotation:
-annotation('textbox', [spont_trace_Off_f80_pos(1,1) spont_trace_Off_f80_pos_top 0 0]+[0.04 0.02 0.5 0.05],...
+annotation('textbox', [spont_trace_f80_pos(1,1) spont_trace_f80_pos_top 0 0]+[0.04 0.02 0.5 0.05],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Spontaneous Activity', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 annotation('textbox', [evoked_trace_Off_f80_pos(1,1) evoked_trace_Off_f80_pos_top 0 0]+[0.03 0.02 0.5 0.05],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Sensory-evoked Responses', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
@@ -331,7 +282,7 @@ annotation('textbox', [spont_cc_On_f80_pos(1,1)+0.01 spont_cc_On_f80_pos_top+0.0
  a_pos3=[-0.04 -0.01 0.04 0.04];
  a_pos4=[-0.04 0.01 0.04 0.04];
  if no_numbering_flag==0;
-annotation('textbox', [spont_trace_Off_f80_pos(1,1) spont_trace_Off_f80_pos_top 0 0]+a_pos1,...
+annotation('textbox', [spont_trace_f80_pos(1,1) spont_trace_f80_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')
  annotation('textbox', [spont_trace_On_f80_pos(1,1) spont_trace_On_f80_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')
@@ -352,7 +303,7 @@ annotation('textbox', [spont_trace_Off_f80_pos(1,1) spont_trace_Off_f80_pos_top 
   annotation('textbox', [cc_paired_plot_pos(1,1) cc_paired_plot_pos_top 0 0]+a_pos4,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'J', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')
  end
- annotation('textbox', [spont_trace_Off_f80_pos(1,1) spont_trace_Off_f80_pos_top 0 0]+[0 -0.01 0.25 0.04],...
+ annotation('textbox', [spont_trace_f80_pos(1,1) spont_trace_f80_pos_top 0 0]+[0 -0.01 0.25 0.04],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Light Off', 'FontName','arial', 'fontsize', 12, 'color', [0 0 0])
  annotation('textbox', [spont_trace_On_f80_pos(1,1) spont_trace_On_f80_pos_top 0 0]+[0 -0.01 0.25 0.04],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Light On', 'FontName','arial', 'fontsize', 12, 'color', [0 0 0])

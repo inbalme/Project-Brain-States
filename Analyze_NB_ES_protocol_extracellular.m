@@ -4,10 +4,10 @@ close all
 clear all
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data
  global exp_type
-exp_type=1; %1-NBES, 2-ChAT
+exp_type=4; %1-NBES, 2-ChAT, 4-ChAT awake
 channel = 1;
 save_flag= 0;
-print_flag=0;
+print_flag=1;
 
 switch exp_type
     case 1
@@ -24,7 +24,7 @@ switch exp_type
         spike_det_threshold = [1 6 nan; 8 6 nan; 10 5 nan; 17 5 nan; 22 6 nan; 23 2.5 nan; 26 3 nan; 27 1.5 nan; 28 1.5 nan; 33 2 nan; 55 5 nan; 60 2 nan]; %35 2 nan; %29 2 nan; 
 
     case 2
-        files_to_analyze =108; %[74,77];
+        files_to_analyze =125; %[74,77];
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light Off', 'Light On'};
@@ -33,8 +33,20 @@ switch exp_type
         if a==0;
             mkdir(path_output);
         end
-         spike_det_threshold = [108 5 nan] ; %[74 10 nan; 77 10 nan];
-end
+         spike_det_threshold =[108 5 nan] ; %[74 10 nan; 77 10 nan];
+
+case 4
+        files_to_analyze =124; %[74,77];
+        cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
+        load ChAT_Files_v3
+        legend_string={'Light Off', 'Light On'};
+        path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Raster+PSTH';
+        a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
+        if a==0;
+            mkdir(path_output);
+        end
+         spike_det_threshold = [124 5 nan] ;%[108 5 nan] ; %[74 10 nan; 77 10 nan];
+         end
 
     for fileind=1:length(files_to_analyze);
         spikes_stat=[];
@@ -61,6 +73,8 @@ end
             color_table=[0 0 0; [216 22 22]/256;  [136 137 138]/256; [255 153 153]/256; [30,75,14]/256; [112,172,90]/256]; 
         case 2
             color_table=[0 0 0; [0 0 204]/256;  [136 137 138]/256; [255 153 153]/256; [30,75,14]/256; [112,172,90]/256];  
+        case 4
+            color_table=[0 0 0; [0 0 204]/256;  [136 137 138]/256; [255 153 153]/256; [30,75,14]/256; [112,172,90]/256]; 
     end
 %% For cell attached
 
@@ -139,7 +153,10 @@ switch exp_type
             x1limits(2,:) = [3.5 6.5];
     case 2
             x1limits(1,:) = [0.5 4.5];
-            x1limits(2,:) = [4.5 8.5];
+            x1limits(2,:) = [4.5 8.5];            
+    case 4
+            x1limits(1,:) = [0 4];
+            x1limits(2,:) = [4 8];
 end
         
             x1ticks = [];
@@ -200,6 +217,13 @@ for t=1:2;
                                 filename=['file', num2str(files_to_analyze(fileind)), ' spontaneous activity Light On'];
                                 saveas(f(2),filename,'fig'); 
                                 print(f(2),filename,'-dpng','-r600','-opengl')  
+                            case 4
+                                filename=['file', num2str(files_to_analyze(fileind)), ' spontaneous activity Light Off'];
+                                saveas(f(1),filename,'fig'); 
+                                print(f(1),filename,'-dpng','-r600','-opengl')    
+                                filename=['file', num2str(files_to_analyze(fileind)), ' spontaneous activity Light On'];
+                                saveas(f(2),filename,'fig'); 
+                                print(f(2),filename,'-dpng','-r600','-opengl')
                         end
                     end
 %     close all
@@ -416,9 +440,9 @@ end
         nspikes_signal{x_value}=sum(mean(raster(stim_begin_sample:response_end_sample,:,x_value),2));
         nspikes_background{x_value}=sum(mean(raster(background_begin_sample:background_end_sample,:,x_value),2));
         nspikes_signal_net{x_value}=nspikes_signal{x_value}-nspikes_background{x_value};
-        nspikes_signal_Hz{x_value}=nspikes_signal{x_value}./(1000/response_window);
-        nspikes_background_Hz{x_value}=nspikes_background{x_value}./(1000/response_window);
-        nspikes_signal_net_Hz{x_value}=nspikes_signal_net{x_value}./(1000/response_window);
+        nspikes_signal_Hz{x_value}=nspikes_signal{x_value}.*(1000/response_window);
+        nspikes_background_Hz{x_value}=nspikes_background{x_value}.*(1000/response_window);
+        nspikes_signal_net_Hz{x_value}=nspikes_signal_net{x_value}.*(1000/response_window);
 
     end
  end
@@ -526,7 +550,7 @@ spikes(fileind).whisker_response_flag = whisker_response_flag;
 %   [Fig4,h5]= fn_Plot_Trace_v2(data_HP(:,7,x_value), dt, dt, stim1_X, dt_galvano, stim2_X{x_value});
 %    [Fig3,h3]= fn_Plot_Trace_v2(PSTH(:,1,x_value), dt*bin_size, dt*bin_size, stim1_X, dt_galvano, stim2_X{x_value});
 %%
-clear SNR
+clear SNR nspikes_signal nspikes_background nspikes_signal_Hz nspikes_background_Hz
 for cell_ind = 1:size(spikes,2)
     SNR(cell_ind,:) = cell2mat(spikes(cell_ind).SNR(1,2:3));
     MI(cell_ind,:) = spikes(cell_ind).modulation_ind;
@@ -555,8 +579,8 @@ end
         [spikes_stat(stim_num).lillietest_h_SNR, spikes_stat(stim_num).lillietest_p_SNR] = lillietest(spikes_stat(stim_num).SNR(:,2)- spikes_stat(stim_num).SNR(:,1));
         [spikes_stat(stim_num).lillietest_h_change_SNR, spikes_stat(stim_num).lillietest_p_change_SNR] = lillietest(spikes_stat(stim_num).change_SNR);
         %paired ttest 
-        [spikes_stat(stim_num).ttest_h_SNR, spikes_stat(stim_num).ttest_p_SNR]= ttest(spikes_stat(stim_num).SNR(:,1),spikes_stat(stim_num).SNR(:,2));   
-        [spikes_stat(stim_num).wilcoxon_p_SNR, spikes_stat(stim_num).wilcoxon_h_SNR]= signrank(spikes_stat(stim_num).SNR(:,1),spikes_stat(stim_num).SNR(:,2));
+        [spikes_stat(stim_num).ttest_h_SNR, spikes_stat(stim_num).ttest_p_SNR,spikes_stat(stim_num).ttest_stats_SNR]= ttest(spikes_stat(stim_num).SNR(:,1),spikes_stat(stim_num).SNR(:,2));   
+        [spikes_stat(stim_num).wilcoxon_p_SNR, spikes_stat(stim_num).wilcoxon_h_SNR,spikes_stat(stim_num).wilcoxon_stats_SNR]= signrank(spikes_stat(stim_num).SNR(:,1),spikes_stat(stim_num).SNR(:,2));
         [spikes_stat(stim_num).ttest_h_change_SNR, spikes_stat(stim_num).ttest_p_change_SNR]= ttest(spikes_stat(stim_num).change_SNR);
         [spikes_stat(stim_num).wilcoxon_p_change_SNR, spikes_stat(stim_num).wilcoxon_h_change_SNR]= signrank(spikes_stat(stim_num).change_SNR);
         
@@ -572,27 +596,27 @@ end
         [spikes_stat(stim_num).lillietest_h_res_modulation, spikes_stat(stim_num).lillietest_p_res_modulation] = lillietest(spikes_stat(stim_num).res_modulation(:,2)- spikes_stat(stim_num).res_modulation(:,1));
         [spikes_stat(stim_num).lillietest_h_change_res_modulation, spikes_stat(stim_num).lillietest_p_change_res_modulation] = lillietest(spikes_stat(stim_num).change_res_modulation);
         %paired ttest 
-        [spikes_stat(stim_num).ttest_h_res_modulation, spikes_stat(stim_num).ttest_p_res_modulation]= ttest(spikes_stat(stim_num).res_modulation(:,1),spikes_stat(stim_num).res_modulation(:,2));   
-        [spikes_stat(stim_num).wilcoxon_p_res_modulation, spikes_stat(stim_num).wilcoxon_h_res_modulation]= signrank(spikes_stat(stim_num).res_modulation(:,1),spikes_stat(stim_num).res_modulation(:,2));
+        [spikes_stat(stim_num).ttest_h_res_modulation, spikes_stat(stim_num).ttest_p_res_modulation,spikes_stat(stim_num).ttest_stats_res_modulation]= ttest(spikes_stat(stim_num).res_modulation(:,1),spikes_stat(stim_num).res_modulation(:,2));   
+        [spikes_stat(stim_num).wilcoxon_p_res_modulation, spikes_stat(stim_num).wilcoxon_h_res_modulation,spikes_stat(stim_num).wilcoxon_stats_res_modulation]= signrank(spikes_stat(stim_num).res_modulation(:,1),spikes_stat(stim_num).res_modulation(:,2));
         [spikes_stat(stim_num).ttest_h_change_res_modulation, spikes_stat(stim_num).ttest_p_change_res_modulation]= ttest(spikes_stat(stim_num).change_res_modulation);
         [spikes_stat(stim_num).wilcoxon_p_change_res_modulation, spikes_stat(stim_num).wilcoxon_h_change_res_modulation]= signrank(spikes_stat(stim_num).change_res_modulation);
 
     %Response Modulation [Hz]
         spikes_stat(stim_num).res_modulation_Hz=R_ctrl_NBES_Hz_temp;
-       spikes_stat(stim_num).res_modulation_m=nanmean(spikes_stat(stim_num).res_modulation,1);
-        spikes_stat(stim_num).res_modulation_std=nanstd(spikes_stat(stim_num).res_modulation,0,1);
-        spikes_stat(stim_num).change_res_modulation=[(spikes_stat(stim_num).res_modulation(:,2)-spikes_stat(stim_num).res_modulation(:,1))./abs(spikes_stat(stim_num).res_modulation(:,1))].*100; %percent change
-        spikes_stat(stim_num).change_res_modulation_m=nanmean(spikes_stat(stim_num).change_res_modulation,1);
-        spikes_stat(stim_num).change_res_modulation_std=nanstd(spikes_stat(stim_num).change_res_modulation,0,1);
-        change_res_modulation_mat(:,stim_num)= spikes_stat(stim_num).change_res_modulation;
+       spikes_stat(stim_num).res_modulation_Hz_m=nanmean(spikes_stat(stim_num).res_modulation_Hz,1);
+        spikes_stat(stim_num).res_modulation_Hz_std=nanstd(spikes_stat(stim_num).res_modulation_Hz,0,1);
+        spikes_stat(stim_num).change_res_modulation_Hz=[(spikes_stat(stim_num).res_modulation_Hz(:,2)-spikes_stat(stim_num).res_modulation_Hz(:,1))./abs(spikes_stat(stim_num).res_modulation_Hz(:,1))].*100; %percent change
+        spikes_stat(stim_num).change_res_modulation_Hz_m=nanmean(spikes_stat(stim_num).change_res_modulation_Hz,1);
+        spikes_stat(stim_num).change_res_modulation_Hz_std=nanstd(spikes_stat(stim_num).change_res_modulation_Hz,0,1);
+        change_res_modulation_Hz_mat(:,stim_num)= spikes_stat(stim_num).change_res_modulation_Hz;
         %testing for normal distribution       
-        [spikes_stat(stim_num).lillietest_h_res_modulation, spikes_stat(stim_num).lillietest_p_res_modulation] = lillietest(spikes_stat(stim_num).res_modulation(:,2)- spikes_stat(stim_num).res_modulation(:,1));
-        [spikes_stat(stim_num).lillietest_h_change_res_modulation, spikes_stat(stim_num).lillietest_p_change_res_modulation] = lillietest(spikes_stat(stim_num).change_res_modulation);
+        [spikes_stat(stim_num).lillietest_h_res_modulation_Hz, spikes_stat(stim_num).lillietest_p_res_modulation_Hz] = lillietest(spikes_stat(stim_num).res_modulation_Hz(:,2)- spikes_stat(stim_num).res_modulation_Hz(:,1));
+        [spikes_stat(stim_num).lillietest_h_change_res_modulation_Hz, spikes_stat(stim_num).lillietest_p_change_res_modulation_Hz] = lillietest(spikes_stat(stim_num).change_res_modulation_Hz);
         %paired ttest 
-        [spikes_stat(stim_num).ttest_h_res_modulation, spikes_stat(stim_num).ttest_p_res_modulation]= ttest(spikes_stat(stim_num).res_modulation(:,1),spikes_stat(stim_num).res_modulation(:,2));   
-        [spikes_stat(stim_num).wilcoxon_p_res_modulation, spikes_stat(stim_num).wilcoxon_h_res_modulation]= signrank(spikes_stat(stim_num).res_modulation(:,1),spikes_stat(stim_num).res_modulation(:,2));
-        [spikes_stat(stim_num).ttest_h_change_res_modulation, spikes_stat(stim_num).ttest_p_change_res_modulation]= ttest(spikes_stat(stim_num).change_res_modulation);
-        [spikes_stat(stim_num).wilcoxon_p_change_res_modulation, spikes_stat(stim_num).wilcoxon_h_change_res_modulation]= signrank(spikes_stat(stim_num).change_res_modulation);
+        [spikes_stat(stim_num).ttest_h_res_modulation_Hz, spikes_stat(stim_num).ttest_p_res_modulation_Hz,spikes_stat(stim_num).ttest_stats_res_modulation_Hz]= ttest(spikes_stat(stim_num).res_modulation_Hz(:,1),spikes_stat(stim_num).res_modulation_Hz(:,2));   
+        [spikes_stat(stim_num).wilcoxon_p_res_modulation_Hz, spikes_stat(stim_num).wilcoxon_h_res_modulation_Hz,spikes_stat(stim_num).wilcoxon_stats_res_modulation_Hz]= signrank(spikes_stat(stim_num).res_modulation_Hz(:,1),spikes_stat(stim_num).res_modulation_Hz(:,2));
+        [spikes_stat(stim_num).ttest_h_change_res_modulation_Hz, spikes_stat(stim_num).ttest_p_change_res_modulation_Hz]= ttest(spikes_stat(stim_num).change_res_modulation_Hz);
+        [spikes_stat(stim_num).wilcoxon_p_change_res_modulation_Hz, spikes_stat(stim_num).wilcoxon_h_change_res_modulation_Hz]= signrank(spikes_stat(stim_num).change_res_modulation_Hz);
 
 %mean response spike count over the specified time window
         spikes_stat(stim_num).nspikes_signal=nspikes_signal;
@@ -606,8 +630,8 @@ end
         [spikes_stat(stim_num).lillietest_h_nspikes_signal, spikes_stat(stim_num).lillietest_p_nspikes_signal] = lillietest(spikes_stat(stim_num).nspikes_signal(:,2)- spikes_stat(stim_num).nspikes_signal(:,1));
         [spikes_stat(stim_num).lillietest_h_change_nspikes_signal, spikes_stat(stim_num).lillietest_p_change_nspikes_signal] = lillietest(spikes_stat(stim_num).change_nspikes_signal);
         %paired ttest 
-        [spikes_stat(stim_num).ttest_h_nspikes_signal, spikes_stat(stim_num).ttest_p_nspikes_signal]= ttest(spikes_stat(stim_num).nspikes_signal(:,1),spikes_stat(stim_num).nspikes_signal(:,2));   
-        [spikes_stat(stim_num).wilcoxon_p_nspikes_signal, spikes_stat(stim_num).wilcoxon_h_nspikes_signal]= signrank(spikes_stat(stim_num).nspikes_signal(:,1),spikes_stat(stim_num).nspikes_signal(:,2));
+        [spikes_stat(stim_num).ttest_h_nspikes_signal, spikes_stat(stim_num).ttest_p_nspikes_signal,spikes_stat(stim_num).ttest_stats_nspikes_signal]= ttest(spikes_stat(stim_num).nspikes_signal(:,1),spikes_stat(stim_num).nspikes_signal(:,2));   
+        [spikes_stat(stim_num).wilcoxon_p_nspikes_signal, spikes_stat(stim_num).wilcoxon_h_nspikes_signal,spikes_stat(stim_num).wilcoxon_stats_nspikes_signal]= signrank(spikes_stat(stim_num).nspikes_signal(:,1),spikes_stat(stim_num).nspikes_signal(:,2));
         [spikes_stat(stim_num).ttest_h_change_nspikes_signal, spikes_stat(stim_num).ttest_p_change_nspikes_signal]= ttest(spikes_stat(stim_num).change_nspikes_signal);
         [spikes_stat(stim_num).wilcoxon_p_change_nspikes_signal, spikes_stat(stim_num).wilcoxon_h_change_nspikes_signal]= signrank(spikes_stat(stim_num).change_nspikes_signal);
                 
@@ -623,11 +647,28 @@ end
         [spikes_stat(stim_num).lillietest_h_nspikes_background, spikes_stat(stim_num).lillietest_p_nspikes_background] = lillietest(spikes_stat(stim_num).nspikes_background(:,2)- spikes_stat(stim_num).nspikes_background(:,1));
         [spikes_stat(stim_num).lillietest_h_change_nspikes_background, spikes_stat(stim_num).lillietest_p_change_nspikes_background] = lillietest(spikes_stat(stim_num).change_nspikes_background);
         %paired ttest 
-        [spikes_stat(stim_num).ttest_h_nspikes_background, spikes_stat(stim_num).ttest_p_nspikes_background]= ttest(spikes_stat(stim_num).nspikes_background(:,1),spikes_stat(stim_num).nspikes_background(:,2));   
-        [spikes_stat(stim_num).wilcoxon_p_nspikes_background, spikes_stat(stim_num).wilcoxon_h_nspikes_background]= signrank(spikes_stat(stim_num).nspikes_background(:,1),spikes_stat(stim_num).nspikes_background(:,2));
+        [spikes_stat(stim_num).ttest_h_nspikes_background, spikes_stat(stim_num).ttest_p_nspikes_background,spikes_stat(stim_num).ttest_stats_nspikes_background]= ttest(spikes_stat(stim_num).nspikes_background(:,1),spikes_stat(stim_num).nspikes_background(:,2));   
+        [spikes_stat(stim_num).wilcoxon_p_nspikes_background, spikes_stat(stim_num).wilcoxon_h_nspikes_background,spikes_stat(stim_num).wilcoxon_stats_nspikes_background]= signrank(spikes_stat(stim_num).nspikes_background(:,1),spikes_stat(stim_num).nspikes_background(:,2));
         [spikes_stat(stim_num).ttest_h_change_nspikes_background, spikes_stat(stim_num).ttest_p_change_nspikes_background]= ttest(spikes_stat(stim_num).change_nspikes_background);
         [spikes_stat(stim_num).wilcoxon_p_change_nspikes_background, spikes_stat(stim_num).wilcoxon_h_change_nspikes_background]= signrank(spikes_stat(stim_num).change_nspikes_background);
-                
+
+ % mean background spike count over the specified time window [Hz]
+        spikes_stat(stim_num).nspikes_background_Hz=nspikes_background_Hz;
+        spikes_stat(stim_num).nspikes_background_Hz_m=nanmean(spikes_stat(stim_num).nspikes_background_Hz,1);
+        spikes_stat(stim_num).nspikes_background_Hz_std=nanstd(spikes_stat(stim_num).nspikes_background_Hz,0,1);
+        spikes_stat(stim_num).change_nspikes_background_Hz=[(spikes_stat(stim_num).nspikes_background_Hz(:,2)-spikes_stat(stim_num).nspikes_background_Hz(:,1))./abs(spikes_stat(stim_num).nspikes_background_Hz(:,1))].*100; %percent change
+        spikes_stat(stim_num).change_nspikes_background_Hz_m=nanmean(spikes_stat(stim_num).change_nspikes_background_Hz,1);
+        spikes_stat(stim_num).change_nspikes_background_Hz_std=nanstd(spikes_stat(stim_num).change_nspikes_background_Hz,0,1);
+        change_nspikes_background_Hz_mat(:,stim_num)= spikes_stat(stim_num).change_nspikes_background_Hz;
+        %testing for normal distribution       
+        [spikes_stat(stim_num).lillietest_h_nspikes_background_Hz, spikes_stat(stim_num).lillietest_p_nspikes_background_Hz] = lillietest(spikes_stat(stim_num).nspikes_background_Hz(:,2)- spikes_stat(stim_num).nspikes_background_Hz(:,1));
+        [spikes_stat(stim_num).lillietest_h_change_nspikes_background_Hz, spikes_stat(stim_num).lillietest_p_change_nspikes_background_Hz] = lillietest(spikes_stat(stim_num).change_nspikes_background_Hz);
+        %paired ttest 
+        [spikes_stat(stim_num).ttest_h_nspikes_background_Hz, spikes_stat(stim_num).ttest_p_nspikes_background_Hz,spikes_stat(stim_num).ttest_stats_nspikes_background_Hz]= ttest(spikes_stat(stim_num).nspikes_background_Hz(:,1),spikes_stat(stim_num).nspikes_background_Hz(:,2));   
+        [spikes_stat(stim_num).wilcoxon_p_nspikes_background_Hz, spikes_stat(stim_num).wilcoxon_h_nspikes_background_Hz,spikes_stat(stim_num).wilcoxon_stats_nspikes_background_Hz]= signrank(spikes_stat(stim_num).nspikes_background_Hz(:,1),spikes_stat(stim_num).nspikes_background_Hz(:,2));
+        [spikes_stat(stim_num).ttest_h_change_nspikes_background_Hz, spikes_stat(stim_num).ttest_p_change_nspikes_background_Hz]= ttest(spikes_stat(stim_num).change_nspikes_background_Hz);
+        [spikes_stat(stim_num).wilcoxon_p_change_nspikes_background_Hz, spikes_stat(stim_num).wilcoxon_h_change_nspikes_background_Hz]= signrank(spikes_stat(stim_num).change_nspikes_background_Hz);
+       
 %Latency Mean (only cells which faithfully responded to the 1st stim in the train)        
         spikes_stat(stim_num).latency=Latency_mean(Whisker_response==1,:);        
         spikes_stat(stim_num).latency_m=nanmean(spikes_stat(stim_num).latency,1);
@@ -640,8 +681,8 @@ end
         [spikes_stat(stim_num).lillietest_h_latency, spikes_stat(stim_num).lillietest_p_latency] = lillietest(spikes_stat(stim_num).latency(:,2)- spikes_stat(stim_num).latency(:,1));
         [spikes_stat(stim_num).lillietest_h_change_latency, spikes_stat(stim_num).lillietest_p_change_latency] = lillietest(spikes_stat(stim_num).change_latency);
         %paired ttest 
-        [spikes_stat(stim_num).ttest_h_latency, spikes_stat(stim_num).ttest_p_latency]= ttest(spikes_stat(stim_num).latency(:,1),spikes_stat(stim_num).latency(:,2));   
-        [spikes_stat(stim_num).wilcoxon_p_latency, spikes_stat(stim_num).wilcoxon_h_latency]= signrank(spikes_stat(stim_num).latency(:,1),spikes_stat(stim_num).latency(:,2));
+        [spikes_stat(stim_num).ttest_h_latency, spikes_stat(stim_num).ttest_p_latency,spikes_stat(stim_num).ttest_stats_latency]= ttest(spikes_stat(stim_num).latency(:,1),spikes_stat(stim_num).latency(:,2));   
+        [spikes_stat(stim_num).wilcoxon_p_latency, spikes_stat(stim_num).wilcoxon_h_latency,spikes_stat(stim_num).wilcoxon_stats_latency]= signrank(spikes_stat(stim_num).latency(:,1),spikes_stat(stim_num).latency(:,2));
         [spikes_stat(stim_num).ttest_h_change_latency, spikes_stat(stim_num).ttest_p_change_latency]= ttest(spikes_stat(stim_num).change_latency);
         [spikes_stat(stim_num).wilcoxon_p_change_latency, spikes_stat(stim_num).wilcoxon_h_change_latency]= signrank(spikes_stat(stim_num).change_latency);
 
@@ -657,8 +698,8 @@ end
         [spikes_stat(stim_num).lillietest_h_latency_std, spikes_stat(stim_num).lillietest_p_latency_std] = lillietest(spikes_stat(stim_num).latency_std(:,2)- spikes_stat(stim_num).latency_std(:,1));
         [spikes_stat(stim_num).lillietest_h_change_latency_std, spikes_stat(stim_num).lillietest_p_change_latency_std] = lillietest(spikes_stat(stim_num).change_latency_std);
         %paired ttest 
-        [spikes_stat(stim_num).ttest_h_latency_std, spikes_stat(stim_num).ttest_p_latency_std]= ttest(spikes_stat(stim_num).latency_std(:,1),spikes_stat(stim_num).latency_std(:,2));   
-        [spikes_stat(stim_num).wilcoxon_p_latency_std, spikes_stat(stim_num).wilcoxon_h_latency_std]= signrank(spikes_stat(stim_num).latency_std(:,1),spikes_stat(stim_num).latency_std(:,2));
+        [spikes_stat(stim_num).ttest_h_latency_std, spikes_stat(stim_num).ttest_p_latency_std,spikes_stat(stim_num).ttest_stats_latency_std]= ttest(spikes_stat(stim_num).latency_std(:,1),spikes_stat(stim_num).latency_std(:,2));   
+        [spikes_stat(stim_num).wilcoxon_p_latency_std, spikes_stat(stim_num).wilcoxon_h_latency_std,spikes_stat(stim_num).wilcoxon_stats_latency_std]= signrank(spikes_stat(stim_num).latency_std(:,1),spikes_stat(stim_num).latency_std(:,2));
         [spikes_stat(stim_num).ttest_h_change_latency_std, spikes_stat(stim_num).ttest_p_change_latency_std]= ttest(spikes_stat(stim_num).change_latency_std);
         [spikes_stat(stim_num).wilcoxon_p_change_latency_std, spikes_stat(stim_num).wilcoxon_h_change_latency_std]= signrank(spikes_stat(stim_num).change_latency_std);
         
@@ -676,8 +717,8 @@ end
         [spikes_stat(stim_num).lillietest_h_success_rate, spikes_stat(stim_num).lillietest_p_success_rate] = lillietest(spikes_stat(stim_num).success_rate(:,2)- spikes_stat(stim_num).success_rate(:,1));
         [spikes_stat(stim_num).lillietest_h_change_success_rate, spikes_stat(stim_num).lillietest_p_change_success_rate] = lillietest(spikes_stat(stim_num).change_success_rate);
         %paired ttest 
-        [spikes_stat(stim_num).ttest_h_success_rate, spikes_stat(stim_num).ttest_p_success_rate]= ttest(spikes_stat(stim_num).success_rate(:,1),spikes_stat(stim_num).success_rate(:,2));   
-        [spikes_stat(stim_num).wilcoxon_p_success_rate, spikes_stat(stim_num).wilcoxon_h_success_rate]= signrank(spikes_stat(stim_num).success_rate(:,1),spikes_stat(stim_num).success_rate(:,2));
+        [spikes_stat(stim_num).ttest_h_success_rate, spikes_stat(stim_num).ttest_p_success_rate,spikes_stat(stim_num).ttest_stats_success_rate]= ttest(spikes_stat(stim_num).success_rate(:,1),spikes_stat(stim_num).success_rate(:,2));   
+        [spikes_stat(stim_num).wilcoxon_p_success_rate, spikes_stat(stim_num).wilcoxon_h_success_rate,spikes_stat(stim_num).wilcoxon_stats_success_rate]= signrank(spikes_stat(stim_num).success_rate(:,1),spikes_stat(stim_num).success_rate(:,2));
         [spikes_stat(stim_num).ttest_h_change_success_rate, spikes_stat(stim_num).ttest_p_change_success_rate]= ttest(spikes_stat(stim_num).change_success_rate);
         [spikes_stat(stim_num).wilcoxon_p_change_success_rate, spikes_stat(stim_num).wilcoxon_h_change_success_rate]= signrank(spikes_stat(stim_num).change_success_rate);
  
@@ -688,8 +729,8 @@ end
         %testing for normal distribution       
         [spikes_stat(stim_num).lillietest_h_MI, spikes_stat(stim_num).lillietest_p_MI] = lillietest(spikes_stat(stim_num).MI(:,1));
         %paired ttest 
-        [spikes_stat(stim_num).ttest_h_MI, spikes_stat(stim_num).ttest_p_MI]= ttest(spikes_stat(stim_num).MI(:,1));   
-        [spikes_stat(stim_num).wilcoxon_p_MI, spikes_stat(stim_num).wilcoxon_h_MI]= signrank(spikes_stat(stim_num).MI(:,1));
+        [spikes_stat(stim_num).ttest_h_MI, spikes_stat(stim_num).ttest_p_MI,spikes_stat(stim_num).ttest_stats_MI]= ttest(spikes_stat(stim_num).MI(:,1));   
+        [spikes_stat(stim_num).wilcoxon_p_MI, spikes_stat(stim_num).wilcoxon_h_MI,spikes_stat(stim_num).wilcoxon_stats_MI]= signrank(spikes_stat(stim_num).MI(:,1));
 
          cd(path_output)
         save('extracellular_spikes_500ms','spikes','spikes_stat')
@@ -704,7 +745,7 @@ my=max(max(SNR_Y))*1.1;
 liney=[my;my];
 if spikes_stat.wilcoxon_p_SNR>0.05 
     asterisk='n.s.';
-    a_fontsize=13;
+    a_fontsize=10;
 else if spikes_stat.wilcoxon_p_SNR<0.05 && spikes_stat.wilcoxon_p_SNR>0.01
     asterisk='*';
     a_fontsize=17;
@@ -750,7 +791,7 @@ my=max(max(Res_mod_Y))*1.1;
 liney=[my;my];
 if spikes_stat.wilcoxon_p_res_modulation>0.05 
     asterisk='n.s.';
-    a_fontsize=13;
+    a_fontsize=10;
 else if spikes_stat.wilcoxon_p_res_modulation<0.05 && spikes_stat.wilcoxon_p_res_modulation>0.01
     asterisk='*';
     a_fontsize=17;
@@ -773,15 +814,59 @@ text(1.5,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','bottom
 hold off
         x1limits = [0.75 2.25];
         x1ticks = [1,2];
-%         y1limits = [0 1.1];
+        y1limits = [-5 30];
 %         y1ticks = [0,0.5,1];
-        set( gca, 'xlim', x1limits, 'xtick', x1ticks,'fontsize',28,'linewidth',1,...%'ylim', y1limits,
+        set( gca, 'xlim', x1limits, 'xtick', x1ticks,'ylim', y1limits,'fontsize',28,'linewidth',1,...%'ylim', y1limits,
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'NB-','NB+'} ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('Response [#spikes/train]', 'FontSize', 28,'fontname', 'arial');
         title(['Response Modulation, n=', num2str(size(Res_mod_Y,2)), ', p=', num2str(spikes_stat.wilcoxon_p_res_modulation)])
-%save figure  
+%% save figure  
 cd(path_output)
 filename='Response_modulation';
+saveas(gcf,filename,'fig'); 
+print(gcf,filename,'-dpng','-r600','-opengl') 
+%%  Response Modulation  [Hz]
+Res_mod_Y =  spikes_stat(stim_num).res_modulation_Hz';
+Res_mod_X(1,:)=ones(1,size(Res_mod_Y,2));
+Res_mod_X(2,:)=2*ones(1,size(Res_mod_Y,2));
+E=std(Res_mod_Y,0,2);
+linex=[1;2];
+my=max(max(Res_mod_Y))*1.1; 
+liney=[my;my];
+if spikes_stat.wilcoxon_p_res_modulation_Hz>0.05 
+    asterisk='n.s.';
+    a_fontsize=10;
+else if spikes_stat.wilcoxon_p_res_modulation_Hz<0.05 && spikes_stat.wilcoxon_p_res_modulation_Hz>0.01
+    asterisk='*';
+    a_fontsize=17;
+    else if spikes_stat.wilcoxon_p_res_modulation_Hz<0.01 && spikes_stat.wilcoxon_p_res_modulation_Hz>0.001
+            asterisk='**';
+            a_fontsize=17;
+    else if spikes_stat.wilcoxon_p_res_modulation_Hz<0.001
+             asterisk='***';
+             a_fontsize=17;
+        end
+        end
+    end
+end
+figure
+hold on
+line(Res_mod_X,Res_mod_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
+errorbar(Res_mod_X(:,1), mean(Res_mod_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
+% line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
+text(1.5,my,asterisk,'HorizontalAlignment', 'center','verticalAlignment','bottom','fontsize',a_fontsize)
+hold off
+        x1limits = [0.75 2.25];
+        x1ticks = [1,2];
+        y1limits = [-5 60];
+%         y1ticks = [0,0.5,1];
+        set( gca, 'xlim', x1limits, 'xtick', x1ticks,'ylim', y1limits,'fontsize',28,'linewidth',1,...%'ylim', y1limits,
+        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'NB-','NB+'} ,'box', 'off'); %'fontweight', 'bold', 
+        ylabel('Spikes (Hz)', 'FontSize', 28,'fontname', 'arial');
+        title(['Response Modulation, n=', num2str(size(Res_mod_Y,2)), ', p=', num2str(spikes_stat.wilcoxon_p_res_modulation_Hz)])
+%% save figure  
+cd(path_output)
+filename='Response_modulation_Hz';
 saveas(gcf,filename,'fig'); 
 print(gcf,filename,'-dpng','-r600','-opengl') 
 %%  Modulation Index 
@@ -794,7 +879,7 @@ my=max(max(MI_Y))*1.2;
 liney=[my;my];
 if spikes_stat.wilcoxon_p_MI>0.05 
     asterisk='n.s.';
-    a_fontsize=13;
+    a_fontsize=10;
     a_fontsize=17;
 else if spikes_stat.wilcoxon_p_MI<0.05 && spikes_stat.wilcoxon_p_MI>0.01
     asterisk='*';
@@ -827,7 +912,7 @@ hold off
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{''},'box', 'off'); %'fontweight', 'bold', 
         ylabel('Modulation Index', 'FontSize', 20,'fontname', 'arial');
 %         title(['Modulation Index, n=', num2str(size(MI_Y,2)), ', p=', num2str(spikes_stat.wilcoxon_p_MI)])
-%save figure  
+%% save figure  
 cd(path_output)
 filename='Modulation index';
 saveas(gcf,'Modulation index.fig'); 
@@ -842,7 +927,7 @@ my=max(max(nspikes_signal_Y))*1.1;
 liney=[my;my];
 if spikes_stat.wilcoxon_p_nspikes_signal>0.05 
     asterisk='n.s.';
-    a_fontsize=13;
+    a_fontsize=10;
 else if spikes_stat.wilcoxon_p_nspikes_signal<0.05 && spikes_stat.wilcoxon_p_nspikes_signal>0.01
     asterisk='*';
     a_fontsize=17;
@@ -888,7 +973,7 @@ my=max(max(nspikes_background_Y))*1.1;
 liney=[my;my];
 if spikes_stat.wilcoxon_p_nspikes_background>0.05 
     asterisk='n.s.';
-    a_fontsize=13;
+    a_fontsize=10;
 else if spikes_stat.wilcoxon_p_nspikes_background<0.05 && spikes_stat.wilcoxon_p_nspikes_background>0.01
     asterisk='*';
     a_fontsize=17;
@@ -912,16 +997,62 @@ hold off
 
         x1limits = [0.75 2.25];
         x1ticks = [1,2];
-        y1limits = [-5 25];
+        y1limits = [-5 20];
         y1ticks = [0,0.5,1];
         set( gca, 'xlim', x1limits, 'ylim', y1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'NB-','NB+'} ,'box', 'off'); %'fontweight', 'bold', 
         ylabel('#Spikes/Train', 'FontSize', 28,'fontname', 'arial');
         title(['Background #Spikes, n=', num2str(size(nspikes_background_Y,2)), ', p=', num2str(spikes_stat.wilcoxon_p_nspikes_background)])
         
-        %save figure  
+        %% save figure  
 cd(path_output)
 filename='Background Spikes';
+saveas(gcf,filename,'fig'); 
+print(gcf,filename,'-dpng','-r600','-opengl') 
+%% background nspikes (Hz)
+nspikes_background_Y= spikes_stat(stim_num).nspikes_background_Hz';
+nspikes_background_X(1,:)=ones(1,size(nspikes_background_Y,2));
+nspikes_background_X(2,:)=2*ones(1,size(nspikes_background_Y,2));
+E = std(nspikes_background_Y,0,2);
+linex=[1;2];
+my=max(max(nspikes_background_Y))*1.1; 
+liney=[my;my];
+if spikes_stat.wilcoxon_p_nspikes_background_Hz>0.05 
+    asterisk='n.s.';
+    a_fontsize=10;
+else if spikes_stat.wilcoxon_p_nspikes_background_Hz<0.05 && spikes_stat.wilcoxon_p_nspikes_background_Hz>0.01
+    asterisk='*';
+    a_fontsize=17;
+    else if spikes_stat.wilcoxon_p_nspikes_background_Hz<0.01 && spikes_stat.wilcoxon_p_nspikes_background_Hz>0.001
+            asterisk='**';
+            a_fontsize=17;
+    else if spikes_stat.wilcoxon_p_nspikes_background_Hz<0.001
+             asterisk='***';
+             a_fontsize=17;
+        end
+        end
+    end
+end
+figure
+hold on
+line(nspikes_background_X,nspikes_background_Y,'color',[0.7 0.7 0.7],'linewidth',1.5,'markersize',10,'markerfacecolor','k')
+errorbar(nspikes_background_X(:,1), mean(nspikes_background_Y,2),E,'k','linewidth',2.5,'markersize',10,'markerfacecolor','k')
+% line(linex,liney,'color',[0 0 0],'linewidth',1,'markersize',10,'markerfacecolor','k')
+text(1.5,my,asterisk,'HorizontalAlignment', 'center','fontsize',a_fontsize) %'verticalAlignment','bottom',
+hold off
+
+        x1limits = [0.75 2.25];
+        x1ticks = [1,2];
+        y1limits = [-5 40];
+        y1ticks = [0,0.5,1];
+        set( gca, 'xlim', x1limits, 'ylim', y1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
+        'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',{'NB-','NB+'} ,'box', 'off'); %'fontweight', 'bold', 
+        ylabel('Spikes (Hz)', 'FontSize', 28,'fontname', 'arial');
+        title(['Background #Spikes, n=', num2str(size(nspikes_background_Y,2)), ', p=', num2str(spikes_stat.wilcoxon_p_nspikes_background_Hz)])
+        
+        %% save figure  
+cd(path_output)
+filename='Background Spikes_Hz';
 saveas(gcf,filename,'fig'); 
 print(gcf,filename,'-dpng','-r600','-opengl') 
 %% Latency (only for cells which faithfully responded to the 1st stim in the train)

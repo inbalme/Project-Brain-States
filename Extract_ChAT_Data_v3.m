@@ -11,7 +11,7 @@ global Exp
 
 files = Get_ChAT_Files_v3();
 
-for fileind =93; 
+for fileind =129; 
     clearvars -except  files fileind Exp
 no_spikes_flag=1;
     fname = files(fileind).name;
@@ -61,6 +61,18 @@ no_spikes_flag=1;
             else
                 ch_gain=10./Param.mode_val{1,POG_loc==1}; %Ilan's data aquisition system automatically divides by 10;
           end
+     end
+    if isfield(files,'channel_whisk')
+        Param.channel_whisk = files(fileind).channel_whisk;
+    end
+    if isfield(files,'channel_treadmill')
+        Param.channel_treadmill = files(fileind).channel_treadmill;
+    end
+    if isfield(files,'channel_stepping')
+        Param.channel_stepping = files(fileind).channel_stepping;
+    end
+    if isfield(files,'channel_pupil')
+        Param.channel_pupil = files(fileind).channel_pupil;
     end
     Param.pr_whisker                = files(fileind).pr_whisker;
     Param.adj_whisker                = files(fileind).adj_whisker;
@@ -79,7 +91,14 @@ no_spikes_flag=1;
         run_header = files(fileind).headers(header);  %run_header is the absolut number of the header in the file
         Exp.Header(run_header).headerInfo = readExpOneHeader(run_header);
         %Exp.Header(run_header).headerInfo.subexp_type
-        for run_trace = 1:length(Exp.Header(run_header).headerInfo.blockLocations)
+        traces_ext=length(Exp.Header(run_header).headerInfo.blockLocations);
+        if fileind==118 &&run_header==4;
+            traces_ext=9;
+        end
+        if fileind==119 &&run_header==3;
+            traces_ext=8;
+        end
+        for run_trace = 1:traces_ext
             block = readOneBlockdata(run_header,run_trace);
          if isfield(block, 'channel') ==0
              break
@@ -87,11 +106,14 @@ no_spikes_flag=1;
          Param.sf_Vm                                = block.scanrate; % the sampling frequency
     Param.dt_Vm                                = 1/(Param.sf_Vm);
     Param.facade                         = block.IncedValues;
-    Param.sf_I1                      = Param.sf_Vm/(length(block.channel(1,1).chdata)/length(block.channel(1,Param.channel_I1).chdata));
-%    if Param.dual_rec_flag ==1
+    if isempty(Param.channel_I1)
+    else
+        Param.sf_I1                      = Param.sf_Vm/(length(block.channel(1,1).chdata)/length(block.channel(1,Param.channel_I1).chdata));
+    end
+   if Param.dual_rec_flag ==1
        Param.sf_V2 = Param.sf_Vm/(length(block.channel(1,1).chdata)/length(block.channel(1,Param.channel_V2).chdata));
-        Param.sf_I2 = Param.sf_Vm/(length(block.channel(1,1).chdata)/length(block.channel(1,Param.channel_I2).chdata));
-%    end
+       Param.sf_I2 = Param.sf_Vm/(length(block.channel(1,1).chdata)/length(block.channel(1,Param.channel_I2).chdata));      
+   end
     Param.sf_galvano                      = Param.sf_Vm/(length(block.channel(1,1).chdata)/length(block.channel(1,Param.channel_galvano).chdata));
     Param.sf_airpuff                     = Param.sf_Vm/(length(block.channel(1,1).chdata)/length(block.channel(1,Param.channel_airpuff).chdata)); 
     Param.sf_laser                     = Param.sf_Vm/(length(block.channel(1,1).chdata)/length(block.channel(1,Param.channel_laser).chdata));      
@@ -165,21 +187,42 @@ no_spikes_flag=1;
                     data.x_value(block.newXvalue).EEG(:,x_value_ind(block.newXvalue))=  block.channel(Param.channel_EEG).chdata;
                 end
                 
-                 if isempty(block.channel(Param.channel_V2).chdata)
+%                  if isempty(block.channel(Param.channel_V2).chdata)
+                if isempty(Param.channel_V2) || isempty(block.channel(Param.channel_V2).chdata)
                  else
                     data.x_value(block.newXvalue).V2(:,x_value_ind(block.newXvalue))=  block.channel(Param.channel_V2).chdata;
                  end
                  
-                 if isempty(block.channel(Param.channel_I1).chdata)
+                 if isempty(Param.channel_I1) || isempty(block.channel(Param.channel_I1).chdata)
                  else
                     data.x_value(block.newXvalue).I1(:,x_value_ind(block.newXvalue))=  block.channel(Param.channel_I1).chdata;
                  end
                  
-                    if isempty(block.channel(Param.channel_I2).chdata)
+                    if isempty(Param.channel_I2) || isempty(block.channel(Param.channel_I2).chdata)
                  else
                     data.x_value(block.newXvalue).I2(:,x_value_ind(block.newXvalue))=  block.channel(Param.channel_I2).chdata;
-                 end
-                 
+                    end
+                    
+                     if isempty(block.channel(Param.channel_whisk).chdata)
+                 else
+                    data.x_value(block.newXvalue).whisk(:,x_value_ind(block.newXvalue))=  block.channel(Param.channel_whisk).chdata;
+                     end
+                     
+                      if isempty(block.channel(Param.channel_treadmill).chdata)
+                 else
+                    data.x_value(block.newXvalue).treadmill(:,x_value_ind(block.newXvalue))=  block.channel(Param.channel_treadmill).chdata;
+                      end
+                    
+                       if isempty(block.channel(Param.channel_stepping).chdata)
+                 else
+                    data.x_value(block.newXvalue).stepping(:,x_value_ind(block.newXvalue))=  block.channel(Param.channel_stepping).chdata;
+                       end
+                    
+                        if isempty(block.channel(Param.channel_pupil).chdata)
+                 else
+                    data.x_value(block.newXvalue).pupil(:,x_value_ind(block.newXvalue))=  block.channel(Param.channel_pupil).chdata;
+                    end
+
                 data.x_value(block.newXvalue).original_header(1,run_header) = run_header;
                 data.x_value(block.newXvalue).original_trace(1,run_trace) = run_trace;
                       end
@@ -286,25 +329,34 @@ end
               continue
         else                
  raw_data{1}(:,1:length(trace),x_value) = data.x_value(x_value).Vm(:,trace).*ch_gain; 
- raw_data{2}(:,1:length(trace),x_value) = data.x_value(x_value).I1(:,trace); 
- raw_data{3}(:,1:length(trace),x_value) = data.x_value(x_value).V2(:,trace);
- raw_data{4}(:,1:length(trace),x_value) = data.x_value(x_value).I2(:,trace); 
+  sf{1} = Param.sf_Vm;
+  aa(1)=1;
+ if ~isempty(Param.channel_I1)
+    raw_data{2}(:,1:length(trace),x_value) = data.x_value(x_value).I1(:,trace); 
+    sf{2} = Param.sf_I1;
+    aa(2)=2;
+ end
+  if ~isempty(Param.channel_V2)
+    raw_data{3}(:,1:length(trace),x_value) = data.x_value(x_value).V2(:,trace);
+    sf{3} = Param.sf_V2;
+    aa(3)=3;
+  end
+   if ~isempty(Param.channel_I2)
+    raw_data{4}(:,1:length(trace),x_value) = data.x_value(x_value).I2(:,trace); 
+    sf{4} = Param.sf_I2;
+    aa(4)=4;
+   end
   end    
           if Param.mode_val{strcmp('VC',Param.mode_name)}==1;
                raw_data{1}(:,1:length(trace),x_value)=-1.* raw_data{1}(:,1:length(trace),x_value);
           end
-              
-                sf{1} = Param.sf_Vm;
-                sf{2} = Param.sf_I1;
-                sf{3} = Param.sf_V2;
-                sf{4} = Param.sf_I2;
-                             
+                                                                                     
                 sf_airpuff = Param.sf_airpuff; %[1/sec]
                 dt_airpuff = 1/sf_airpuff;
                 sf_galvano = Param.sf_galvano; %[1/sec]
                 dt_galvano = 1/sf_galvano;
   
- for ii=1:4
+ for ii=nonzeros(aa)
                dt{ii}=1/sf{ii}; %[sec]
                 time_axis{ii}(:,x_value) = (1:size(raw_data{ii}(:,:,x_value),1))*dt{ii};
               

@@ -3,10 +3,10 @@
 %etc...) prior to the analysis
 
                 sf{1} = Param.sf_Vm;
-                sf{2} = Param.sf_I1;
-                sf{3} = Param.sf_V2;
-                sf{4} = Param.sf_I2;
-                dt=1/sf{channel};
+%                 sf{2} = Param.sf_I1;
+%                 sf{3} = Param.sf_V2;
+%                 sf{4} = Param.sf_I2;
+                dt=1/sf{1};
                              
                 sf_airpuff = Param.sf_airpuff; %[1/sec]
                 dt_airpuff = 1/sf_airpuff;

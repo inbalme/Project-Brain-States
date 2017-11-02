@@ -13,8 +13,8 @@ rectangle_color=[210 210 210]/256;
 %opening saved figures:
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Illustrations+Histology'
 
-NB_illustration = imread('NBES_Schematic_Illustration_one-electrode_tight','TIF');
-
+% NB_illustration = imread('NBES_Schematic_Illustration_one-electrode_tight','TIF');
+NB_illustration = imread('White mouse with brain+whiskers_one electrode_cropped','TIF');
 NB_histology = imread('20150709_slide1(red)_sec3_whole section_2_v1','TIF');
 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\LFP depth'
@@ -23,6 +23,19 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\LFP depth'
 traces_depth3 = open('2016-10-20-001_LFP_traces_h28_t2  3  4  5  6_5000um.fig');    
 rec=findobj(gca,'type','rectangle'); 
 set(rec(2:3),'FaceColor',rectangle_color);
+t1=findobj(gca,'type','text');
+set(t1,'fontsize',ax_fontsize);
+positiontext1=get(t1(1),'position');
+positiontext1(1)=positiontext1(1)-0.8;
+positiontext2=get(t1(2),'position');
+positiontext2(1)=positiontext2(1)-0.5;
+set(t1(1),'position',positiontext1);
+set(t1(2),'position',positiontext2);
+l1=findobj(gca,'type','line');
+line1xdata=get(l1(1),'xdata');
+line2xdata=get(l1(2),'xdata');
+set(l1(1),'xdata',line1xdata-1);
+set(l1(2),'xdata',line2xdata-0.5);
 traceh=get(gca,'children');
 set(traceh(6:16),'Linewidth',0.8) %these are the handles of the traces
 traces_depth3_ax = get(gcf, 'children');
@@ -65,7 +78,7 @@ Modulation_index = open('Modulation index.fig');
 Modulation_index_ax = get(gcf, 'children');
 
 %Background spikes
-Background_spikes = open('Background Spikes.fig');    
+Background_spikes = open('Background Spikes_Hz.fig');    
 Background_spikes_ax = get(gcf, 'children');
 
 %SNR Index
@@ -73,7 +86,7 @@ SNR = open('SNR.fig');
 SNR_ax = get(gcf, 'children');
 
 %Response Modulation
-Response_modulation = open('Response_modulation.fig');    
+Response_modulation = open('Response_modulation_Hz.fig');    
 Response_modulation_ax = get(gcf, 'children');
 
 %%
@@ -89,7 +102,7 @@ set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 
 
 %% Positions:
-NB_illustration_pos = [0 , 0.75 , 0.27 , 0.17];
+NB_illustration_pos = [0 , 0.72 , 0.3 , 0.25];
 NB_histology_pos = [0.04 , 0.52 , 0.17 , 0.2];
 
 traces_depth3_pos(1,:) = [0.27 , 0.7 , 0.51 , 0.25];
@@ -265,17 +278,17 @@ set(evoked_trace_On2_ax_copy(2),'position',evoked_trace_On2_pos(1,:),'xlim',xlim
 ticklen=fn_get_abs_ticklength(gca, abslen);
  %Response modulation
 Response_modulation_ax_copy = copyobj(Response_modulation_ax,F); % copy axes to new fig
-set(Response_modulation_ax_copy,'position',Response_modulation_pos(1,:),'ylim',[-5 30] ,'ytick', [0 10 20],'xticklabel',[],...
-       'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'box','off','tickdir','out'); %, 'ylim', y6limits,'ytick', y6ticks,'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
- set(F, 'currentaxes', Response_modulation_ax_copy); t=title(''); yl=ylabel('Spikes/Train','fontsize',ax_fontsize); 
+set(Response_modulation_ax_copy,'position',Response_modulation_pos(1,:),'xticklabel',[],...
+       'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'box','off','tickdir','out'); % 'ylim',[-5 30] ,'ytick', [0 10 20],
+ set(F, 'currentaxes', Response_modulation_ax_copy); t=title(''); %yl=ylabel('Spikes/Train','fontsize',ax_fontsize); 
  ticklen=fn_get_abs_ticklength(gca, abslen);
- set(gca,'ylim',[0 30],'YTick',[0, 10, 20,30])
+%  set(gca,'ylim',[0 30],'YTick',[0, 10, 20,30])
 
  %Background Spikes
 Background_spikes_ax_copy = copyobj(Background_spikes_ax,F); % copy axes to new fig
-set(Background_spikes_ax_copy,'position',Background_spikes_pos(1,:),'ylim',[-5 20],'xticklabel',[] ,...
-       'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'box','off','tickdir','out'); %, 'ylim',[-5 30] ,'ytick', [0 10 20],'xlim',x6limits,'xtick',x6ticks, 'xticklabel',x6ticklab);
- set(F, 'currentaxes', Background_spikes_ax_copy); t=title(''); yl=ylabel('Spikes','fontsize',ax_fontsize);
+set(Background_spikes_ax_copy,'position',Background_spikes_pos(1,:),'xticklabel',[] ,...
+       'fontname', 'arial','fontsize',ax_fontsize,'linewidth',1.5,'box','off','tickdir','out'); %, 'ylim',[-5 20],
+ set(F, 'currentaxes', Background_spikes_ax_copy); t=title(''); %yl=ylabel('Spikes','fontsize',ax_fontsize);
 ticklen=fn_get_abs_ticklength(gca, abslen);
  %Modulation index
 %  Modulation_index_ax_copy = copyobj(Modulation_index_ax,F); % copy axes to new fig
@@ -313,7 +326,7 @@ ticklen=fn_get_abs_ticklength(gca, abslen);
 %  
 if no_numbering_flag==1
 
- annotation('textbox', [NB_illustration_pos(1,1)+0.03 NB_illustration_pos_top 0 0]+a_pos1,...
+ annotation('textbox', [NB_illustration_pos(1,1)+0.03 traces_depth3_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
  annotation('textbox', [NB_histology_pos(1,1) NB_histology_pos_top 0 0]+a_pos1,...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
@@ -343,7 +356,7 @@ end
     cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures\Neuron'
 
 if save_flag==1;
-filename='Fig 1 LFP traces+PSD_1-100Hz+SNR_file28_v2';
+filename='Fig 1 LFP traces+PSD_1-100Hz+SNR_file28_v3';
 saveas(F,filename,'fig'); 
 print(F,filename,'-dpng','-r600','-opengl') 
 print(F, '-depsc2', filename);

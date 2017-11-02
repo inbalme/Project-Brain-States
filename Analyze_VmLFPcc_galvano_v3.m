@@ -18,13 +18,13 @@ cc_stat=[]; cc_spont=[]; cc_evoked=[]; cc=[]; cc_shuffled_it=[]; cc_shuff_sub=[]
  global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X
  
  global exp_type
-exp_type=1; %1-NBES, 2-ChAT
+exp_type=2; %1-NBES, 2-ChAT
 trace_type_input=[1,2]; %[3,2] for exp_type=1; %for exp_type=2 or 3 use [1,2]
 analyze_time_before_train=0;
 analyze_train_only_flag=1; %use analyze_train_only_flag=1
-add_to_plot=0.1; %seconds from each side of the trace. use 0.1 for NBES and 0.080 for ChAT
- plot_trace=[2,3,4];%1:size(current_data,2); %5;for f46: [2,3,4], [3 4 6]; for f80: [2 4 5]
-save_flag=1;
+add_to_plot=0.08; %seconds from each side of the trace. use 0.1 for NBES and 0.080 for ChAT
+ plot_trace=[2,4,5];%1:size(current_data,2); %5;for f46: [2,3,4], [3 4 6]; for f80: [2 4 5]
+save_flag=0;
 print_flag=1;
 norm_flag=0;
 clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
@@ -44,7 +44,7 @@ switch exp_type
         legend_string_shuff={'NB- shuffled', 'NB+ shuffled'};       
 
     case 2
-        files_to_analyze =[76,77,80,82,84,87,90,92,115]; %[92,94,96,98,101]
+        files_to_analyze =[76,77,80,82,84,87,90,92,112, 114, 115]; %[92,94,96,98,101]
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={ 'Light Off','Light On'}; y_ax_label={'Vm'}; y_ax_units={'mV'};   
@@ -95,7 +95,7 @@ end
  end
 %% set the path for saving figures and variables
 if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1 && BPLFP_flag==1
-    path_output=['LFP_50Hz+BP Vm_50Hz+BP\BP',num2str(bp_manual_Vm(1)),'-',num2str(bp_manual_Vm(2))];
+    path_output=['LFP_50Hz+BP Vm_50Hz+BP',num2str(bp_manual_Vm(1)),'-',num2str(bp_manual_Vm(2))];
 else if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPLFP_flag==1
      path_output='LFP_50Hz+BP Vm_50Hz';  
     else if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1
@@ -415,10 +415,18 @@ tupp = tinv(alphaup,df);
 tlow = tinv(alphalow,df); 
 %  [prcntile1_off, prcntile2_off]=fn_get_CI_w_bootstrap(cc_shuff_sub{fileind,1}(:,:),0,5000);
 %  [prcntile1_on, prcntile2_on]=fn_get_CI_w_bootstrap(cc_shuff_sub{fileind,2}(:,:),0,5000);
- cc_shuff_sub_sem1=tupp.*std(cc_shuff_sub{fileind,1}(:,:),0,2)./sqrt(size(cc_shuff_sub{fileind,1}(:,:),2)); %this is ci and not SEM
- cc_shuff_sub_sem2=tupp.*std(cc_shuff_sub{fileind,2}(:,:),0,2)./sqrt(size(cc_shuff_sub{fileind,2}(:,:),2));
- cc_shuffled_sem1=tupp.*std(cc_shuffled_it{fileind,1}(:,:),0,2)./sqrt(size(cc_shuff_sub{fileind,1}(:,:),2));
- cc_shuffled_sem2=tupp.*std(cc_shuffled_it{fileind,2}(:,:),0,2)./sqrt(size(cc_shuff_sub{fileind,2}(:,:),2));
+
+% %for CI:
+%  cc_shuff_sub_sem1=tupp.*std(cc_shuff_sub{fileind,1}(:,:),0,2)./sqrt(size(cc_shuff_sub{fileind,1}(:,:),2)); %this is ci and not SEM
+%  cc_shuff_sub_sem2=tupp.*std(cc_shuff_sub{fileind,2}(:,:),0,2)./sqrt(size(cc_shuff_sub{fileind,2}(:,:),2));
+%  cc_shuffled_sem1=tupp.*std(cc_shuffled_it{fileind,1}(:,:),0,2)./sqrt(size(cc_shuff_sub{fileind,1}(:,:),2));
+%  cc_shuffled_sem2=tupp.*std(cc_shuffled_it{fileind,2}(:,:),0,2)./sqrt(size(cc_shuff_sub{fileind,2}(:,:),2));
+
+ %for SEM
+ cc_shuff_sub_sem1=std(cc_shuff_sub{fileind,1}(:,:),0,2)./sqrt(size(cc_shuff_sub{fileind,1}(:,:),2));
+ cc_shuff_sub_sem2=std(cc_shuff_sub{fileind,2}(:,:),0,2)./sqrt(size(cc_shuff_sub{fileind,2}(:,:),2));
+ cc_shuffled_sem1=std(cc_shuffled_it{fileind,1}(:,:),0,2)./sqrt(size(cc_shuff_sub{fileind,1}(:,:),2));
+ cc_shuffled_sem2=std(cc_shuffled_it{fileind,2}(:,:),0,2)./sqrt(size(cc_shuff_sub{fileind,2}(:,:),2));
 
  Fig{fileind}(trace_type+6)=figure;
  hold on
@@ -449,7 +457,7 @@ hline_zero=line([0 0],[ylim(1) ylim(2)],'linestyle','-.','color',[136 137 138]./
 l=legend([h1.mainLine h2.mainLine h3.mainLine h4.mainLine],{'NB-','NB+','NB- shuffled', 'NB+ shuffled'},'fontsize',12,'Location','northeast', 'box', 'off');
 l.FontSize=11;
 % legend('ES off mean cc','ES on mean cc'); legend('boxoff');%legend('boxoff','fontsize',6,'linewidth',1.5,'Position',[0.39,0.45,0.25,0.1]);
-xlabel('Lags [S]' ,'FontSize', 14); ylabel('CC' ,'FontSize', 14);
+xlabel('Lags (s)' ,'FontSize', 14); ylabel('CC' ,'FontSize', 14);
 set(gca,'xlim',[-0.5 0.5],'xtick',[-0.5 0 0.5],'ytick',yticks,'fontsize',14); %set(gca,'xlim',[-0.2 0.2]); set(gca,'xtick',[-0.2 0 0.2]);
 hold off
 % axis tight 
@@ -484,7 +492,7 @@ for ix=1:length(l.String)
   h.LineWidth =1.5;
 end
 % legend('ES off mean cc','ES on mean cc'); legend('boxoff');%legend('boxoff','fontsize',6,'linewidth',1.5,'Position',[0.39,0.45,0.25,0.1]);
-xlabel('Lags [S]' ,'FontSize', 14); ylabel('CC' ,'FontSize', 14);
+xlabel('Lags (s)' ,'FontSize', 14); ylabel('CC' ,'FontSize', 14);
 set(gca,'xlim',[-0.5 0.5],'xtick',[-0.5 0 0.5],'fontsize',14); 
 if trace_type~=2
     set(gca,'ylim',ylim);
@@ -511,7 +519,7 @@ for ix=1:length(l.String)
   h = findobj(gcf,'DisplayName',str);
   h.LineWidth =1.5;
 end
-xlabel('Lags [S]' ,'FontSize', 14); ylabel('CC' ,'FontSize', 14);
+xlabel('Lags (s)' ,'FontSize', 14); ylabel('CC' ,'FontSize', 14);
 set(gca,'xlim',[-0.5 0.5],'xtick',[-0.5 0 0.5],'fontsize',14);
 if trace_type~=2
     set(gca,'ylim',ylim);
@@ -881,8 +889,8 @@ if eps{1}<0.75
     lag0_p_evoked=table2cell(NBbySS_lag0(1,6));
     lag0_p_spont=table2cell(NBbySS_lag0(3,6));
 else
-     lag0_p_evoked=table2cell(NBbySS_lag0(1,7));
-     lag0_p_spont=table2cell(NBbySS_lag0(3,7));
+     lag0_p_evoked=table2cell(NBbySS_lag0(1,6));
+     lag0_p_spont=table2cell(NBbySS_lag0(3,6));
 end
 
 lag0_stat.table=ta;
