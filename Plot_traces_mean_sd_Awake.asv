@@ -363,7 +363,7 @@ ymaxwhisk=max([plot_data_whisk(:,plot_trace),plot_data_whisk(:,plot_trace)]);
 yminwhisk=min([plot_data_whisk(:,plot_trace),plot_data_whisk(:,plot_trace)]);
 ydiffwhisk=ymaxwhisk-yminwhisk;
 yrangewhisk=ceil(max(ydiffwhisk));
-ymaxpupil=max([pupil_mat,pupil_mat]);
+ymaxpupil=max([pupil_mat,pupil_mat(:,plot_trace)]);
 yminpupil=min([pupil_mat,pupil_mat]);
 ydiffpupil=ymaxpupil-yminpupil;
 yrangepupil=ceil(max(ydiffpupil));
@@ -427,22 +427,22 @@ horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,
                 [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
              horiz_vert=0;        lengthh=1;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=[]; perc2=[];
                 [b3,b4] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
-           delete(b1); delete(b2); delete(b3); delete(b4); 
-%          if tr_ind~=length(plot_trace);
-%              delete(b3); delete(b4); 
-%         end
+           delete(b1); delete(b2); 
+         if tr_ind~=length(plot_trace);
+             delete(b3); delete(b4); 
+        end
     hold off  
     set(gca, 'visible', 'off') ;
     
   subplot(3*length(plot_trace),1,3*tr_ind) 
  	hold on
-        htrace3=plot([segment1*dt, segment2*dt],pupil_mat(:,tr_ind), 'LineWidth',1.2);
+        htrace3=plot([segment1*dt, segment2*dt],pupil_mat(:,plot_trace(tr_ind)), 'LineWidth',1.2,'color', color_table(3,:));
         
         axis tight            
      ylim_data=[get(gca,'ylim')]';
-     ylim_data(1)=ylim_data(2)-yrangepupil;   
+     ylim_data(1)=ylim_data(2)-yrangewhisk;   
      xlim_data=[get(gca,'xlim')]';
-     ylim_data(2)=ylim_data(2)+(0.1).*yrangepupil; 
+     ylim_data(2)=ylim_data(2)+(0.1).*yrangewhisk; 
      set(gca,'ylim',ylim_data, 'xlim',xlim_data)  
               
      %plotting scale bar
@@ -450,10 +450,10 @@ horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,
                 [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
              horiz_vert=0;        lengthh=1;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=[]; perc2=[];
                 [b3,b4] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
-           delete(b1); delete(b2); delete(b3); delete(b4); 
-%          if tr_ind~=length(plot_trace);
-%              delete(b3); delete(b4); 
-%         end
+           delete(b1); delete(b2); 
+         if tr_ind~=length(plot_trace);
+             delete(b3); delete(b4); 
+        end
     hold off  
     set(gca, 'visible', 'off') ;
 
@@ -466,7 +466,7 @@ end
 %         set(line1(1),'xdata',linexdata-0.3);
     title('Vm-whisk single trace ES Off','FontSize', 16); 
     ylabel('Potential (mV)' ,'FontSize', 14); xlabel('Time (s)','FontSize', 14)
-l=legend([htrace1,htrace2,htrace3],{'Vm','Whisk','Pupil'}, 'box', 'off','position',[0.8,0.85,0.2,0.1]); 
+l=legend([htrace1,htrace2],{'Vm','Whisk'}, 'box', 'off','position',[0.8,0.85,0.2,0.1]); 
     l.FontSize=11;
 
 if save_flag==1;    

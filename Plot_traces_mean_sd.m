@@ -8,6 +8,8 @@ exp_type=1; %1-NBES, 2-ChAT
 data_type='Vm'; %'LFP', 'Vm'
 save_flag= 0;
 print_flag=1;
+no_DC_flag=0;
+traceWidth=1;
 choose_traces=[]; %if choose_traces is empty the script takes all traces for analysis. If it is not empty the script takes the specified traces.
 clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 % short_flag=0; %1- short trace, 0- long trace
@@ -19,8 +21,8 @@ BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 BPLFP_flag=1; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
 bp_manual_LFP=[1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
-bp_manual_Vm=[0,300]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
-lengthh_vert=[2,5,10; 2,5,10]; %[0.1,0.1,0.5];%f46:[2,5,10; 2,5,10]; f80:[1,2,10; 1,2,10] %lengthh_vert(1) is for STD, lengthh_vert(2) is for mean and (3) is for traces. row 1 spont. row 2 evoked
+bp_manual_Vm=[0,1000]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
+lengthh_vert=[5,5,10; 2,5,10]; %[0.1,0.1,0.5];%f46:[5,5,10; 2,5,10]; f80:[2,2,10; 1,2,10] %lengthh_vert(1) is for STD, lengthh_vert(2) is for mean and (3) is for traces. row 1 spont. row 2 evoked
 trace_ind =[2,3,4,5,6];%[2,3,4,5,6]; %if trace_ind is empty, the default would be to take all traces
 DC_factor =16; %12; %sets the spacing between plotted traces. set DC_factor=1 for LFP [f44 13; f46 16] [f80 9; f74 12] 
  %% set the path for saving figures and variables
@@ -326,8 +328,8 @@ plot_data_var=nanvar(current_data_no_DC(:,:,x_value),0,2); % plot_data_var=var(p
         hold on
         rec1=rectangle('Position',[segment1(1,1)*dt,trace_to_plot(segment1(1,1)),0.1,0.1]);
         rec2=rectangle('Position',[segment1(1,1)*dt,trace_to_plot(segment1(1,1)),0.1,0.1]);
-htrace1=plot(segment1*dt,trace_to_plot(segment1,:,:), 'LineWidth',1.2,'color', color_table(1,:));
-htrace2=plot(segment2*dt,trace_to_plot(segment2,:,:), 'LineWidth',1.2,'color', color_table(2,:));
+htrace1=plot(segment1*dt,trace_to_plot(segment1,:,:), 'LineWidth',traceWidth,'color', color_table(1,:));
+htrace2=plot(segment2*dt,trace_to_plot(segment2,:,:), 'LineWidth',traceWidth,'color', color_table(2,:));
 %     text(x_axis_Slong(1)*dt,trace_to_plot(x_axis_Slong(1),1),[num2str(floor(plot_data(x_axis_Slong(1),1,1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
 % for i=1:length(trace_ind); %adding the voltage value of the first data point to the left of the trace
 %     text(x_axis_Slong(1)*dt,trace_to_plot(x_axis_Slong(1),i),[num2str(floor(plot_data(x_axis_Slong(1),i,1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
@@ -350,7 +352,7 @@ end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
         %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];  c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];  c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=lengthh_vert(1,3);     textit=[num2str(lengthh),y_ax_units{1}];  c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -362,9 +364,9 @@ set(gca, 'visible', 'off') ;
         hold on
        rec1=rectangle('Position',[segment1(1,1)*dt,plot_data_mean(segment1(1,1)),0.1,0.1]);
          rec2=rectangle('Position',[segment1(1,1)*dt,plot_data_mean(segment1(1,1)),0.1,0.1]);
-htrace1=plot(segment1*dt,plot_data_mean(segment1,:,1), 'LineWidth',1.2,'color', color_table(1,:));
-htrace2=plot(segment2*dt,plot_data_mean(segment2,:,1), 'LineWidth',1.2,'color', color_table(2,:));
-% htrace1=plot(x_axis_Slong*dt,plot_data_mean(x_axis_Slong,:,1), 'LineWidth',1.2,'color', color_table(1,:));
+htrace1=plot(segment1*dt,plot_data_mean(segment1,:,1), 'LineWidth',traceWidth,'color', color_table(1,:));
+htrace2=plot(segment2*dt,plot_data_mean(segment2,:,1), 'LineWidth',traceWidth,'color', color_table(2,:));
+% htrace1=plot(x_axis_Slong*dt,plot_data_mean(x_axis_Slong,:,1), 'LineWidth',traceWidth,'color', color_table(1,:));
 % text(x_axis_Slong(1)*dt,plot_data_mean(x_axis_Slong(1),1,1),[num2str(floor(plot_data_mean(x_axis_Slong(1),1,1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
 axis tight
 ylim_data=[get(gca,'ylim')]';
@@ -384,7 +386,7 @@ switch exp_type
 end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 % %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=lengthh_vert(1,2);     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=12;perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -404,9 +406,9 @@ end
         hold on
         rec1=rectangle('Position',[segment1(1,1)*dt,plot_data_std(segment1(1,1),1,1),0.1,0.1]);
          rec2=rectangle('Position',[segment1(1,1)*dt,plot_data_std(segment1(1,1)),0.1,0.1]);
-htrace1=plot(segment1*dt,plot_data_std(segment1,:,1), 'LineWidth',1.2,'color', color_table(1,:));
-htrace2=plot(segment2*dt,plot_data_std(segment2,:,1), 'LineWidth',1.2,'color', color_table(2,:));
-% htrace1=plot(x_axis_Slong*dt,plot_data_std(x_axis_Slong,:,1), 'LineWidth',1.2,'color', color_table(1,:));
+htrace1=plot(segment1*dt,plot_data_std(segment1,:,1), 'LineWidth',traceWidth,'color', color_table(1,:));
+htrace2=plot(segment2*dt,plot_data_std(segment2,:,1), 'LineWidth',traceWidth,'color', color_table(2,:));
+% htrace1=plot(x_axis_Slong*dt,plot_data_std(x_axis_Slong,:,1), 'LineWidth',traceWidth,'color', color_table(1,:));
 
 axis tight
 ylim_data=[get(gca,'ylim')]';
@@ -426,7 +428,7 @@ switch exp_type
 end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 % %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=lengthh_vert(1,1);     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -439,7 +441,7 @@ set(gca, 'visible', 'off') ;
         s4=figure;
         hold on
          rec1=rectangle('Position',[x_axis_Sshort(1,1)*dt,trace_to_plot(x_axis_Sshort(1,1),1),0.1,0.1]);
-htrace1=plot(x_axis_Sshort(1,:)*dt,trace_to_plot(x_axis_Sshort(1,:),:), 'LineWidth',1.2,'color', color_table(1,:)); 
+htrace1=plot(x_axis_Sshort(1,:)*dt,trace_to_plot(x_axis_Sshort(1,:),:), 'LineWidth',traceWidth,'color', color_table(1,:)); 
 
 % for i=1:length(trace_ind);
 %     text(x_axis_Sshort(1,1)*dt,trace_to_plot(x_axis_Sshort(1,1),i),[num2str(floor(plot_data(x_axis_Sshort(1,1),i,1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
@@ -451,7 +453,7 @@ set(rec1,'Position',[x_axis_Sshort(1,1)*dt,ylim_data(1),(x_axis_Sshort(1,end)-x_
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=lengthh_vert(1,3);     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -465,7 +467,7 @@ set(gca, 'visible', 'off') ;
         s5=figure;
         hold on
         rec1=rectangle('Position',[x_axis_Sshort(2,1)*dt,trace_to_plot(x_axis_Sshort(2,1)+100,1),0.1,0.1]);
-htrace1=plot(x_axis_Sshort(2,:)*dt,trace_to_plot(x_axis_Sshort(2,:),:), 'LineWidth',1.2,'color', color_table(2,:));
+htrace1=plot(x_axis_Sshort(2,:)*dt,trace_to_plot(x_axis_Sshort(2,:),:), 'LineWidth',traceWidth,'color', color_table(2,:));
 
 axis tight
 ylim_data=[get(gca,'ylim')]';
@@ -479,7 +481,7 @@ end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=lengthh_vert(1,3);     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -491,8 +493,8 @@ set(gca, 'visible', 'off') ;
         s6=figure;
         hold on
         rec1=rectangle('Position',[x_axis_Sshort(1,1)*dt,plot_data_mean(x_axis_Sshort(1,1),:,1),0.1,0.1]);
-htrace1=plot(x_axis_Sshort(1,:)*dt,plot_data_mean(x_axis_Sshort(1,:),:,1), 'LineWidth',1.2,'color', color_table(1,:));
-htrace2=plot(x_axis_Sshort(1,:)*dt,plot_data_mean(x_axis_Sshort(2,:),:,1), 'LineWidth',1.2,'color', color_table(2,:));
+htrace1=plot(x_axis_Sshort(1,:)*dt,plot_data_mean(x_axis_Sshort(1,:),:,1), 'LineWidth',traceWidth,'color', color_table(1,:));
+htrace2=plot(x_axis_Sshort(1,:)*dt,plot_data_mean(x_axis_Sshort(2,:),:,1), 'LineWidth',traceWidth,'color', color_table(2,:));
 % text(x_axis_Sshort(1,1)*dt,plot_data_mean(x_axis_Sshort(1,1),1),[num2str(floor(plot_data_mean(x_axis_Sshort(1,1),1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
 axis tight
 ylim_data=[get(gca,'ylim')]';
@@ -505,7 +507,7 @@ if exp_type==2;
 end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=lengthh_vert(1,2);     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -518,8 +520,8 @@ set(gca, 'visible', 'off') ;
         s7=figure;
         hold on
          rec1=rectangle('Position',[x_axis_Sshort(1,1)*dt,plot_data_std(x_axis_Sshort(1,1),:,1),0.1,0.1]);
-htrace1=plot(x_axis_Sshort(1,:)*dt,plot_data_std(x_axis_Sshort(1,:),:,1), 'LineWidth',1.2,'color', color_table(1,:));
-htrace2=plot(x_axis_Sshort(1,:)*dt,plot_data_std(x_axis_Sshort(2,:),:,1), 'LineWidth',1.2,'color', color_table(2,:));
+htrace1=plot(x_axis_Sshort(1,:)*dt,plot_data_std(x_axis_Sshort(1,:),:,1), 'LineWidth',traceWidth,'color', color_table(1,:));
+htrace2=plot(x_axis_Sshort(1,:)*dt,plot_data_std(x_axis_Sshort(2,:),:,1), 'LineWidth',traceWidth,'color', color_table(2,:));
 % text(x_axis_Sshort(1,1)*dt,plot_data_std(x_axis_Sshort(1,1),1),[num2str(floor(plot_data_std(x_axis_Sshort(1,1),1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
 axis tight
 ylim_data=[get(gca,'ylim')]';
@@ -532,7 +534,7 @@ end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
 horiz_vert=0;        lengthh=lengthh_vert(1,1);     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -589,7 +591,7 @@ end
         e1=figure;
         hold on
         rec1=rectangle('position',[x_axis_Elong(1)*dt ,min(trace_to_plot(x_axis_Elong,2,:)),0.1,0.1]);
-htrace=plot(x_axis_Elong*dt,trace_to_plot(x_axis_Elong,:,:), 'LineWidth',1.2,'color', color_table(1,:));
+htrace=plot(x_axis_Elong*dt,trace_to_plot(x_axis_Elong,:,:), 'LineWidth',traceWidth,'color', color_table(1,:));
 if baseline_flag==1;
     h_baseline=line(x_bl',y_bl','linestyle','--','color',[136 137 138]./256,'linewidth',1);
 end
@@ -621,7 +623,7 @@ end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 uistack(htrace,'top')
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=lengthh_vert(2,3);     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);        
@@ -636,7 +638,7 @@ trace_to_plot = bsxfun(@plus,plot_data(:,trace_ind,3),DC); %DC is added just to 
         e2=figure;
         hold on
         rec1=rectangle('position',[x_axis_Elong(1)*dt ,min(trace_to_plot(x_axis_Elong,2,:)),0.1,0.1]);
-htrace=plot(x_axis_Elong*dt,trace_to_plot(x_axis_Elong,:,:), 'LineWidth',1.2,'color', color_table(2,:));
+htrace=plot(x_axis_Elong*dt,trace_to_plot(x_axis_Elong,:,:), 'LineWidth',traceWidth,'color', color_table(2,:));
 if baseline_flag==1;
     h_baseline=line(x_bl',y_bl','linestyle','--','color',[136 137 138]./256,'linewidth',1);
 end
@@ -677,21 +679,21 @@ uistack(htrace,'top')
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=lengthh_vert(2,3);     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
         
 hold off
-ylabel('Vm [mV]', 'FontSize', 16);  xlabel('Time [sec]' ,'FontSize', 16);
+ylabel('Vm (mV)', 'FontSize', 16);  xlabel('Time (s)' ,'FontSize', 16);
 set(gca, 'visible', 'off') ;
 
  %% plot evoked mean trace
         e3=figure;
         hold on
         rec1=rectangle('position',[x_axis_Elong(1)*dt ,min(plot_data_mean(x_axis_Elong,:,2)),0.1,0.1]);
-htrace1=plot(x_axis_Elong*dt,plot_data_mean(x_axis_Elong,:,2), 'LineWidth',1.2,'color', color_table(1,:));
-htrace2=plot(x_axis_Elong*dt,plot_data_mean(x_axis_Elong,:,3), 'LineWidth',1.2,'color', color_table(2,:));
+htrace1=plot(x_axis_Elong*dt,plot_data_mean(x_axis_Elong,:,2), 'LineWidth',traceWidth,'color', color_table(1,:));
+htrace2=plot(x_axis_Elong*dt,plot_data_mean(x_axis_Elong,:,3), 'LineWidth',traceWidth,'color', color_table(2,:));
 % text(x_axis_Elong(1)*dt,plot_data_mean(x_axis_Elong(1),1,2),[num2str(floor(plot_data_mean(x_axis_Elong(1),1,2))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
 axis tight
 ylim_data=[get(gca,'ylim')]';
@@ -725,7 +727,7 @@ uistack(htrace1,'top'); uistack(htrace2,'top');
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=lengthh_vert(2,2);     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -739,8 +741,8 @@ set(gca, 'visible', 'off') ;
         e4=figure;
         hold on
         rec1=rectangle('position',[x_axis_Elong(1)*dt ,min(plot_data_std(x_axis_Elong,:,2)),0.1,0.1]);
-htrace1=plot(x_axis_Elong*dt,plot_data_std(x_axis_Elong,:,2), 'LineWidth',1.2,'color', color_table(1,:));
-htrace2=plot(x_axis_Elong*dt,plot_data_std(x_axis_Elong,:,3), 'LineWidth',1.2,'color', color_table(2,:));
+htrace1=plot(x_axis_Elong*dt,plot_data_std(x_axis_Elong,:,2), 'LineWidth',traceWidth,'color', color_table(1,:));
+htrace2=plot(x_axis_Elong*dt,plot_data_std(x_axis_Elong,:,3), 'LineWidth',traceWidth,'color', color_table(2,:));
 % text(x_axis_Elong(1)*dt,plot_data_std(x_axis_Elong(1),1,2),[num2str(floor(plot_data_std(x_axis_Elong(1),1,2))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
 axis tight
 ylim_data=[get(gca,'ylim')]';
@@ -774,7 +776,7 @@ uistack(htrace1,'top'); uistack(htrace2,'top');
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=lengthh_vert(2,1);     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);hold off
@@ -802,7 +804,7 @@ end
         e5=figure;
         hold on
         rec1=rectangle('position',[x_axis_Eshort(1,1)*dt ,min(trace_to_plot(x_axis_Eshort(1,:),2,:)),0.1,0.1]);
-htrace=plot(x_axis_Eshort(1,:)*dt,trace_to_plot(x_axis_Eshort(1,:),:), 'LineWidth',1.2,'color', color_table(1,:));
+htrace=plot(x_axis_Eshort(1,:)*dt,trace_to_plot(x_axis_Eshort(1,:),:), 'LineWidth',traceWidth,'color', color_table(1,:));
 if baseline_flag==1;
     h_baseline=line(x_bl',y_bl','linestyle','--','color',[136 137 138]./256,'linewidth',1);
 end
@@ -842,7 +844,7 @@ uistack(htrace,'top');
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=lengthh_vert(2,3);     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);         
@@ -861,7 +863,7 @@ trace_to_plot = bsxfun(@plus,plot_data(:,trace_ind,3),DC); %DC is added just to 
         e6=figure;
         hold on
         rec1=rectangle('position',[x_axis_Eshort(2,1)*dt ,min(trace_to_plot(x_axis_Eshort(2,:),2,:)),0.1,0.1]);
-htrace=plot(x_axis_Eshort(2,:)*dt,trace_to_plot(x_axis_Eshort(2,:),:), 'LineWidth',1.2,'color', color_table(2,:));
+htrace=plot(x_axis_Eshort(2,:)*dt,trace_to_plot(x_axis_Eshort(2,:),:), 'LineWidth',traceWidth,'color', color_table(2,:));
 if baseline_flag==1;
     h_baseline=line(x_bl',y_bl','linestyle','--','color',[136 137 138]./256,'linewidth',1);
 end
@@ -909,7 +911,7 @@ uistack(htrace,'top');
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=lengthh_vert(2,3);     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -922,8 +924,8 @@ set(gca, 'visible', 'off') ;
         e7=figure;
         hold on
         rec1=rectangle('position',[x_axis_Eshort(1,1)*dt ,min(plot_data_mean(x_axis_Eshort(1,:),:,2)),0.1,0.1]);
-htrace1=plot(x_axis_Eshort(1,:)*dt,plot_data_mean(x_axis_Eshort(1,:),:,2), 'LineWidth',1.2,'color', color_table(1,:));
-htrace2=plot(x_axis_Eshort(1,:)*dt,plot_data_mean(x_axis_Eshort(2,:),:,3), 'LineWidth',1.2,'color', color_table(2,:));
+htrace1=plot(x_axis_Eshort(1,:)*dt,plot_data_mean(x_axis_Eshort(1,:),:,2), 'LineWidth',traceWidth,'color', color_table(1,:));
+htrace2=plot(x_axis_Eshort(1,:)*dt,plot_data_mean(x_axis_Eshort(2,:),:,3), 'LineWidth',traceWidth,'color', color_table(2,:));
 % text(x_axis_Eshort(1,1)*dt,plot_data_mean(x_axis_Eshort(1,1),1,2),[num2str(floor(plot_data_mean(x_axis_Eshort(1,1),1,2))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
 axis tight
 ylim_data=[get(gca,'ylim')]';
@@ -964,7 +966,7 @@ uistack(htrace1,'top'); uistack(htrace2,'top');
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
 %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=lengthh_vert(2,2);     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -985,8 +987,8 @@ end
         e8=figure;
         hold on
         rec1=rectangle('position',[x_axis_Eshort(1,1)*dt ,min(plot_data_std(x_axis_Eshort(1,:),:,2)),0.1,0.1]);
-htrace1=plot(x_axis_Eshort(1,:)*dt,plot_data_std(x_axis_Eshort(1,:),:,2), 'LineWidth',1.2,'color', color_table(1,:));
-htrace2=plot(x_axis_Eshort(1,:)*dt,plot_data_std(x_axis_Eshort(2,:),:,3), 'LineWidth',1.2,'color', color_table(2,:));
+htrace1=plot(x_axis_Eshort(1,:)*dt,plot_data_std(x_axis_Eshort(1,:),:,2), 'LineWidth',traceWidth,'color', color_table(1,:));
+htrace2=plot(x_axis_Eshort(1,:)*dt,plot_data_std(x_axis_Eshort(2,:),:,3), 'LineWidth',traceWidth,'color', color_table(2,:));
 % text(x_axis_Eshort(1)*dt,plot_data_std(x_axis_Eshort(1),1,2),[num2str(floor(plot_data_std(x_axis_Eshort(1),1,2))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
 axis tight
 ylim_data=[get(gca,'ylim')]';

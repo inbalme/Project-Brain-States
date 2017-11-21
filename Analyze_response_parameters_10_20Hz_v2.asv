@@ -89,7 +89,7 @@ switch exp_type
        stimz=11;
        
     case 4
-        files_to_analyze = [118,121,122,126,127,128,129]; %119
+        files_to_analyze = [119,121,122,126,127,128,129]; %118
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light Off', 'Light On'};  y_ax_label={'Vm'}; y_ax_units={'mV'};    

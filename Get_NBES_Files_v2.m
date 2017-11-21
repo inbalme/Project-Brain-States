@@ -1949,8 +1949,8 @@ files(50).channel_EEG = 13; %EEG through MCP
 files(50).channel_laser = 10;                %optogenetic stimulation
 files(50).channel_ES = 11;                   %I.U. command
 files(50).galvano = 1;
-files(50).comments = [];
-files(50).offset = 'huge series resistance';          %need to subtract the offset
+files(50).comments = 'huge series resistance';
+files(50).offset = [];        %need to subtract the offset
 
 files(51).name = '2015-12-22-002.exp2';
 files(51).path = 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Raw Data';

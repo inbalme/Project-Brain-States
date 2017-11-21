@@ -42,7 +42,7 @@ if horiz_vert; %for horizontal bar
     pos = get(gca,'position');  
     x_units=2*perc2*diff(xl);  
     y_units=perc2*diff(yl);
-    p1 = plot([barXstart, barXend],[barYstart, barYend],'linewidth',2,'color',c);
+    p1 = plot([barXstart, barXend],[barYstart, barYend],'linewidth',1.5,'color',c);
     p2 = text(barXstart+lengthh/2,barYstart-y_units,textit,'HorizontalAlignment', 'center','VerticalAlignment', 'top','fontsize',fonsizes);
     set(gca,'xlim',[xl(1),barXend+x_units]);  %setting new xlim for the axes to contain the scale bar
     set(gca,'ylim',[barYstart-y_units, yl(2)]) %setting new ylim for the axes to contain the scale bar
@@ -56,7 +56,7 @@ else %for vertical bar
     pos = get(gca,'position');
     set(gca,'xlim',[xl(1),barXend+x_units]);  %setting new xlim for the axes to contain the scale bar
     set(gca,'ylim',[barYstart-y_units, yl(2)]) %setting new ylim for the axes to contain the scale bar
-   p1 = plot([barXstart, barXend],[barYstart, barYend],'linewidth',2,'color',c);
+   p1 = plot([barXstart, barXend],[barYstart, barYend],'linewidth',1.5,'color',c);
     p2 = text(barXstart+x_units,barYstart+lengthh/2,textit,'HorizontalAlignment', 'center','VerticalAlignment', 'middle', 'fontsize',fonsizes); %'rotation',90,
 end;
 

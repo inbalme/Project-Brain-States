@@ -10,40 +10,50 @@ abslen=0.05; %[in cm]
 ax_fontsize=10;
 color1=[255, 102,102]./256; %pink
 color2=[102, 172,255]./256; %light blue
- 
+rectangle_color=[210 210 210]/256;
+barWidth=1.5;
+pairPlotLineWidth=1.2;
+ letter_fontsize=12;
 %opening saved figures:
 %Long traces NB:
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean\Long Trace Presentation\style2'
 %spontaneous:
-spont_trace_f46 = open('f46_traces_x1_v2.fig');    
+spont_trace_f46 = open('f46_traces_x1_v2.fig');   
+rec=findobj(gca,'type','rectangle'); 
+set(rec(2:3),'FaceColor',rectangle_color);
 b1=findall(gcf,'type','line');
 b2=findall(gcf,'type','text');
 set(b2,'fontsize',10);
 linexdata=get(b1(1),'xdata');
-set(b1(1),'xdata',linexdata-200/1000);
+set(b1(1),'xdata',linexdata-200/1000,'linewidth',barWidth);
 delete(b1(2,1)); 
 delete(b2(2,1));
 spont_trace_f46_ax = get(gcf, 'children');
 
-spont_mean_f46 = open('f46_mean_x1_v2.fig');    
+spont_mean_f46 = open('f46_mean_x1_v2.fig');   
+rec=findobj(gca,'type','rectangle'); 
+set(rec(2:3),'FaceColor',rectangle_color);
 b2=findall(gcf,'type','text');
 set(b2,'fontsize',10);
 set(b2(2),'string','1 s');
 b1=findall(gcf,'type','line');
 linexdata=get(b1(1),'xdata');
-set(b1(1),'xdata',linexdata-200/1000);
+set(b1(1),'xdata',linexdata-200/1000,'linewidth',barWidth);
 lineydata=get(b1(2),'ydata');
+set(b1(2),'linewidth',barWidth);
 % set(b1(2),'ydata',lineydata);
 spont_mean_f46_ax = get(gcf, 'children');
 
 spont_std_f46 = open('f46_std_x1_mean-subt_v2.fig');    
+rec=findobj(gca,'type','rectangle'); 
+set(rec(2:3),'FaceColor',rectangle_color);
 b1=findall(gcf,'type','line');
 b2=findall(gcf,'type','text');
 set(b2,'fontsize',10);
 set(b2(2),'string','1 s');
 b1=findall(gcf,'type','line');
 linexdata=get(b1(1),'xdata');
-set(b1(1),'xdata',linexdata-200/1000);
+set(b1(1),'xdata',linexdata-200/1000,'linewidth',barWidth);
 delete(b1(2,1)); 
 delete(b2(2,1));
 spont_std_f46_ax = get(gcf, 'children');
@@ -52,13 +62,15 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Traces+std+mean+summary\LFP_50Hz V
 
 VmM_NB = open('Vm M_Before Sensory stim.fig');   
             l1=findall(gcf,'color',[0.7 0.7 0.7]);
-            set(l1(10),'color',color1); uistack(l1(10),'top')
+            set(l1(7),'color',color1); uistack(l1(7),'top')
+            set(l1,'linewidth',pairPlotLineWidth);
 VmM_NB_ax = get(gcf, 'children');
 
  
 VmSTD_NB = open('Vm STD_Before Sensory stim.fig');   
         l1=findall(gcf,'color',[0.7 0.7 0.7]);
-        set(l1(10),'color',color1); uistack(l1(10),'top')
+        set(l1(7),'color',color1); uistack(l1(7),'top')
+        set(l1,'linewidth',pairPlotLineWidth);
 VmSTD_NB_ax = get(gcf, 'children');  
 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm Histograms and Powerspec\Spontaneous histograms'
@@ -68,11 +80,15 @@ cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Vm Histograms and Powerspec\Sponta
 
     spont_Vm_5prcentile = open('Vm_5prcentile_ongoing.fig');   
         l1=findall(gcf,'color',[0.7 0.7 0.7]);
-        set(l1(10),'color',color1); uistack(l1(10),'top')
+        set(l1(7),'color',color1); uistack(l1(7),'top')
+        set(l1,'linewidth',pairPlotLineWidth);
     spont_Vm_5prcentile_ax = get(gcf, 'children');
     
-cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Rin'
-    spont_Rin = open('Rin.fig');    
+% cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Rin'
+cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Rin_VC'
+    spont_Rin = open('Rin.fig');  
+    l1=findall(gcf,'color',[0.7 0.7 0.7]);
+    set(l1,'linewidth',pairPlotLineWidth);
     spont_Rin_ax = get(gcf, 'children');
 
 
@@ -94,21 +110,21 @@ set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 
 % option 1: #need to change paper length to 15cm
 v_dist=0.04;
-spont_trace_f46_pos(1,:) = [0.15 , 0.6 ,  0.6 ,  0.28];
+spont_trace_f46_pos(1,:) = [0.05 , 0.6 ,  0.65 ,  0.28];
 spont_mean_f46_pos(1,:) = [spont_trace_f46_pos(1,1), spont_trace_f46_pos(1,2)-0.1-v_dist, spont_trace_f46_pos(1,3), 0.12];
 spont_std_f46_pos(1,:) = [spont_trace_f46_pos(1,1), spont_mean_f46_pos(1,2)-spont_mean_f46_pos(1,4)-v_dist, spont_trace_f46_pos(1,3), spont_mean_f46_pos(1,4)];
 
 %NB
-spont_Vm_hist_pos(1,:)=[0.2 , 0.5 ,  0.27 ,  0.14]; spont_Vm_hist_pos(1,2)=spont_std_f46_pos(1,2)-spont_Vm_hist_pos(1,4)-0.08;
+spont_Vm_hist_pos(1,:)=[0.15 , 0.5 ,  0.27 ,  0.14]; spont_Vm_hist_pos(1,2)=spont_std_f46_pos(1,2)-spont_Vm_hist_pos(1,4)-0.08;
 h_dist1=spont_Vm_hist_pos(1,1)+spont_Vm_hist_pos(1,3)+0.16;
 spont_Vm_5prcentile_pos(1,:) = [h_dist1 , spont_Vm_hist_pos(1,2)-0.03 ,  0.11 ,  0.17];
-spont_Rin_pos(1,:) = [h_dist1+spont_Vm_5prcentile_pos(1,3)+0.12, spont_Vm_5prcentile_pos(1,2) ,  spont_Vm_5prcentile_pos(1,3) ,  spont_Vm_5prcentile_pos(1,4)];
+spont_Rin_pos(1,:) = [h_dist1+spont_Vm_5prcentile_pos(1,3)+0.15, spont_Vm_5prcentile_pos(1,2) ,  spont_Vm_5prcentile_pos(1,3) ,  spont_Vm_5prcentile_pos(1,4)];
 
 v_dist2=0.1;
 VmM_NB_pos(1,:)=[spont_Rin_pos(1,1), spont_trace_f46_pos(1,2)+0.07, 0.11, 0.17]; 
 VmSTD_NB_pos(1,:)= VmM_NB_pos; VmSTD_NB_pos(1,2)=VmM_NB_pos(1,2)-VmM_NB_pos(1,4)-0.14;
 
-NB_illustration_pos(1,:)=[0.02,spont_trace_f46_pos(1,2)+spont_trace_f46_pos(1,4)-0.05, 0.11, 0.1];
+NB_illustration_pos(1,:)=[0.4,spont_trace_f46_pos(1,2)+spont_trace_f46_pos(1,4), 0.11, 0.1];
 
 %option 2:  #need to change paper length to 18cm
 % v_dist=0.04;
@@ -153,7 +169,7 @@ spont_std_f46_ax_copy = copyobj(spont_std_f46_ax,F); % copy axes to new fig
 set(spont_std_f46_ax_copy,'position',spont_std_f46_pos(1,:))
 
 %position legend:
-set(spont_mean_f46_ax_copy(1),'position',[0.65 spont_trace_f46_pos_top+0.02 0.08 0.005])
+set(spont_mean_f46_ax_copy(1),'position',[0.61 spont_trace_f46_pos_top+0.02 0.08 0.005])
 spont_mean_f46_ax_copy(1).FontSize=9;
 
 %population panels:
@@ -204,7 +220,7 @@ lpatch1(2).FaceAlpha=0.3;
 spont_Vm_5prcentile_ax_copy = copyobj(spont_Vm_5prcentile_ax,F); % copy axes to new fig
 set(spont_Vm_5prcentile_ax_copy,'position',spont_Vm_5prcentile_pos(1,:))
 set(F, 'currentaxes', spont_Vm_5prcentile_ax_copy);   tl=title('');
-yl=ylabel({'Lower 5th'; 'perc. (mV)'},'fontsize',ax_fontsize);
+% yl=ylabel({'Lower 5th'; 'perc. (mV)'},'fontsize',ax_fontsize);
 spont_Vm_5prcentile_ax_copy.FontSize=ax_fontsize;
 set(gca,'tickdir','out');
 ticklen=fn_get_abs_ticklength(gca, abslen);
@@ -212,7 +228,7 @@ ticklen=fn_get_abs_ticklength(gca, abslen);
 spont_Rin_ax_copy = copyobj(spont_Rin_ax,F); % copy axes to new fig
 set(spont_Rin_ax_copy,'position',spont_Rin_pos(1,:))
 set(F, 'currentaxes', spont_Rin_ax_copy);   tl=title(''); 
-yl=ylabel('Rin (MOhm)','fontsize',ax_fontsize);
+yl=ylabel('Rin (M\Omega)','fontsize',ax_fontsize);
 spont_Rin_ax_copy.FontSize=ax_fontsize;
 set(gca,'tickdir','out');
 ticklen=fn_get_abs_ticklength(gca, abslen);
@@ -223,13 +239,13 @@ imshow(NB_illustration, 'parent', NB_illustration_ax)
 
 %   annotation:
 
-annotation('textbox', [spont_trace_f46_pos(1,1), spont_trace_f46_pos_top 0 0]+[0 0.04 0.5 0.05],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Spontaneous Activity', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold') %
+annotation('textbox', [spont_trace_f46_pos(1,1), spont_trace_f46_pos_top 0 0]+[0.02 0.04 0.5 0.05],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Spontaneous Activity', 'FontName','arial', 'fontsize', 12) % , 'fontweight', 'bold'
  
- a_pos1=[-0.03 -0.01 0.04 0.04];
+ a_pos1=[-0.04 0.02 0.04 0.04];
  a_pos4=[0 0 0.16 0.04];
  a_pos2=[-0.02 -0.01 0.04 0.04];
- a_pos3=[-0.035 0 0.04 0.04];
+ a_pos3=[-0.09 0.01 0.04 0.04];
 %  annotation('textbox', [spont_trace_f46_pos(1,1)+0.14 spont_trace_f46_pos_top+0.05 0.4 0],...
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'NB electrical stimulation', 'FontName','arial', 'fontsize', 12) %'fontweight', 'bold'
  annotation('textbox', [spont_trace_f46_pos(1,1) spont_trace_f46_pos_top 0 0]+a_pos4,...
@@ -248,31 +264,32 @@ annotation('textbox', [VmSTD_NB_pos(1,1) VmSTD_NB_pos_top+0.005 0.16 0.04],...
 %  annotation('textbox', [NB_illustration_pos(1,1)-0.01 NB_illustration_pos_top-0.02 0 0],...
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
 annotation('textbox', [spont_trace_f46_pos(1,1) spont_trace_f46_pos_top 0 0]+a_pos1,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold')
 annotation('textbox', [spont_mean_f46_pos(1,1) spont_mean_f46_pos_top 0 0]+a_pos1,...
-    'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')
+    'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold')
 annotation('textbox', [spont_std_f46_pos(1,1) spont_std_f46_pos_top 0 0]+a_pos1,...
-    'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')
+    'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold')
 annotation('textbox', [VmM_NB_pos(1,1) VmM_NB_pos_top 0 0]+a_pos3,...
-    'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')
+    'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold')
 annotation('textbox', [VmSTD_NB_pos(1,1) VmSTD_NB_pos_top 0 0]+a_pos3,...
-    'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')
+    'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold')
 annotation('textbox', [spont_Vm_hist_pos(1,1) spont_Vm_hist_pos_top 0 0]+a_pos3,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold')
 annotation('textbox', [spont_Vm_5prcentile_pos(1,1) spont_Vm_hist_pos_top 0 0]+a_pos3,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'G', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'G', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold')
 annotation('textbox', [spont_Rin_pos(1,1) spont_Vm_hist_pos_top 0 0]+a_pos3,...
-    'FitHeightToText', 'on', 'edgecolor', 'none','string', 'H', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')
+    'FitHeightToText', 'on', 'edgecolor', 'none','string', 'H', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold')
 
  end
 
       cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures\Neuron'
   
 if save_flag==1
-    filename='Fig 2a intracellular traces spont_f46_v1';
+    filename='Fig2_intracellular_traces_spont_f46';
     saveas(F,filename,'fig'); 
     print(F,filename,'-dpng','-r600','-opengl') 
-    print(F, '-depsc2', filename);
+    print -depsc2 Fig2_intracellular_traces_spont_f46
+%     print(F, '-depsc2', filename);
 end
 
 %% old version 2

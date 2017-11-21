@@ -6,16 +6,17 @@ ax_fontsize=10;
 %f23 - xlim=[5.5 8.5], f28 - [4 7], f55 - [4.5 7.5], f60 - [5 8];
 xlim1=[4,7]; xlim2=[4.5,7.5];
 save_flag=0;
-no_numbering_flag=1;
+no_numbering_flag=0;
 abslen=0.05; %[in cm]
 rectangle_color=[210 210 210]/256;
+letter_fontsize=12;
 
 %opening saved figures:
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Illustrations+Histology'
 
 % NB_illustration = imread('NBES_Schematic_Illustration_one-electrode_tight','TIF');
-NB_illustration = imread('White mouse with brain+whiskers_one electrode_cropped','TIF');
-NB_histology = imread('20150709_slide1(red)_sec3_whole section_2_v1','TIF');
+NB_illustration = imread('White mouse with brain+whiskers_one electrode_cropped2','TIF');
+NB_histology = imread('20150709_slide1(red)_sec3_whole section_2_v3','TIF');
 
 cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\LFP depth'
 
@@ -34,8 +35,8 @@ set(t1(2),'position',positiontext2);
 l1=findobj(gca,'type','line');
 line1xdata=get(l1(1),'xdata');
 line2xdata=get(l1(2),'xdata');
-set(l1(1),'xdata',line1xdata-1);
-set(l1(2),'xdata',line2xdata-0.5);
+set(l1(1),'xdata',line1xdata-1,'Linewidth',1.5);
+set(l1(2),'xdata',line2xdata-0.5,'Linewidth',1.5);
 traceh=get(gca,'children');
 set(traceh(6:16),'Linewidth',0.8) %these are the handles of the traces
 traces_depth3_ax = get(gcf, 'children');
@@ -103,7 +104,7 @@ set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]);
 
 %% Positions:
 NB_illustration_pos = [0 , 0.72 , 0.3 , 0.25];
-NB_histology_pos = [0.04 , 0.52 , 0.17 , 0.2];
+NB_histology_pos = [0.04 , 0.51 , 0.17 , 0.2];
 
 traces_depth3_pos(1,:) = [0.27 , 0.7 , 0.51 , 0.25];
 
@@ -111,26 +112,26 @@ dist1=0.05; dist2=0.07; h_dist1=traces_depth3_pos(1,1)+traces_depth3_pos(1,3)+di
 
 PSD_depth3_pos(1,:) = [h_dist1 , traces_depth3_pos(1,2)+0.08 ,  0.12,  0.15];
 
-total_power_pos(1,:) = [0.33 , 0.5 , 0.1 , 0.1]; total_power_pos(1,2)=traces_depth3_pos(1,2)-total_power_pos(1,4)-0.07;
+total_power_pos(1,:) = [0.33 , 0.5 , 0.1 , 0.09]; total_power_pos(1,2)=traces_depth3_pos(1,2)-total_power_pos(1,4)-0.07;
 delta_pos(1,:) = [total_power_pos(1,1)+total_power_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 beta_pos(1,:) = [delta_pos(1,1)+delta_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 gamma_pos(1,:) = [beta_pos(1,1)+beta_pos(1,3)+dist2 , total_power_pos(1,2) , total_power_pos(1,3) , total_power_pos(1,4)];
 
-evoked_trace_Off_pos(1,:) = [0.1 , total_power_pos(1,2)-0.16 , 0.25 , 0.09];
-evoked_trace_Off_pos(2,:) = [evoked_trace_Off_pos(1,1) , 0.5 ,evoked_trace_Off_pos(1,3) ,evoked_trace_Off_pos(1,4)]; evoked_trace_Off_pos(2,2)=evoked_trace_Off_pos(1,2)-evoked_trace_Off_pos(2,4)-0.01;
-evoked_trace_On_pos(1,:) = [evoked_trace_Off_pos(1,1) , 0.5 , evoked_trace_Off_pos(1,3) , evoked_trace_Off_pos(1,4)];  evoked_trace_On_pos(1,2)=evoked_trace_Off_pos(2,2)-evoked_trace_Off_pos(1,4)-0.01;
-evoked_trace_On_pos(2,:) = [evoked_trace_Off_pos(1,1) , 0.5 , evoked_trace_Off_pos(1,3) , evoked_trace_Off_pos(1,4)]; evoked_trace_On_pos(2,2)=evoked_trace_On_pos(1,2)-evoked_trace_On_pos(2,4)-0.01;
+evoked_trace_Off_pos(1,:) = [0.11 , total_power_pos(1,2)-0.18 , 0.25 , 0.09];
+evoked_trace_Off_pos(2,:) = [evoked_trace_Off_pos(1,1) , 0.5 ,evoked_trace_Off_pos(1,3) ,0.07]; evoked_trace_Off_pos(2,2)=evoked_trace_Off_pos(1,2)-evoked_trace_Off_pos(2,4)-0.01;
+evoked_trace_On_pos(1,:) = [evoked_trace_Off_pos(1,1) , 0.5 , evoked_trace_Off_pos(1,3) , evoked_trace_Off_pos(1,4)];  evoked_trace_On_pos(1,2)=evoked_trace_Off_pos(2,2)-evoked_trace_Off_pos(1,4)-0.04;
+evoked_trace_On_pos(2,:) = [evoked_trace_Off_pos(1,1) , 0.5 , evoked_trace_Off_pos(1,3) , evoked_trace_Off_pos(2,4)]; evoked_trace_On_pos(2,2)=evoked_trace_On_pos(1,2)-evoked_trace_On_pos(2,4)-0.01;
 
 evoked_trace_Off2_pos(1,:) = [evoked_trace_Off_pos(1,1)+evoked_trace_Off_pos(1,3)+0.12 , evoked_trace_Off_pos(1,2) , evoked_trace_Off_pos(1,3) , evoked_trace_Off_pos(1,4)];
-evoked_trace_Off2_pos(2,:) = [evoked_trace_Off2_pos(1,1) , 0.5 ,evoked_trace_Off2_pos(1,3) ,evoked_trace_Off2_pos(1,4)]; evoked_trace_Off2_pos(2,2)=evoked_trace_Off2_pos(1,2)-evoked_trace_Off2_pos(2,4)-0.01;
-evoked_trace_On2_pos(1,:) = [evoked_trace_Off2_pos(1,1) , 0.5 , evoked_trace_Off2_pos(1,3) , evoked_trace_Off2_pos(1,4)];  evoked_trace_On2_pos(1,2)=evoked_trace_Off2_pos(2,2)-evoked_trace_Off2_pos(1,4)-0.01;
-evoked_trace_On2_pos(2,:) = [evoked_trace_Off2_pos(1,1) , 0.5 , evoked_trace_Off2_pos(1,3) , evoked_trace_Off2_pos(1,4)]; evoked_trace_On2_pos(2,2)=evoked_trace_On2_pos(1,2)-evoked_trace_On2_pos(2,4)-0.01;
+evoked_trace_Off2_pos(2,:) = [evoked_trace_Off2_pos(1,1) , 0.5 ,evoked_trace_Off2_pos(1,3) ,evoked_trace_Off_pos(2,4)]; evoked_trace_Off2_pos(2,2)=evoked_trace_Off2_pos(1,2)-evoked_trace_Off2_pos(2,4)-0.01;
+evoked_trace_On2_pos(1,:) = [evoked_trace_Off2_pos(1,1) , 0.5 , evoked_trace_Off2_pos(1,3) , evoked_trace_Off2_pos(1,4)];  evoked_trace_On2_pos(1,2)=evoked_trace_Off2_pos(2,2)-evoked_trace_Off2_pos(1,4)-0.04;
+evoked_trace_On2_pos(2,:) = [evoked_trace_Off2_pos(1,1) , 0.5 , evoked_trace_Off2_pos(1,3) , evoked_trace_Off_pos(2,4)]; evoked_trace_On2_pos(2,2)=evoked_trace_On2_pos(1,2)-evoked_trace_On2_pos(2,4)-0.01;
 
 vert_dim=0.1;
-SNR_pos(1,:) = [h_dist1-0.01 , evoked_trace_On_pos(2,2)-0.03, 0.12 , vert_dim];
-Modulation_index_pos(1,:) = [SNR_pos(1,1) , SNR_pos(1,2)+vert_dim+0.05 , 0.13 , vert_dim];
-Background_spikes_pos(1,:) = [SNR_pos(1,1) , SNR_pos(1,2)+vert_dim+0.05 , 0.13 , vert_dim];
-Response_modulation_pos(1,:) = [SNR_pos(1,1) , Modulation_index_pos(1,2)+vert_dim+0.05 , 0.13 , vert_dim];
+SNR_pos(1,:) = [h_dist1 , evoked_trace_On_pos(2,2)-0.02, 0.12 , vert_dim];
+Modulation_index_pos(1,:) = [SNR_pos(1,1) , SNR_pos(1,2)+vert_dim+0.05 , 0.12 , vert_dim];
+Background_spikes_pos(1,:) = [SNR_pos(1,1) , SNR_pos(1,2)+vert_dim+0.04 , 0.12 , vert_dim];
+Response_modulation_pos(1,:) = [SNR_pos(1,1) , Modulation_index_pos(1,2)+vert_dim+0.05 , 0.12 , vert_dim];
 
 %top positions
 PSD_depth3_pos_top = PSD_depth3_pos(1,2)+PSD_depth3_pos(1,4);
@@ -167,12 +168,12 @@ PSD_depth3_ax_copy = copyobj(PSD_depth3_ax,F); % copy axes to new fig
 set(PSD_depth3_ax_copy(2),'position',PSD_depth3_pos(1,:))
 set(F, 'currentaxes', PSD_depth3_ax_copy(2)); 
 PSD_depth3_ax_copy(2).FontSize=ax_fontsize;
+yl=ylabel('PSD (mV^2/Hz)'); xl=xlabel('Frequency (Hz)');
 set(gca,'tickdir','out'); %'yminortick','off'
 ticklen=fn_get_abs_ticklength(gca, abslen);
 %position legend:
 set(PSD_depth3_ax_copy(1),'position',[0.885 PSD_depth3_pos_top-0.025 0.08 0.05])
 PSD_depth3_ax_copy(1).FontSize=9;
-PSD_depth3_ax_copy(1).LineWidth=1.5;  
 %     for ix=1:length(PSD_depth3_ax_copy(1).String)
 %       str = PSD_depth3_ax_copy(1).String{ix};
 %       h = findobj(gcf,'DisplayName',str);
@@ -183,7 +184,7 @@ total_power_ax_copy = copyobj(total_power_ax,F); % copy axes to new fig
 set(total_power_ax_copy,'position',total_power_pos(1,:))
 total_power_ax_copy.FontSize=ax_fontsize;
 set(F, 'currentaxes', total_power_ax_copy); 
-tl=title({'Total Power'; ''},'fontweight','normal','fontsize',10);
+tl=title({'Total Power'; ''},'fontweight','normal','fontsize',10); yl=ylabel('PSD (mV^2/Hz)');
 set(gca,'ylim',[0 15e-3],'YTick',[0, 5e-3, 10e-3, 15e-3],'YTickLabel',[0, 5, 10, 15],'tickdir','out')
 ticklen=fn_get_abs_ticklength(gca, abslen);
 
@@ -230,10 +231,10 @@ annotation('textbox', [beta_pos(1,1)-0.009 beta_pos_top+0.035 0 0],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'WS', 'FontName','arial', 'fontsize', 9)
  annotation('textbox', [evoked_trace_Off2_pos(1,1)+0.095 evoked_trace_Off_pos_top+0.03 0 0],...
      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'WS', 'FontName','arial', 'fontsize', 9)
- annotation('textbox', [Response_modulation_pos(1,1)-0.01 Response_modulation_pos_top+0.035 0.2 0],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Evoked activity', 'FontName','arial', 'fontsize', 10)
- annotation('textbox', [Background_spikes_pos(1,1)-0.02 Background_spikes_pos_top+0.035 0.2 0],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Background activity', 'FontName','arial', 'fontsize', 10)
+ annotation('textbox', [Response_modulation_pos(1,1)+0.02 Response_modulation_pos_top+0.035 0.2 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Evoked', 'FontName','arial', 'fontsize', 10)
+ annotation('textbox', [Background_spikes_pos(1,1) Background_spikes_pos_top+0.035 0.2 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Background', 'FontName','arial', 'fontsize', 10)
  
  
  %PSTH
@@ -313,51 +314,51 @@ ticklen=fn_get_abs_ticklength(gca, abslen);
  for i=1:numel(haxlabels)
     set(haxlabels{i},'fontsize',ax_fontsize);
  end
-
+set(haxes(findax),'Ycolor',[0 0 0],'xcolor',[0 0 0],'linewidth',1.2); %set the axis color to black
  %  
- a_pos1=[0 -0.02 0.04 0.04];
+ a_pos1=[0 0.01 0.04 0.04];
  a_pos2=[-0.06 0 0.04 0.04];
  a_pos3=[0.4*traces_depth3_pos(1,3), -0.025, 0.5, 0.05];
- a_pos4=[-0.03, 0.02, 0.04, 0.04];
+ a_pos4=[-0.03, 0.04, 0.04, 0.04];
  
 
 %   annotation('textbox', [traces_depth3_pos(1,1) traces_depth3_pos_top 0 0]+a_pos3,...
 %      'FitHeightToText', 'on', 'edgecolor', 'none','string', 'Stimulation depth 5000 \mum', 'FontName','arial', 'fontsize', 12, 'fontweight', 'bold')
 %  
-if no_numbering_flag==1
-
- annotation('textbox', [NB_illustration_pos(1,1)+0.03 traces_depth3_pos_top 0 0]+a_pos1,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
- annotation('textbox', [NB_histology_pos(1,1) NB_histology_pos_top 0 0]+a_pos1,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
- annotation('textbox', [traces_depth3_pos(1,1)-0.04 traces_depth3_pos_top 0 0]+a_pos1,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')
- annotation('textbox', [PSD_depth3_pos(1,1) traces_depth3_pos_top+a_pos1(2) 0 0]+a_pos2,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')
- annotation('textbox', [total_power_pos(1,1)-0.02 total_power_pos_top 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
-annotation('textbox', [evoked_trace_Off_pos(1,1)-0.05 evoked_trace_Off_pos_top+0.025 0 0],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold')  
- annotation('textbox', [evoked_trace_On_pos(1,1)-0.05 evoked_trace_On_pos_top+0.025 0 0],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'G', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
-  annotation('textbox', [evoked_trace_Off2_pos(1,1)-0.05 evoked_trace_Off2_pos_top+0.025 0 0],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'H', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
-  annotation('textbox', [evoked_trace_On2_pos(1,1)-0.05 evoked_trace_On2_pos_top+0.025 0 0],...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'I', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
- annotation('textbox', [Response_modulation_pos(1,1)-0.01 Response_modulation_pos_top-0.01 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'J', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
- annotation('textbox', [Background_spikes_pos(1,1)-0.01 Background_spikes_pos_top-0.01 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'K', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
- annotation('textbox', [SNR_pos(1,1)-0.01 SNR_pos_top-0.01 0 0]+a_pos4,...
-     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'L', 'FontName','arial', 'fontsize', 10, 'fontweight', 'bold') 
+if no_numbering_flag==0
+ annotation('textbox', [0.01 traces_depth3_pos_top+0.05 0 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'A', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold') 
+ annotation('textbox', [0.01 total_power_pos_top+0.09 0 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'B', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold') 
+ annotation('textbox', [traces_depth3_pos(1,1)-0.04 traces_depth3_pos_top+0.05 0 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'C', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold')
+ annotation('textbox', [PSD_depth3_pos(1,1)-0.11 traces_depth3_pos_top+0.05 0 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'D', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold')
+ annotation('textbox', [total_power_pos(1,1)-0.09 total_power_pos_top+0.09 0 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'E', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold') 
+annotation('textbox', [evoked_trace_Off_pos(1,1)-0.1 evoked_trace_Off_pos_top+0.04 0 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'F', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold')  
+ annotation('textbox', [evoked_trace_On_pos(1,1)-0.1 evoked_trace_On_pos_top+0.04 0 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'G', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold') 
+  annotation('textbox', [evoked_trace_Off2_pos(1,1)-0.09 evoked_trace_Off2_pos_top+0.04 0 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'H', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold') 
+  annotation('textbox', [evoked_trace_On2_pos(1,1)-0.09 evoked_trace_On2_pos_top+0.04 0 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'I', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold') 
+ t10=annotation('textbox', [Response_modulation_pos(1,1)-0.09 Response_modulation_pos_top+0.04 0 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'J', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold'); 
+ annotation('textbox', [Background_spikes_pos(1,1)-0.09 Background_spikes_pos_top+0.04 0 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'K', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold') 
+ annotation('textbox', [SNR_pos(1,1)-0.09 SNR_pos_top+0.04 0 0],...
+     'FitHeightToText', 'on', 'edgecolor', 'none','string', 'L', 'FontName','arial', 'fontsize', letter_fontsize, 'fontweight', 'bold') 
 end
  
 %% 
     cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Figures\Paper Figures\Neuron'
 
 if save_flag==1;
-filename='Fig 1 LFP traces+PSD_1-100Hz+SNR_file28_v3';
+filename='Fig1_LFP_traces+PSD_1-100Hz+SNR_file28';
 saveas(F,filename,'fig'); 
 print(F,filename,'-dpng','-r600','-opengl') 
-print(F, '-depsc2', filename);
+print -depsc2 Fig1_LFP_traces+PSD_1-100Hz+SNR_file28
+% print(F, '-depsc2', filename);
 end

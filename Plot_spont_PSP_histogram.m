@@ -104,7 +104,7 @@ lpatch(2).FaceAlpha=0.3;
             set(e1,'Marker','o','MarkerSize',10,'MarkerFaceColor',color_table(1,:),'MarkerEdgeColor',color_table(1,:),'linewidth',2)
             set(e2,'Marker','o','MarkerSize',10,'MarkerFaceColor',color_table(2,:),'MarkerEdgeColor',color_table(2,:),'linewidth',2)
             set(gca,'xtick',[1,2],'xticklabel',legend_string);
-            ylabel('Amp. [mV]')
+            ylabel('Amp. (mV)')
 
         hold off
 %             pause

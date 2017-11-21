@@ -12,8 +12,29 @@
                 dt_airpuff = 1/sf_airpuff;
                 sf_galvano = Param.sf_galvano; %[1/sec]
                 dt_galvano = 1/sf_galvano;   
-    
-    current_data_filt=[]; Ch2_data_filt=[];
+                                 
+    current_data_filt=[]; Ch2_data_filt=[]; data_no_spike_no_DC=[];
+
+    %% Subtract mean trace from data with or without spikes
+if no_DC_flag==1;
+                meansubtract_start_time = 0; %[sec]
+                meansubtract_duration = 3; %[sec]
+    for t = 1:size(current_data,3);
+                 meansubtract_start_sample = meansubtract_start_time.*sf{channel};
+                if meansubtract_start_time==0
+                    meansubtract_start_sample = 1;
+                end
+                meansubtract_end_sample = meansubtract_start_sample+meansubtract_duration.*sf{channel}-1;
+                meansubtract_interval = round(meansubtract_start_sample:meansubtract_end_sample);
+      
+                data_no_spike_no_DC{channel}(:,:,t) = fn_Subtract_Mean(current_data(:,:,t),meansubtract_interval);
+%                 data_no_DC{channel}(:,:,x_value) = fn_Subtract_Mean(raw_data{channel}(:,:,x_value),meansubtract_interval);    
+    end
+end
+%%
+if no_DC_flag==1;
+    current_data=data_no_spike_no_DC{1}(:,:,:);
+end
 
 %% bandpass filtering to remove 50Hz noise from LFP and Vm.
 if BP50HzLFP_flag==1;

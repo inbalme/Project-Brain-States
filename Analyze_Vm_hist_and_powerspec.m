@@ -16,7 +16,7 @@ clear all
 close all
 global dt sf dt_galvano sf_galvano data data_no_spikes files Param raw_data current_data Ch2_data stim2_X stim1_X 
  global exp_type
-exp_type=1; %1-NBES, 2-ChAT
+exp_type=4; %1-NBES, 2-ChAT
 data_type='Vm'; %'LFP', 'Vm'
 trace_type_input=1; %
 analyze_time_before_train=0;
@@ -24,8 +24,9 @@ analyze_train_only_flag=0;
 analyze_hist_flag=1;
 analyze_powerspec_flag=0;
 save_flag= 1;
-print_flag=1;
+print_flag=0;
 norm_flag=0;
+no_DC_flag=1; %put 1 for exp_type=4
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
 BPLFP_flag=0; %filtering LFP. the default filter is the one used to filter LFP in the multiclamp
@@ -37,7 +38,7 @@ data_vec_all{1} = []; data_vec_all{2} = []; data_vec_residual_all{1} = []; data_
 %%
 switch exp_type
     case 1
-        files_to_analyze =46; %[46,52,58,62,72,75,84]; %[8,10,12,14,15,16,22,36,37,40,1,44,46,48,52,56,58,62,72,75,82,84]; %[46,52,58,62,72,75,84]; %one cell from each animal for LFP  
+        files_to_analyze =[8,10,12,14,15,16,22,37,40,1,46,48,52,58,72,82,84]; %[46,52,58,62,72,75,84]; %[8,10,12,14,15,16,22,36,37,40,1,44,46,48,52,56,58,62,72,75,82,84]; %[46,52,58,62,72,75,84]; %one cell from each animal for LFP  
         cd 'D:\Inbal M.Sc\Data PhD\NB-ES Data\Extracted Data';
         load NBES_Files_v2
         legend_string={'NB-', 'NB+'};
@@ -56,6 +57,16 @@ switch exp_type
         a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
         if a==0;
             mkdir(path_output);
+        end   
+     case 4
+        files_to_analyze =  [118,120,121,122,126,127,128,129]; %119
+        cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
+        load ChAT_Files_v3
+        legend_string={'Light Off', 'Light On'};
+        path_output= 'D:\Inbal M.Sc\Data PhD\ChAT Data\Figures\Vm Histograms and Powerspec_awake';
+        a = exist(path_output,'dir'); %a will be 1 if a folder "name" exists and 0 otherwise
+        if a==0;
+            mkdir(path_output);
         end        
 end
 
@@ -68,29 +79,34 @@ if analyze_hist_flag==1;
     cd(path)
     load(fname) 
    %%
-   Ch2_data= raw_data{3}./20; %dividing by the LFP gain           
+if exp_type~=4
+   Ch2_data= raw_data{3}./20; %dividing by the LFP gain        
+end
     current_data=data_no_spikes{channel};   %Ch2_data; %data_no_spikes{channel};    
     galvano_nstim = Param.facade(6);
     galvano_freq = Param.facade(7);
 
-data_preprocessing   
-
+    data_preprocessing       
+   
  if isempty(current_data_filt)
      current_data_filt=current_data;
  end
  
- clear color_table
+%%
+clear color_table
         whisker_stim_color(1,:)=[255 153 153]/256; %[239 188 86]/256;
         switch exp_type
             case 1 
                 color_table=[0 0 0; [216 22 22]/256;  [136 137 138]/256; [255 153 153]/256; [30,75,14]/256; [112,172,90]/256];  
             case 2
                 color_table=[0 0 0; [0 0 204]/256;  [136 137 138]/256; [102, 172,255]./256; [30,75,14]/256; [112,172,90]/256];  
+            case 4
+                color_table=[0 0 0; [0 0 204]/256;  [136 137 138]/256; [102, 172,255]./256; [30,75,14]/256; [112,172,90]/256];  
         end
  
 %% Vm histogram - for spontaneous and evoked activity
  for trace_type=  trace_type_input   %1 or 3 for spont., 2 for evoked
-     interval=[]; data_vec=[]; data_vec_residual=[]; data_vec_5traces=[]; data_vec_5traces_residual=[]; 
+     interval=[]; data_vec=[]; data_vec_residual=[]; data_vec_5traces=[]; data_vec_5traces_residual=[]; data_mat=[]; data_mat_median=[];
  intervals_to_analyze         
         %%
         binsize=1; %[mV];
@@ -105,7 +121,7 @@ data_preprocessing
             end
 %              nbin = 30;
              data_mat_median_m(fileind,:)=[mean(data_mat_median{1}(:,:)),mean(data_mat_median{2}(:,:))];
-             data_mat_median_std(fileind,:)=[std(data_mat_median{1}(:,:),0,1),std(data_mat_median{2}(:,:),0,1)];
+             data_mat_median_std(fileind,:)=[std(data_mat_median{1}(:,:),0,2),std(data_mat_median{2}(:,:),0,2)];
              data_vec_residual_median{trace_type}(fileind,:) = median(data_vec_residual);
              data_vec_5prctile{trace_type}(fileind,:)  = prctile(data_vec,5,1);
 %              data_vec_mean{trace_type}(fileind,:) = mean(data_vec,1);
@@ -115,7 +131,7 @@ data_preprocessing
             data_vec_residual_all{trace_type}=[data_vec_residual_all{trace_type}; data_vec_5traces_residual];
   switch trace_type
       case 1
-        ongoing(fileind).Vm_median=[data_mat_median{1}(fileind,:)',data_mat_median{2}(fileind,:)'];  
+        ongoing(fileind).Vm_median=[data_mat_median{1}(:,:)',data_mat_median{2}(:,:)'];  
         ongoing(fileind).Vm_median_m=mean(ongoing(fileind).Vm_median);
         ongoing(fileind).Vm_median_std=std(ongoing(fileind).Vm_median,0,1);
         
@@ -173,7 +189,6 @@ lpatch(1).FaceColor=color_table(1,:);
 lpatch(1).FaceAlpha=0.7;
 lpatch(2).FaceColor=color_table(2,:);
 lpatch(2).FaceAlpha=0.3;
-            
             %% plot the medians+ci on a separate figure
 %             switch exp_type
 %         case 1
@@ -240,8 +255,8 @@ lpatch(2).FaceAlpha=0.3;
   cd(path_output)
                     saveas(Fig1,['f' num2str(files_to_analyze(fileind)) '_Vm_histogram_', type_strng{trace_type},'.fig']) 
                     print(Fig1,['f' num2str(files_to_analyze(fileind)) '_Vm_histogram_', type_strng{trace_type}],'-dpng','-r600','-opengl') 
-                     saveas(Fig2,['f' num2str(files_to_analyze(fileind)) '_median_ci_', type_strng{trace_type},'.fig']) 
-                    print(Fig2,['f' num2str(files_to_analyze(fileind)) '_median_ci_', type_strng{trace_type}],'-dpng','-r600','-opengl') 
+%                      saveas(Fig2,['f' num2str(files_to_analyze(fileind)) '_median_ci_', type_strng{trace_type},'.fig']) 
+%                     print(Fig2,['f' num2str(files_to_analyze(fileind)) '_median_ci_', type_strng{trace_type}],'-dpng','-r600','-opengl') 
 %                     saveas(Fig2,['f' num2str(files_to_analyze(fileind)) '_Vm_histogram_residuals_',type_strng{trace_type},'.fig']) 
 %                     print(Fig2,['f' num2str(files_to_analyze(fileind)) '_Vm_histogram_residuals_', type_strng{trace_type}],'-dpng','-r600','-opengl') 
             end
@@ -383,7 +398,6 @@ lpatch(2).FaceAlpha=0.3;
 %         clear norm_Vm_CV_noES norm_Vm_CV_ES diff_val
   end
 %%   Plotting Vm median  
-if print_flag==1;
   for trace_type=trace_type_input;
 
 Vm_median_Y=hists_stat(trace_type).Vm_median';
@@ -420,7 +434,7 @@ hold off
 %         y1ticks = [0,0.5,1];
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 
-        ylabel('Median Vm [mV]', 'FontSize', 28,'fontname', 'arial');
+        ylabel('Median Vm (mV)', 'FontSize', 28,'fontname', 'arial');
         title([type_strng{trace_type},' activity n=' num2str(length(files_to_analyze)) ', p=' num2str(hists_stat(trace_type).wilcoxon_p_Vm_median)] ,'FontSize', 28,'fontname', 'arial');
   
         %% plotting Vm lower 5 percentile
@@ -471,7 +485,7 @@ hold off
 %         y1ticks = [0,0.5,1];
         set( gca, 'xlim', x1limits,'xtick', x1ticks, 'ylim', y1limits, 'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold', 'ylim', [-85,-25],
-        ylabel('lower 5th percentile [mV]', 'FontSize', 28,'fontname', 'arial');
+        ylabel('5%-ile (mV)', 'FontSize', 28,'fontname', 'arial');
         title([type_strng{trace_type},' activity n=' num2str(length(files_to_analyze)) ', p=' num2str(hists_stat(trace_type).wilcoxon_p_Vm_5prctile)] ,'FontSize', 28,'fontname', 'arial');
   
  %%        %save figures  
@@ -486,7 +500,7 @@ print(g2,fn2,'-dpng','-r600','-opengl')
  
  end
   end
-end
+
  cd(path_output)
 if save_flag==1;
    % filename='hists'; 
@@ -673,8 +687,8 @@ end
         set(gca,'xscale','log');
         set(gca,'yscale','log');
         set(gca,'fontsize',20, 'fontname', 'arial', 'box', 'off','linewidth',2, 'xtick',[1, 10,100],'ytick', y1tick,'yminortick','on') 
-         xlabel('Frequency [Hz]','fontsize',20, 'fontname', 'arial')
-        ylabel('PSD [mV^2/Hz]','fontsize',20, 'fontname', 'arial'); %Power spectral density
+         xlabel('Frequency (Hz)','fontsize',20, 'fontname', 'arial')
+        ylabel('PSD (mV^2/Hz)','fontsize',20, 'fontname', 'arial'); %Power spectral density
 l=legend([d1(1).mainLine d1(2).mainLine ],legend_string,'Location','northeast', 'box', 'off');
 l.LineWidth=1.5;
 l.FontSize=12;
