@@ -4879,9 +4879,9 @@ files(130).channel_EEG = 13;
 files(130).channel_laser = 8;                %optogenetic stimulation
 files(130).channel_whisk = 9;                %whisking sensor
 files(130).channel_treadmill = 11;                %treadmill sensor
-files(130).channel_stepping = 14;                %stepping sensor
-files(130).channel_pupil = 17;                %pupil monitor
-files(130).galvano = 1;
+files(130).channel_stepping = [];                %stepping sensor
+files(130).channel_pupil = [];                %pupil monitor
+files(130).galvano = [];
 files(130).comments =[];
 files(130).offset = [];                                                   %need to subtract the offset
 
@@ -4900,7 +4900,7 @@ files(131).electrode_resist = [];
 files(131).depth = [311];
 files(131).pr_whisker = [];
 files(131).adj_whisker = [];                                            
-files(131).headers = [3:7];
+files(131).headers = [4:9];
 files(131).protocol = 2;
 files(131).stim_type = 7;                        % 1=spont , 2=light alone, 3=puff alone, 4=puff+light, 5=galvano alone, 6=galvano+light, 7=protocol light only, 8=protocol galvano
 files(131).EEG_flag = 0;
@@ -4920,9 +4920,9 @@ files(131).channel_EEG = 13;
 files(131).channel_laser = 8;                %optogenetic stimulation
 files(131).channel_whisk = 9;                %whisking sensor
 files(131).channel_treadmill = 11;                %treadmill sensor
-files(131).channel_stepping = 14;                %stepping sensor
-files(131).channel_pupil = 17;                %pupil monitor
-files(131).galvano = 1;
+files(131).channel_stepping = [];                %stepping sensor
+files(131).channel_pupil = [];                %pupil monitor
+files(131).galvano = [];
 files(131).comments =[];
 files(131).offset = [];                                                   %need to subtract the offset
 

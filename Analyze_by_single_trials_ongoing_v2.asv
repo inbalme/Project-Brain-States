@@ -53,7 +53,7 @@ switch exp_type
                 mkdir(path_output);
             end 
         case 4
-        files_to_analyze = [119,121,122,126,127,128,129]; %119
+        files_to_analyze = 119; %[119,121,122,126,127,128,129]; %119
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light Off', 'Light On'};  y_ax_label={'Vm'}; y_ax_units={'mV'};    
@@ -202,13 +202,13 @@ set(gca,'ylim',[ydata(1), ydata(1)+yrange])
                      hold off
 %                 pause         
     if save_flag==1;
-        cd(path_output)
-        path_detection = [path_output,'\detection f',num2str(files_to_analyze(fileind))];
+        
+        path_detection = 
         a= exist(path_detection,'dir'); %a will be 7 if a folder "name" exists and 0 otherwise
             if a==0;
                 mkdir(path_detection);
             end
-        cd(path_detection)
+        cd(path_output)
          if t==1;
              filename1=['detection example - ongoing NB-, trace ', num2str(trace)];
             print(1,filename1,'-dpng','-r600','-opengl')

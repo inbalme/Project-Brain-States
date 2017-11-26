@@ -263,24 +263,6 @@ spont_Vm_5prcentile_ChAT_ax_copy.XTickLabel={'Off','On'};
 set(gca,'tickdir','out');
 ticklen=fn_get_abs_ticklength(gca, abslen);
 
-spont_event_freq_ChAT_ax_copy = copyobj(spont_event_freq_ChAT_ax,F); % copy axes to new fig
-set(spont_event_freq_ChAT_ax_copy,'position',spont_event_freq_ChAT_pos(1,:))
-set(F, 'currentaxes', spont_event_freq_ChAT_ax_copy);  xl=xlabel('');  tl=title('');
-yl=ylabel('Freq. (Hz)');
-spont_event_freq_ChAT_ax_copy.FontSize=ax_fontsize;
-spont_event_freq_ChAT_ax_copy.XTickLabel={'Off','On'};
-set(gca,'tickdir','out');
-ticklen=fn_get_abs_ticklength(gca, abslen);
-
-  spont_event_amp_ChAT_ax_copy = copyobj(spont_event_amp_ChAT_ax,F); % copy axes to new fig
-set(spont_event_amp_ChAT_ax_copy,'position',spont_event_amp_ChAT_pos(1,:))
-set(F, 'currentaxes', spont_event_amp_ChAT_ax_copy);  xl=xlabel('');  tl=title(''); 
-yl=ylabel('Amp. (mV)');
-spont_event_amp_ChAT_ax_copy.FontSize=ax_fontsize;
-spont_event_amp_ChAT_ax_copy.XTickLabel={'Off','On'};
-set(gca,'tickdir','out');
-ticklen=fn_get_abs_ticklength(gca, abslen);
-
 % spont_Rin_ChAT_ax_copy = copyobj(spont_Rin_ChAT_ax,F); % copy axes to new fig
 % set(spont_Rin_ChAT_ax_copy,'position',spont_Rin_ChAT_pos(1,:))
 % set(F, 'currentaxes', spont_Rin_ChAT_ax_copy);   tl=title(''); 

@@ -9,8 +9,9 @@ data_type='Vm'; %'LFP', 'Vm'
 save_flag= 0;
 print_flag=1;
 no_DC_flag=1;
-plot_trace=[7,35,36]; %f129 [12,9,8]; f121 [7,35,36]
-choose_traces=[]; %[1:30]; %if choose_traces is empty the script takes all traces for analysis. If it is not empty the script takes the specified traces.
+lWidth=1;
+plot_trace=[12,9,8]; %f129 [12,9,8]; f121 [7,35,36]; f130 [31,35,38]
+choose_traces=[1:37]; %[1:37]; %if choose_traces is empty the script takes all traces for analysis. If it is not empty the script takes the specified traces.
 clamp_flag=[]; %[]; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 % short_flag=0; %1- short trace, 0- long trace
 baseline_flag=0; %adding dashed line under traces
@@ -22,9 +23,9 @@ BPLFP_flag=0; %filtering LFP. the default filter is the one used to filter LFP i
 bp_manual_LFP=[]; %[1,200]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
 BPVm_flag=1; %filtering LFP and Vm same as LFP was filtered in the multiclamp
 bp_manual_Vm=[0,1000]; %if bp_manual=[] the default would be to take bp_filt from Param (the filter used for LFP in the multiclamp)
-lengthh_vert=[1,2,10; 1,2,10];%[2,5,10; 2,5,10]; %[0.1,0.1,0.5];%f46:[2,5,10; 2,5,10]; f80,f127:[1,2,10; 1,2,10] %lengthh_vert(1) is for STD, lengthh_vert(2) is for mean and (3) is for traces. row 1 spont. row 2 evoked
+lengthh_vert=[2,5,20; 2,5,20];%[2,5,10; 2,5,10]; %[0.1,0.1,0.5];%f46:[2,5,10; 2,5,10]; f80, f121:[2,5,20; 2,5,20], f127:[1,2,10; 1,2,10]; f130 [2,2,20; 2,2,10] %lengthh_vert(1) is for STD, lengthh_vert(2) is for mean and (3) is for traces. row 1 spont. row 2 evoked
 trace_ind =[3,5,7,8,10]; %[2,3,4,5,6];%[2,3,4,5,6]; %if trace_ind is empty, the default would be to take all traces
-DC_factor =20; %12; %sets the spacing between plotted traces. set DC_factor=1 for LFP [f44 13; f46 16] [f80 9; f74 12; f127 20; f126 30; 128 8] 
+DC_factor =20; %12; %sets the spacing between plotted traces. set DC_factor=1 for LFP [f44 13; f46 16] [f80 9; f74 12; f121 20; f127 20; f126 30; 128 8; 130 60] 
  %% set the path for saving figures and variables
 % if BP50HzLFP_flag==1 && BP50HzVm_flag==1 && BPVm_flag==1 && BPLFP_flag==1
 %     path_output=['LFP_50Hz+BP Vm_ 50Hz+BP\BP',num2str(bp_manual_Vm(1)),'-',num2str(bp_manual_Vm(2))];
@@ -77,7 +78,7 @@ switch exp_type
       end 
 
     case 2
-        files_to_analyze =121; %129; %[74,76,77,80,82,84,87,90,92,112,114,115]; [94,96,98,101] [118,119,120,121,122,126,127,128,129]
+        files_to_analyze =121; %129; %[74,76,77,80,82,84,87,90,92,112,114,115]; [94,96,98,101] [118,120,121,122,126,127,128,129]
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light Off', 'Light On'};    y_ax_label={'Vm'}; y_ax_units={'mV'}; 
@@ -342,17 +343,8 @@ horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,
 %         [b3,b4] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);    
     hold off
     set(gca, 'visible', 'off') ;
-    
-%%
-
-cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016\2017-10-16-001-H4-7-vid';
-%get the pupil vectors for file 121 traces [7,35,36]
-load 2017-10-16-001-2-7
-pupil_mat(:,1)=Pupilsize;
-load 2017-10-16-001-4-5
-pupil_mat(:,2)=Pupilsize;
-load 2017-10-16-001-4-6
-pupil_mat(:,3)=Pupilsize;
+ 
+%% plotting Vm and whisk signal, 3 traces each.
 
 pair1=figure;
 ymax=max([plot_data_Vm(:,plot_trace),plot_data_Vm(:,plot_trace)]);
@@ -363,18 +355,16 @@ ymaxwhisk=max([plot_data_whisk(:,plot_trace),plot_data_whisk(:,plot_trace)]);
 yminwhisk=min([plot_data_whisk(:,plot_trace),plot_data_whisk(:,plot_trace)]);
 ydiffwhisk=ymaxwhisk-yminwhisk;
 yrangewhisk=ceil(max(ydiffwhisk));
-ymaxpupil=max([pupil_mat,pupil_mat(:,plot_trace)]);
-yminpupil=min([pupil_mat,pupil_mat]);
-ydiffpupil=ymaxpupil-yminpupil;
-yrangepupil=ceil(max(ydiffpupil));
 
 for tr_ind=1:length(plot_trace)
-subplot(3*length(plot_trace),1,3*tr_ind-2)     
+subplot(2*length(plot_trace),1,2*tr_ind-1)     
     hold on
 %         p1=plot(interval_plot(:,1).*dt*1000,plot_data_Vm{1}(:,plot_trace(tr_ind)), 'color',color_table(1,:),'LineWidth',1.5);
-       htrace1=plot([segment1*dt, segment2*dt],plot_data_Vm(segment1(1):segment2(end),plot_trace(tr_ind)), 'LineWidth',1.2,'color', color_table(1,:));
-       rec1=rectangle('Position',[segment1(1,1)*dt,plot_data_Vm(segment1(1,1)),0.1,0.1]);
-        rec2=rectangle('Position',[segment1(1,1)*dt,plot_data_Vm(segment1(1,1)),0.1,0.1]);
+        htrace1=plot(segment1*dt,plot_data_Vm(segment1,plot_trace(tr_ind)), 'LineWidth',1,'color', color_table(1,:));
+        htrace12=plot(segment2*dt,plot_data_Vm(segment2,plot_trace(tr_ind)), 'LineWidth',1,'color', color_table(2,:));
+%        htrace1=plot([segment1*dt, segment2*dt],plot_data_Vm(segment1(1):segment2(end),plot_trace(tr_ind)), 'LineWidth',1,'color', color_table(1,:));
+%        rec1=rectangle('Position',[segment1(1,1)*dt,plot_data_Vm(segment1(1,1)),0.1,0.1]);
+%         rec2=rectangle('Position',[segment1(1,1)*dt,plot_data_Vm(segment1(1,1)),0.1,0.1]);
    
         axis tight
      ylim_data=[get(gca,'ylim')]';
@@ -382,9 +372,9 @@ subplot(3*length(plot_trace),1,3*tr_ind-2)
      xlim_data=[get(gca,'xlim')]';
   set(gca,'ylim',ylim_data, 'xlim',xlim_data)  
 
-  set(rec1,'Position',[x_axis_Sshort(1,1)*dt,ylim_data(1),(x_axis_Sshort(1,end)-x_axis_Sshort(1,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
-set(rec2,'Position',[x_axis_Sshort(2,1)*dt,ylim_data(1),(x_axis_Sshort(2,end)-x_axis_Sshort(2,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
-uistack(htrace1,'top');
+%   set(rec1,'Position',[x_axis_Sshort(1,1)*dt,ylim_data(1),(x_axis_Sshort(1,end)-x_axis_Sshort(1,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
+% set(rec2,'Position',[x_axis_Sshort(2,1)*dt,ylim_data(1),(x_axis_Sshort(2,end)-x_axis_Sshort(2,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
+uistack(htrace1,'top'); uistack(htrace12,'top');
 
  if tr_ind==1;
     switch exp_type
@@ -402,18 +392,22 @@ uistack(htrace1,'top');
   %plotting scale bar
 horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=0.03; perc2=[];
         [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
- horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=0.03; perc2=[];
+horiz_vert=0;        lengthh=lengthh_vert(1,3);     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=0.03; perc2=[];
         [b3,b4] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
-         if tr_ind~=length(plot_trace)-1;
+
+         if tr_ind~=2;
              delete(b1); delete(b2); delete(b3); delete(b4);
+         else
+             delete(b1); delete(b2); 
         end
     hold off
+    
 %     uistack(htrace1,'top');
     set(gca, 'visible', 'off') ;
 
-    subplot(3*length(plot_trace),1,3*tr_ind-1) 
+    subplot(2*length(plot_trace),1,2*tr_ind) 
  	hold on
-        htrace2=plot([segment1*dt, segment2*dt],plot_data_whisk(segment1(1):segment2(end),plot_trace(tr_ind)), 'LineWidth',1.2,'color', color_table(3,:));
+        htrace2=plot([segment1*dt, segment2*dt],plot_data_whisk(segment1(1):segment2(end),plot_trace(tr_ind)), 'LineWidth',1,'color', color_table(3,:));
         
         axis tight            
      ylim_data=[get(gca,'ylim')]';
@@ -423,58 +417,166 @@ horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,
      set(gca,'ylim',ylim_data, 'xlim',xlim_data)  
               
      %plotting scale bar
-             horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=[]; perc2=[];
+             horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=[]; perc2=[];
                 [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
-             horiz_vert=0;        lengthh=1;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=[]; perc2=[];
+             horiz_vert=0;        lengthh=50;     textit=[num2str(lengthh), ' a.u.'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=[]; perc2=[];
                 [b3,b4] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
-           delete(b1); delete(b2); 
-         if tr_ind~=length(plot_trace);
+ if tr_ind~=2;
+             delete(b1); delete(b2); delete(b3); delete(b4);
+         else
              delete(b3); delete(b4); 
         end
+            %delete(b3); delete(b4); delete(b1); delete(b2);
+%          if tr_ind~=length(plot_trace);
+%              delete(b3); delete(b4); 
+%         end
     hold off  
-    set(gca, 'visible', 'off') ;
-    
-  subplot(3*length(plot_trace),1,3*tr_ind) 
- 	hold on
-        htrace3=plot([segment1*dt, segment2*dt],pupil_mat(:,plot_trace(tr_ind)), 'LineWidth',1.2,'color', color_table(3,:));
-        
-        axis tight            
-     ylim_data=[get(gca,'ylim')]';
-     ylim_data(1)=ylim_data(2)-yrangewhisk;   
-     xlim_data=[get(gca,'xlim')]';
-     ylim_data(2)=ylim_data(2)+(0.1).*yrangewhisk; 
-     set(gca,'ylim',ylim_data, 'xlim',xlim_data)  
-              
-     %plotting scale bar
-             horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=[]; perc2=[];
-                [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
-             horiz_vert=0;        lengthh=1;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=[]; perc2=[];
-                [b3,b4] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
-           delete(b1); delete(b2); 
-         if tr_ind~=length(plot_trace);
-             delete(b3); delete(b4); 
-        end
-    hold off  
-    set(gca, 'visible', 'off') ;
-
-    
-
+    set(gca, 'visible', 'off') ; 
 end
 %         line1=findall(gcf,'type','line');
 %         linexdata=get(line1(8),'xdata');
 %         set(line1(8),'xdata',linexdata-0.3);
 %         set(line1(1),'xdata',linexdata-0.3);
-    title('Vm-whisk single trace ES Off','FontSize', 16); 
+    title('Vm-whisk single trace','FontSize', 16); 
     ylabel('Potential (mV)' ,'FontSize', 14); xlabel('Time (s)','FontSize', 14)
-l=legend([htrace1,htrace2],{'Vm','Whisk'}, 'box', 'off','position',[0.8,0.85,0.2,0.1]); 
+l=legend([htrace1,htrace12,htrace2],{'Vm light off','Vm light on','Whisk'}, 'box', 'off','position',[0.8,0.85,0.2,0.1]); 
     l.FontSize=11;
 
 if save_flag==1;    
             cd(path_output1)
-         filename1= ['f' num2str(files_to_analyze(fileind)) '_VmWhisk_traces_x1'];
-        saveas(pair1,filename1,'fig') 
-        print(pair1,filename1,'-dpng','-r600','-opengl') 
+         filename= ['f' num2str(files_to_analyze(fileind)) '_VmWhisk_traces_x1'];
+        saveas(pair1,filename,'fig') 
+        print(pair1,filename,'-dpng','-r600','-opengl') 
 end
+%% plotting Vm, whisk signal and pupil size, 3 traces each.
+
+% cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016\2017-10-16-001-H4-7-vid';
+% %get the pupil vectors for file 121 traces [7,35,36]
+% load 2017-10-16-001-2-7
+% pupil_mat(:,1)=Pupilsize;
+% load 2017-10-16-001-4-5
+% pupil_mat(:,2)=Pupilsize;
+% load 2017-10-16-001-4-6
+% pupil_mat(:,3)=Pupilsize;
+% 
+% pair1=figure;
+% ymax=max([plot_data_Vm(:,plot_trace),plot_data_Vm(:,plot_trace)]);
+% ymin=min([plot_data_Vm(:,plot_trace),plot_data_Vm(:,plot_trace)]);
+% ydiff=ymax-ymin;
+% yrange=ceil(1.2*max(ydiff));
+% ymaxwhisk=max([plot_data_whisk(:,plot_trace),plot_data_whisk(:,plot_trace)]);
+% yminwhisk=min([plot_data_whisk(:,plot_trace),plot_data_whisk(:,plot_trace)]);
+% ydiffwhisk=ymaxwhisk-yminwhisk;
+% yrangewhisk=ceil(max(ydiffwhisk));
+% ymaxpupil=max([pupil_mat,pupil_mat]);
+% yminpupil=min([pupil_mat,pupil_mat]);
+% ydiffpupil=ymaxpupil-yminpupil;
+% yrangepupil=ceil(max(ydiffpupil));
+% 
+% for tr_ind=1:length(plot_trace)
+% subplot(3*length(plot_trace),1,3*tr_ind-2)     
+%     hold on
+% %         p1=plot(interval_plot(:,1).*dt*1000,plot_data_Vm{1}(:,plot_trace(tr_ind)), 'color',color_table(1,:),'LineWidth',1.5);
+%        htrace1=plot([segment1*dt, segment2*dt],plot_data_Vm(segment1(1):segment2(end),plot_trace(tr_ind)), 'LineWidth',1.2,'color', color_table(1,:));
+%        rec1=rectangle('Position',[segment1(1,1)*dt,plot_data_Vm(segment1(1,1)),0.1,0.1]);
+%         rec2=rectangle('Position',[segment1(1,1)*dt,plot_data_Vm(segment1(1,1)),0.1,0.1]);
+%    
+%         axis tight
+%      ylim_data=[get(gca,'ylim')]';
+%      ylim_data(2)=ylim_data(1)+(1.1).*yrange;
+%      xlim_data=[get(gca,'xlim')]';
+%   set(gca,'ylim',ylim_data, 'xlim',xlim_data)  
+% 
+%   set(rec1,'Position',[x_axis_Sshort(1,1)*dt,ylim_data(1),(x_axis_Sshort(1,end)-x_axis_Sshort(1,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
+% set(rec2,'Position',[x_axis_Sshort(2,1)*dt,ylim_data(1),(x_axis_Sshort(2,end)-x_axis_Sshort(2,1))*dt,ylim_data(2)-ylim_data(1)],'FaceColor',rectangle_color, 'edgecolor','none');
+% uistack(htrace1,'top');
+% 
+%  if tr_ind==1;
+%     switch exp_type
+%     case 1
+%         rec3=rectangle('Position',[stim1_X{1}(1)*dt-0.005,ylim_data(1),(stim1_X{1}(2)-stim1_X{1}(1))*dt+0.005,ylim_data(2)-ylim_data(1)],'faceColor',color_table(3,:),'edgecolor','none');
+%     case 2
+% %         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
+%         stim1_Y = ones(size(stim1_X{1})).*ylim_data(2); 
+%         line(stim1_X{1}.*dt,stim1_Y,'LineWidth',3,'Color','b') 
+%     case 3
+%         rec3=rectangle('Position',[stim1_X{1}(1)*dt-0.005,ylim_data(1),(stim1_X{1}(2)-stim1_X{1}(1))*dt+0.005,ylim_data(2)-ylim_data(1)],'faceColor',color_table(3,:),'edgecolor','none');
+%     end
+%  end
+%      
+%   %plotting scale bar
+% horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=0.03; perc2=[];
+%         [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+%  horiz_vert=0;        lengthh=10;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=0.03; perc2=[];
+%         [b3,b4] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+%          if tr_ind~=length(plot_trace)-1;
+%              delete(b1); delete(b2); delete(b3); delete(b4);
+%         end
+%     hold off
+% %     uistack(htrace1,'top');
+%     set(gca, 'visible', 'off') ;
+% 
+%     subplot(3*length(plot_trace),1,3*tr_ind-1) 
+%  	hold on
+%         htrace2=plot([segment1*dt, segment2*dt],plot_data_whisk(segment1(1):segment2(end),plot_trace(tr_ind)), 'LineWidth',1.2,'color', color_table(3,:));
+%         
+%         axis tight            
+%      ylim_data=[get(gca,'ylim')]';
+%      ylim_data(1)=ylim_data(2)-yrangewhisk;   
+%      xlim_data=[get(gca,'xlim')]';
+%      ylim_data(2)=ylim_data(2)+(0.1).*yrangewhisk; 
+%      set(gca,'ylim',ylim_data, 'xlim',xlim_data)  
+%               
+%      %plotting scale bar
+%              horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=[]; perc2=[];
+%                 [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+%              horiz_vert=0;        lengthh=1;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=[]; perc2=[];
+%                 [b3,b4] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+%            delete(b1); delete(b2); delete(b3); delete(b4); 
+% %          if tr_ind~=length(plot_trace);
+% %              delete(b3); delete(b4); 
+% %         end
+%     hold off  
+%     set(gca, 'visible', 'off') ;
+%     
+%   subplot(3*length(plot_trace),1,3*tr_ind) 
+%  	hold on
+%         htrace3=plot([segment1*dt, segment2*dt],pupil_mat(:,tr_ind), 'LineWidth',1.2);
+%         
+%         axis tight            
+%      ylim_data=[get(gca,'ylim')]';
+%      ylim_data(1)=ylim_data(2)-yrangepupil;   
+%      xlim_data=[get(gca,'xlim')]';
+%      ylim_data(2)=ylim_data(2)+(0.1).*yrangepupil; 
+%      set(gca,'ylim',ylim_data, 'xlim',xlim_data)  
+%               
+%      %plotting scale bar
+%              horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' mS'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=[]; perc2=[];
+%                 [b1,b2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+%              horiz_vert=0;        lengthh=1;     textit=[num2str(lengthh), ' mV'];     c=[0,0,0];  fonsizes=scalebar_fontsize; %perc1=[]; perc2=[];
+%                 [b3,b4] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
+%            delete(b1); delete(b2); delete(b3); delete(b4); 
+% %          if tr_ind~=length(plot_trace);
+% %              delete(b3); delete(b4); 
+% %         end
+%     hold off  
+%     set(gca, 'visible', 'off') ;
+% end
+% %         line1=findall(gcf,'type','line');
+% %         linexdata=get(line1(8),'xdata');
+% %         set(line1(8),'xdata',linexdata-0.3);
+% %         set(line1(1),'xdata',linexdata-0.3);
+%     title('Vm-whisk single trace','FontSize', 16); 
+%     ylabel('Potential (mV)' ,'FontSize', 14); xlabel('Time (s)','FontSize', 14)
+% l=legend([htrace1,htrace2,htrace3],{'Vm','Whisk','Pupil'}, 'box', 'off','position',[0.8,0.85,0.2,0.1]); 
+%     l.FontSize=11;
+% 
+% if save_flag==1;    
+%             cd(path_output1)
+%          filename1= ['f' num2str(files_to_analyze(fileind)) '_VmWhiskPupil_traces_x1'];
+%         saveas(pair1,filename1,'fig') 
+%         print(pair1,filename1,'-dpng','-r600','-opengl') 
+% end
   %% spontaneous figures    
             %plot spont traces long:
     trace_to_plot = bsxfun(@plus,plot_data(:,trace_ind,1),DC); %DC is added just to make space between the traces 
@@ -483,8 +585,8 @@ end
         hold on
         rec1=rectangle('Position',[segment1(1,1)*dt,trace_to_plot(segment1(1,1)),0.1,0.1]);
         rec2=rectangle('Position',[segment1(1,1)*dt,trace_to_plot(segment1(1,1)),0.1,0.1]);
-htrace1=plot(segment1*dt,trace_to_plot(segment1,:,:), 'LineWidth',1.2,'color', color_table(1,:));
-htrace2=plot(segment2*dt,trace_to_plot(segment2,:,:), 'LineWidth',1.2,'color', color_table(2,:));
+htrace1=plot(segment1*dt,trace_to_plot(segment1,:,:), 'LineWidth',1,'color', color_table(1,:));
+htrace2=plot(segment2*dt,trace_to_plot(segment2,:,:), 'LineWidth',1,'color', color_table(2,:));
 %     text(x_axis_Slong(1)*dt,trace_to_plot(x_axis_Slong(1),1),[num2str(floor(plot_data(x_axis_Slong(1),1,1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
 % for i=1:length(trace_ind); %adding the voltage value of the first data point to the left of the trace
 %     text(x_axis_Slong(1)*dt,trace_to_plot(x_axis_Slong(1),i),[num2str(floor(plot_data(x_axis_Slong(1),i,1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
@@ -507,7 +609,7 @@ end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 
         %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];  c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];  c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=lengthh_vert(1,3);     textit=[num2str(lengthh),y_ax_units{1}];  c=[0,0,0];  fonsizes=scalebar_fontsize; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -519,8 +621,8 @@ set(gca, 'visible', 'off') ;
         hold on
        rec1=rectangle('Position',[segment1(1,1)*dt,plot_data_mean(segment1(1,1)),0.1,0.1]);
          rec2=rectangle('Position',[segment1(1,1)*dt,plot_data_mean(segment1(1,1)),0.1,0.1]);
-htrace1=plot(segment1*dt,plot_data_mean(segment1,:,1), 'LineWidth',1.2,'color', color_table(1,:));
-htrace2=plot(segment2*dt,plot_data_mean(segment2,:,1), 'LineWidth',1.2,'color', color_table(2,:));
+htrace1=plot(segment1*dt,plot_data_mean(segment1,:,1), 'LineWidth',1,'color', color_table(1,:));
+htrace2=plot(segment2*dt,plot_data_mean(segment2,:,1), 'LineWidth',1,'color', color_table(2,:));
 % htrace1=plot(x_axis_Slong*dt,plot_data_mean(x_axis_Slong,:,1), 'LineWidth',1.2,'color', color_table(1,:));
 % text(x_axis_Slong(1)*dt,plot_data_mean(x_axis_Slong(1),1,1),[num2str(floor(plot_data_mean(x_axis_Slong(1),1,1))), ' mV '],'HorizontalAlignment','right','fontsize',trace_fontsize,'fontname','arial')
 axis tight
@@ -541,7 +643,7 @@ switch exp_type
 end
 set(gca,'color',[1 1 1],'xticklabel',[],'yticklabel',[],'xtick',[], 'ytick',[],'xlim',xlim_data)
 % %plotting scale bar
-horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' S'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
+horiz_vert=1;        lengthh=1;     textit=[num2str(lengthh), ' s'];     c=[0,0,0];  fonsizes=12; perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
  horiz_vert=0;        lengthh=lengthh_vert(1,2);     textit=[num2str(lengthh),y_ax_units{1}];     c=[0,0,0];  fonsizes=12;perc1=[]; perc2=[];
         [p1,p2] = fn_makeCalibBar2(horiz_vert,lengthh,textit,c,fonsizes,perc1,perc2);
@@ -553,7 +655,7 @@ l.FontSize=11;
 for ix=1:length(l.String)
   str = l.String{ix};
   h = findobj(gcf,'DisplayName',str);
-  h.LineWidth =1.5;
+  h.LineWidth =lWidth;
 end
 %%
 %plot std trace
@@ -561,8 +663,8 @@ end
         hold on
         rec1=rectangle('Position',[segment1(1,1)*dt,plot_data_std(segment1(1,1),1,1),0.1,0.1]);
          rec2=rectangle('Position',[segment1(1,1)*dt,plot_data_std(segment1(1,1)),0.1,0.1]);
-htrace1=plot(segment1*dt,plot_data_std(segment1,:,1), 'LineWidth',1.2,'color', color_table(1,:));
-htrace2=plot(segment2*dt,plot_data_std(segment2,:,1), 'LineWidth',1.2,'color', color_table(2,:));
+htrace1=plot(segment1*dt,plot_data_std(segment1,:,1), 'LineWidth',1,'color', color_table(1,:));
+htrace2=plot(segment2*dt,plot_data_std(segment2,:,1), 'LineWidth',1,'color', color_table(2,:));
 % htrace1=plot(x_axis_Slong*dt,plot_data_std(x_axis_Slong,:,1), 'LineWidth',1.2,'color', color_table(1,:));
 
 axis tight

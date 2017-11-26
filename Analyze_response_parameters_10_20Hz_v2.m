@@ -23,7 +23,7 @@ analyze_train_only_flag=1;
 save_flag=1;
 print_flag=1;
 norm_flag=0;
-no_DC_flag=1;
+no_DC_flag=0;
 clamp_flag=3; %3; %clamp_flag=1 for hyperpolarization traces, clamp_flag=2 for depolarization traces and clamp_flag=3 for no current traces (only clamp to resting Vm)
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
 BP50HzVm_flag=1; %removing 50Hz noise from Vm signal
@@ -219,7 +219,7 @@ end
          start_sample(:,t) = ceil(start_time(t).*sf{1}); 
          end_sample(:,t) = ceil(start_sample(:,t)+duration.*sf{1})-1;
          interval_spont(:,t) = start_sample(:,t):end_sample(:,t);    
-% from intervals to analyze
+% 
                 Vm_spont(:,:,t) = current_data(interval_spont(:,t),:,1);
                 VmM(:,t) =mean(mean(Vm_spont(:,:,t),2));
                 VmSTD(:,t) = mean(std(Vm_spont(:,:,t),0,2)); %mean std across traces (trial-to-trial)
@@ -2038,10 +2038,14 @@ end
     j3=figure;     
     %option 1: paired-plot (lines)
     stim_num=1;
-    tmp_Y= peaks_stat(stim_num).VmM';
+    tmp_Y= (peaks_stat(stim_num).VmM');
+     if exp_type==4
+        tmp_Y= (peaks_stat(stim_num).VmM');
+     end
 tmp_X(1,:)=ones(1,size(tmp_Y,2));
 tmp_X(2,:)=2*ones(1,size(tmp_Y,2));
-E = peaks_stat(stim_num).VmM_std;
+E=std(tmp_Y');
+% E = peaks_stat(stim_num).VmM_std;
 VmM_p=peaks_stat(stim_num).wilcoxon_p_VmM;
  if VmM_p >0.05 
     asterisk_before='n.s.';
@@ -2076,14 +2080,14 @@ hold off
             case 2
                 y1limits = [-70 -45];
             case 4
-                y1limits = [-10 5];
+                y1limits = [-75 -40];
         end
 %         y1ticks = [0,0.5,1];
         set( gca, 'xlim', x1limits,'xtick', x1ticks,'ylim', y1limits,'fontsize',28,'linewidth',1,...
         'ticklength', [0.010 0.010],'fontname', 'arial','xticklabel',legend_string ,'box', 'off'); %'fontweight', 'bold',  
         ylabel('Vm mean [mV]', 'FontSize', 28,'fontname', 'arial');
         title(['VmM spontaneous,  p=' num2str(VmM_p)] ,'FontSize', 20,'fontname', 'arial');
-    % option 2: bar-plot
+   %%  option 2: bar-plot
 %     nstim=1;
 %     hold on
 %         errbar_h1=errorbar(1-0.15,nanmean([peaks_stat(stim_num).pre_response_M(:,1)],1), nanstd([peaks_stat(stim_num).pre_response_M(:,1)],0,1),'.k', 'LineWidth',1.5,'marker','none'); %'markerfacecolor','k'
@@ -2322,7 +2326,7 @@ hold off
             case 2
                 y1limits = [0 7];
             case 4
-                y1limits = [0 8];
+                y1limits = [0 30];
         end
 %         y1ticks = [0,0.5,1];
         set( gca, 'xlim', x1limits,'xtick', x1ticks, 'ylim', y1limits,'fontsize',28,'linewidth',1,...

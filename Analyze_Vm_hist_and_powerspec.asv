@@ -23,8 +23,8 @@ analyze_time_before_train=0;
 analyze_train_only_flag=0;
 analyze_hist_flag=1;
 analyze_powerspec_flag=0;
-save_flag=0;
-print_flag=1;
+save_flag= 0;
+print_flag=0;
 norm_flag=0;
 no_DC_flag=0; %put 1 for exp_type=4
 BP50HzLFP_flag=1; %removing 50Hz noise from LFP signal
@@ -59,7 +59,7 @@ switch exp_type
             mkdir(path_output);
         end   
      case 4
-        files_to_analyze =  129; %[118,121,122,126,127,128,129]; %119, 120
+        files_to_analyze =  [118,121,122,126,127,128,129]; %119, 120
         cd 'D:\Inbal M.Sc\Data PhD\ChAT Data\Extracted Data 2016';
         load ChAT_Files_v3
         legend_string={'Light Off', 'Light On'};
@@ -108,7 +108,8 @@ clear color_table
  for trace_type=  trace_type_input   %1 or 3 for spont., 2 for evoked
      interval=[]; data_vec=[]; data_vec_residual=[]; data_vec_5traces=[]; data_vec_5traces_residual=[]; data_mat=[]; data_mat_median=[];
  intervals_to_analyze   
-
+ if files_to_analyze(fileind)==3
+     current_data_filt=current_data_filt
         %%
         binsize=1; %[mV];
         for t=1:size(interval,2);
